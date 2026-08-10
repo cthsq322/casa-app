@@ -49,6 +49,9 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 .count{color:var(--soft);font-size:14px;padding:12px 0 6px}
 #mapbox{display:none;height:68vh;min-height:340px;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:10px 0 4px;background:var(--card)}
 #mapbox.on{display:block}
+.stoppin span{display:flex;align-items:center;justify-content:center;
+ width:30px;height:30px;border-radius:50%;color:#fff;font:700 14px/1 -apple-system,sans-serif;
+ border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)}
 .leaflet-popup-content{margin:11px 13px;font:14px/1.45 -apple-system,sans-serif}
 .pp b{font-size:15px}
 .pp a{color:var(--accent);text-decoration:none;display:inline-block;margin-top:5px}
@@ -446,7 +449,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-1747-b8fe2ea';
+const BUILD='20260810-1758-77278cf';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -836,7 +839,8 @@ function renderRota(){
 }
 
 
-var MAP=null, LAYER=null, LEAFLET=false;
+var MAP=null, LAYER=null, ROUTE=null, LEAFLET=false;
+var DAY_COLOURS=['#c25a2b','#2e6b4f','#7b3fb5','#1f6f8b','#8a6d1f'];
 function loadLeaflet(cb){
   if(LEAFLET) return cb();
   var css=document.createElement('link');
@@ -868,11 +872,13 @@ function renderMapa(list){
         {maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(MAP);
     }
     if(LAYER) MAP.removeLayer(LAYER);
+    if(ROUTE) MAP.removeLayer(ROUTE);
     var pts=[];
     LAYER=L.layerGroup(list.filter(function(h){return h.lat;}).map(function(h){
       pts.push([h.lat,h.lon]);
-      var m=L.circleMarker([h.lat,h.lon],{radius:8,weight:2,color:'#fff',
-        fillColor:pinColour(h),fillOpacity:.95});
+      var booked=!!vTime(h.id);
+      var m=L.circleMarker([h.lat,h.lon],{radius:booked?4:8,weight:booked?1:2,
+        color:'#fff',fillColor:pinColour(h),fillOpacity:booked?.35:.95});
       var det=[];
       if(h.bedrooms) det.push('T'+h.bedrooms);
       if(h.land_area_m2) det.push('земля '+new Intl.NumberFormat('pt-PT').format(h.land_area_m2)+' м²');
@@ -887,7 +893,36 @@ function renderMapa(list){
         '" target="_blank" rel="noopener">маршрут</a></div>');
       return m;
     })).addTo(MAP);
-    if(pts.length){ MAP.fitBounds(pts,{padding:[30,30],maxZoom:12}); }
+    // the booked days, in order, over the top of everything else
+    var byDay={};
+    Object.keys(VISITS).forEach(function(id){
+      var t=vTime(id); if(!t) return;
+      var hh=list.filter(function(x){return String(x.id)===String(id);})[0];
+      if(!hh||!hh.lat) return;
+      (byDay[t.slice(0,10)]=byDay[t.slice(0,10)]||[]).push({h:hh,t:t});
+    });
+    var days=Object.keys(byDay).sort(), routeBits=[], routePts=[];
+    days.forEach(function(d,di){
+      var col=DAY_COLOURS[di%DAY_COLOURS.length];
+      var stops=byDay[d].sort(function(a,b){ return a.t.localeCompare(b.t); });
+      var line=stops.map(function(x){ return [x.h.lat,x.h.lon]; });
+      if(line.length>1) routeBits.push(L.polyline(line,
+        {color:col,weight:3,opacity:.85,dashArray:'7 6'}));
+      stops.forEach(function(x,i){
+        routePts.push([x.h.lat,x.h.lon]);
+        routeBits.push(L.marker([x.h.lat,x.h.lon],{icon:L.divIcon({
+          className:'stoppin', iconSize:[30,30], iconAnchor:[15,15],
+          html:'<span style="background:'+col+'">'+(i+1)+'</span>'})})
+          .bindPopup('<div class="pp"><b>'+fmtDay(d)+' '+x.t.slice(11,16)+'</b> · '+
+            (x.h.concelho||'?')+'<div class="m">'+eur(x.h.price_eur)+'</div>'+
+            '<a href="'+x.h.url+'" target="_blank" rel="noopener">объявление</a>'+
+            (x.h.agent_phone?' &nbsp; <a href="tel:'+telHref(x.h.agent_phone)+
+              '">позвонить</a>':'')+'</div>'));
+      });
+    });
+    ROUTE = routeBits.length ? L.layerGroup(routeBits).addTo(MAP) : null;
+    if(routePts.length){ MAP.fitBounds(routePts,{padding:[45,45],maxZoom:11}); }
+    else if(pts.length){ MAP.fitBounds(pts,{padding:[30,30],maxZoom:12}); }
     setTimeout(function(){MAP.invalidateSize();},80);
   });
 }
