@@ -150,6 +150,37 @@ let HOUSES=[],NOTES={},STATUS={},VISITS={},sortBy=localStorage.getItem('casa_sor
 
 const BLOB='019feb59-15e5-7ad0-81ea-0b75e08ca35a';
 const API='https://jsonblob.com/api/jsonBlob/'+BLOB;
+let DIRTY=new Set(JSON.parse(localStorage.getItem('casa_dirty')||'[]'));
+function soil(kind,id){ DIRTY.add(kind+':'+id); saveDirty(); }
+function saveDirty(){ localStorage.setItem('casa_dirty',JSON.stringify([...DIRTY])); }
+function dirtyHas(kind,id){ return DIRTY.has(kind+':'+id); }
+
+// server value wins, except where we hold something not yet confirmed sent
+function mergeMap(serverMap,localMap,kind){
+  const out=Object.assign({},serverMap||{});
+  Object.keys(localMap||{}).forEach(function(id){
+    if(dirtyHas(kind,id)) out[id]=localMap[id];
+  });
+  Object.keys(out).forEach(function(id){
+    if(out[id]==null) delete out[id];
+  });
+  return out;
+}
+function mergeNotes(fresh){
+  const map=new Map((fresh||[]).map(function(n){return [key(n),n];}));
+  let pending=false;
+  Object.values(NOTES).flat().forEach(function(n){
+    const srv=map.get(key(n));
+    const ours=dirtyHas('n',n.house_id)&&n.author===me;
+    if(!srv||(ours&&(n.updated_at||'')>=(srv.updated_at||''))){
+      map.set(key(n),n);
+      if(ours) pending=true;
+    }
+  });
+  const out={};
+  [...map.values()].forEach(function(n){(out[n.house_id]=out[n.house_id]||[]).push(n);});
+  return {notes:out,pending:pending};
+}
 let SYNCED=false;
 
 function cacheSave(){
@@ -172,14 +203,21 @@ async function pull(){
     if(!r.ok) throw 0;
     const d=await r.json();
     SYNCED=true;
-    STATUS=d.status||{};
-    VISITS=d.visits||{};
+    STATUS=mergeMap(d.status,STATUS,'s');
+    VISITS=mergeMap(d.visits,VISITS,'v');
     return d.notes||[];
   }catch(e){ SYNCED=false; return cacheLoad(); }
 }
 
 // merge my change into whatever is on the server, so we never clobber
 // the other person's note
+function mark(){
+  const el=document.getElementById('sub');
+  if(!el||!HOUSES.length) return;
+  const c=Object.keys(NOTES).filter(function(k){return (NOTES[k]||[]).length;}).length;
+  el.textContent=HOUSES.length+' imóveis · '+c+' com notas · '+
+    (SYNCED?'sincronizado':(retryTimer?'por enviar…':'offline'));
+}
 async function push(mine){
   cacheSave();
   try{
@@ -201,20 +239,47 @@ async function push(mine){
     NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
     STATUS=body.status; VISITS=body.visits||{};
     cacheSave();
+    DIRTY.clear(); saveDirty();
     return true;
-  }catch(e){ SYNCED=false; return false; }
+  }catch(e){ SYNCED=false; scheduleRetry(); return false; }
 }
 
 // pick up the other person's edits while the page is open
-setInterval(async()=>{
-  if(document.hidden) return;
-  const fresh=await pull();
-  if(!SYNCED) return;
-  const before=JSON.stringify(Object.values(NOTES).flat().map(key).sort());
-  const map={}; fresh.forEach(n=>{(map[n.house_id]=map[n.house_id]||[]).push(n)});
-  const after=JSON.stringify(fresh.map(key).sort());
-  if(before!==after){ NOTES=map; cacheSave(); render(); }
-}, 20000);
+const POLL_MIN=20000, POLL_MAX=150000;
+let pollWait=POLL_MIN, pollTimer=null, retryTimer=null;
+
+function scheduleRetry(){
+  if(retryTimer) return;                        // one pending retry is enough
+  retryTimer=setTimeout(async()=>{ retryTimer=null; await push(); mark(); }, 15000);
+}
+
+async function tick(){
+  if(!document.hidden){
+    const fresh=await pull();
+    if(SYNCED){
+      pollWait=POLL_MIN;                        // the server is answering again
+      const before=JSON.stringify(Object.values(NOTES).flat()
+        .map(function(n){return key(n)+'|'+(n.text||'')+'|'+(n.tier||'');}).sort());
+      const m=mergeNotes(fresh);
+      NOTES=m.notes;
+      const after=JSON.stringify(Object.values(NOTES).flat()
+        .map(function(n){return key(n)+'|'+(n.text||'')+'|'+(n.tier||'');}).sort());
+      if(before!==after){ cacheSave(); render(); }
+      if(m.pending||DIRTY.size) scheduleRetry();   // we are ahead of the server
+    } else {
+      pollWait=Math.min(pollWait*2, POLL_MAX);  // throttled or offline - ease off
+    }
+    mark();
+  }
+  pollTimer=setTimeout(tick, pollWait);
+}
+pollTimer=setTimeout(tick, POLL_MIN);
+
+// coming back to the tab, or back online, is worth an immediate look
+document.addEventListener('visibilitychange',function(){
+  if(!document.hidden){ clearTimeout(pollTimer); pollWait=POLL_MIN; tick(); }
+});
+addEventListener('online',function(){ clearTimeout(pollTimer); pollWait=POLL_MIN; tick(); });
 
 
 const eur=n=>n?new Intl.NumberFormat('pt-PT').format(n)+' €':'—';
@@ -233,9 +298,8 @@ async function load(){
  HOUSES=await (await fetch('data.json?v='+Date.now())).json();
  const all=await pull();
  NOTES={};all.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
- const s={houses:HOUSES.length,commented:Object.keys(NOTES).length};
- document.getElementById('sub').textContent=s.houses+' imóveis · '+s.commented+
-   ' com notas'+(SYNCED?' · sincronizado':' · offline');
+ mark();
+ if(DIRTY.size){ push().then(mark); }
  document.getElementById('foot').innerHTML=
   '«выше округи» — насколько дом выше среднего рельефа в радиусе 15 км. '+
   '«до соседа» — до ближайшей постройки по карте. Notas partilhadas entre Serhii e Violeta.';
@@ -462,14 +526,14 @@ async function saveNote(id,text,tier){
    text: text!=='' ? text : (prev.text||''),
    tier: tier!=null ? tier : (prev.tier??null),
    updated_at:new Date().toISOString().slice(0,16).replace('T',' ')});
- NOTES[id]=rest; render();
- const okd=await push();
- toast(okd?'Guardado ✓':'Guardado no telemóvel (sem rede)',!okd);
+ NOTES[id]=rest; soil('n',id); render();
+ const okd=await push(); mark();
+ toast(okd?'Guardado ✓':'Guardado no telemóvel — envio depois',!okd);
 }
 
 document.addEventListener('click',async e=>{
  const cl=e.target.closest('[data-clr]');
- if(cl){ delete VISITS[cl.dataset.clr]; await push(); render(); toast('Visita removida'); return; }
+ if(cl){ delete VISITS[cl.dataset.clr]; soil('v',cl.dataset.clr); await push(); render(); toast('Visita removida'); return; }
  const u=e.target.closest('[data-u]'); if(u){setUser(u.dataset.u);load();return;}
  const f=e.target.closest('[data-f]'); if(f){filt=f.dataset.f;
    document.querySelectorAll('[data-f]').forEach(x=>x.classList.toggle('on',x===f));render();return;}
@@ -482,7 +546,7 @@ document.addEventListener('click',async e=>{
    await saveNote(id,ta?ta.value:'',+t.dataset.tier);render();return;}
  const s=e.target.closest('[data-st]');
  if(s){const id=+s.dataset.h;
-   STATUS[id]=s.dataset.st; await push();
+   STATUS[id]=s.dataset.st; soil('s',id); await push();
    const h=HOUSES.find(x=>x.id===id); if(h)h.status=s.dataset.st;
    toast('Estado: '+s.dataset.st); render(); return;}
 });
@@ -491,8 +555,9 @@ document.addEventListener('change',async e=>{
  const vi=e.target.closest('[data-visit]');
  if(vi){ const id=vi.dataset.visit;
    if(vi.value){ VISITS[id]=vi.value; STATUS[id]='visita'; } else { delete VISITS[id]; }
-   const okd=await push(); render();
-   toast(okd?'Visita marcada':'Guardado no telemovel',!okd); return; }
+   soil('v',id); soil('s',id);
+   const okd=await push(); render(); mark();
+   toast(okd?'Visita marcada':'Guardado no telemóvel',!okd); return; }
  const ta=e.target.closest('[data-note]');
  if(ta)saveNote(+ta.dataset.note,ta.value,null);
 });
