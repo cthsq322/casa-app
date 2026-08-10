@@ -200,6 +200,25 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
  border:1px solid var(--line);background:var(--paper);color:var(--ink);flex:1;min-width:150px}
 .visit .clr{padding:5px 11px;font-size:13px}
 #rota{margin:10px 0 0}
+.planhead{background:var(--accent-s);border:1px solid var(--accent);
+ border-radius:13px;padding:12px 14px;margin:10px 0;font-size:14.5px;color:var(--accent)}
+.planhead .m{color:var(--soft);font-size:13px;margin-top:5px;font-weight:400}
+.day.later{opacity:.6}
+.day.todo{border-color:var(--warn)}
+.day.todo .dh{background:var(--warn);color:var(--paper)}
+.pstop{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:9px 14px;
+ border-top:1px solid var(--line);font-size:14px}
+.pstop b{font-variant-numeric:tabular-nums}
+.pstop .pl{font-weight:600}
+.pstop .pr{color:var(--soft);font-variant-numeric:tabular-nums}
+.pstop .leg2{color:var(--soft);font-size:12.5px}
+.pstop .stt{font-size:12px;color:var(--soft)}
+.pstop .stt.todo{color:var(--warn);font-weight:600}
+.pstop a{margin-left:auto;text-decoration:none;color:var(--accent);font-size:13px;
+ border:1px solid var(--line);border-radius:8px;padding:3px 9px}
+.pstop a+a{margin-left:0}
+.pstop.ok{background:var(--accent-s)}
+.pstop.no{opacity:.5;text-decoration:line-through}
 .day{background:var(--card);border:1px solid var(--line);border-radius:13px;
  box-shadow:var(--sh);margin-bottom:12px;overflow:hidden}
 .dh{background:var(--accent-s);color:var(--accent);font-weight:600;padding:11px 14px;
@@ -213,6 +232,7 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .stop a{text-decoration:none;color:var(--accent);font-size:18px;margin-left:8px}
 .stop .leg{font-size:12.5px;color:var(--soft);margin-top:4px}
 .stop.tight{background:var(--warn-s)}
+.stop .leg{font-variant-numeric:tabular-nums}
 .stop.tight .leg{color:var(--warn);font-weight:600}
 .gate{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;
  justify-content:center;z-index:50}
@@ -249,6 +269,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="planned">📅 С датой</button>
   <button data-f="wa">💬 Можно писать</button>
   <button data-f="gone">🚫 Снятые</button>
+  <button data-f="plan">🧭 Круг</button>
   <button data-f="mine">С заметками</button>
   <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
   <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
@@ -263,7 +284,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <a href="frases.html">✍ Что писать</a>
   <a href="lista.html">🔗 Ссылки по сайтам</a>
 </div>
-<div id="rota"></div><div id="mapbox"></div><div class="count" id="count"></div>
+<div id="rota"></div><div id="planbox"></div><div id="mapbox"></div><div class="count" id="count"></div>
 <div class="grid" id="grid"></div>
 <footer id="foot"></footer>
 </div>
@@ -449,7 +470,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-1758-77278cf';
+const BUILD='20260810-1809-6209f0a';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -573,6 +594,7 @@ function keep(h){
  if(filt==='fresh'&&(stVal(h.id)||vTime(h.id)||
    (NOTES[h.id]||[]).some(function(n){return (n.text||'').trim();})))return false;
  if(filt==='planned'&&!vTime(h.id))return false;
+ if(filt==='plan')return false;          // the plan draws itself
  if(filt==='gone'&&!isSold(h))return false;
  if(filt==='live'&&isSold(h))return false;
  if(filt==='wa'&&!(h.agent_phone&&telList(h.agent_phone).some(isMobile)))return false;
@@ -785,6 +807,41 @@ function visitWord(n){
   if(t>=2&&t<=4&&(h<12||h>14)) return 'визита';
   return 'визитов';
 }
+
+// OSRM's demo router: no key, and it answers with the road itself
+const ROADS={};                                  // "lat,lon;lat,lon" -> {km,min,line}
+function roadKey(a,b){ return a.lat+','+a.lon+';'+b.lat+','+b.lon; }
+async function roadBetween(a,b){
+  if(!a.lat||!b.lat) return null;
+  const k=roadKey(a,b);
+  if(ROADS[k]!==undefined) return ROADS[k];
+  ROADS[k]=null;                                 // do not ask twice while in flight
+  try{
+    const u='https://router.project-osrm.org/route/v1/driving/'+
+      a.lon+','+a.lat+';'+b.lon+','+b.lat+'?overview=full&geometries=geojson';
+    const r=await fetch(u,{cache:'no-store'});
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    const rt=d.routes&&d.routes[0];
+    if(!rt) throw 0;
+    ROADS[k]={km:rt.distance/1000, min:rt.duration/60,
+              line:rt.geometry.coordinates.map(function(c){return [c[1],c[0]];})};
+  }catch(e){ ROADS[k]=false; }                   // false = asked and failed
+  return ROADS[k];
+}
+async function fillRoads(items){
+  let got=false;
+  for(let i=1;i<items.length;i++){
+    const r=await roadBetween(items[i-1].h,items[i].h);
+    if(r) got=true;
+  }
+  return got;
+}
+function gapWords(min){
+  const h=Math.floor(min/60), m=Math.round(min%60);
+  return (h?h+' ч ':'')+(m?m+' мин':(h?'':'0 мин'));
+}
+
 function fmtDay(v){
   var d=new Date(v+'T00:00'); if(isNaN(d)) return v;
   return d.toLocaleDateString('ru-RU',{weekday:'long',day:'2-digit',month:'2-digit'});
@@ -819,23 +876,32 @@ function renderRota(){
           '</div>';
     list.forEach(function(it,i){
       var prev=i?list[i-1].h:null;
-      var dist=prev?kmBetween(prev,it.h):null;
-      var drive=dist!=null?Math.round(dist):null;          // ~60 km/h rural = 1 min per km
+      var road=prev?ROADS[roadKey(prev,it.h)]:null;
+      var byRoad=!!road;
+      var dist=prev?(byRoad?road.km:kmBetween(prev,it.h)):null;
+      var drive=dist!=null?Math.round(byRoad?road.min:dist):null;
       var gap=prev?(new Date(it.t)-new Date(list[i-1].t))/60000:null;
-      var tight=(drive!=null&&gap!=null&&gap<drive+30);
+      var spare=(drive!=null&&gap!=null)?gap-drive-45:null;   // 45 min to look round
+      var tight=(spare!=null&&spare<0);
       html+='<div class="stop'+(tight?' tight':'')+'">'+
         '<b>'+fmtTime(it.t)+'</b>'+
         '<span class="pl">'+(it.h.concelho||'?')+'</span>'+
         '<span class="pr">'+(it.h.price_eur?new Intl.NumberFormat('pt-PT').format(it.h.price_eur)+' &euro;':'')+'</span>'+
         (it.by?'<span class="who2">'+it.by+'</span>':'')+
         (it.h.agent_phone?'<a href="tel:+351'+it.h.agent_phone+'">&#9742;</a>':'')+
-        (dist!=null?'<div class="leg">'+Math.round(dist)+' км &middot; ~'+drive+' мин на машине'+
-           (tight?' &mdash; мало времени между визитами':'')+'</div>':'')+
+        (dist!=null?'<div class="leg">'+Math.round(dist)+' км &middot; '+drive+
+           ' мин за рулём'+(byRoad?' по дороге':' по прямой')+
+           (spare!=null?(spare>=0?' &middot; в запасе '+gapWords(spare)
+                                : ' &middot; не хватает '+gapWords(-spare)):'')+
+           '</div>':'')+
         '</div>';
     });
     html+='</div>';
   });
   box.innerHTML=html;
+  var need=[];
+  Object.keys(days).forEach(function(d){ need=need.concat(days[d]); });
+  fillRoads(need).then(function(got){ if(got&&filt==='rota') renderRota(); });
 }
 
 
@@ -906,8 +972,14 @@ function renderMapa(list){
       var col=DAY_COLOURS[di%DAY_COLOURS.length];
       var stops=byDay[d].sort(function(a,b){ return a.t.localeCompare(b.t); });
       var line=stops.map(function(x){ return [x.h.lat,x.h.lon]; });
-      if(line.length>1) routeBits.push(L.polyline(line,
-        {color:col,weight:3,opacity:.85,dashArray:'7 6'}));
+      for(var q=1;q<stops.length;q++){
+        var rd=ROADS[roadKey(stops[q-1].h,stops[q].h)];
+        routeBits.push(rd
+          ? L.polyline(rd.line,{color:col,weight:4,opacity:.9})
+          : L.polyline([[stops[q-1].h.lat,stops[q-1].h.lon],
+                        [stops[q].h.lat,stops[q].h.lon]],
+              {color:col,weight:3,opacity:.7,dashArray:'7 6'}));
+      }
       stops.forEach(function(x,i){
         routePts.push([x.h.lat,x.h.lon]);
         routeBits.push(L.marker([x.h.lat,x.h.lon],{icon:L.divIcon({
@@ -921,6 +993,10 @@ function renderMapa(list){
       });
     });
     ROUTE = routeBits.length ? L.layerGroup(routeBits).addTo(MAP) : null;
+    days.forEach(function(d){
+      fillRoads(byDay[d].sort(function(a,b){return a.t.localeCompare(b.t);}))
+        .then(function(got){ if(got&&filt==='mapa') renderMapa(list); });
+    });
     if(routePts.length){ MAP.fitBounds(routePts,{padding:[45,45],maxZoom:11}); }
     else if(pts.length){ MAP.fitBounds(pts,{padding:[30,30],maxZoom:12}); }
     setTimeout(function(){MAP.invalidateSize();},80);
@@ -1119,6 +1195,72 @@ function renderPeople(){
   });
   box.innerHTML=html;
 }
+
+let PLAN=null, planAsked=false;
+async function loadPlan(){
+  if(planAsked) return PLAN;
+  planAsked=true;
+  try{
+    const r=await fetch('plan.json?t='+Date.now(),{cache:'no-store'});
+    if(r.ok) PLAN=await r.json();
+  }catch(e){}
+  return PLAN;
+}
+function planStop(st,weekly){
+  const v=stVal(st.id), lab=v?(ST_SHORT[v]||v):'';
+  const cls = v==='marcado'?'ok' : v==='recusa'?'no' : v?'mid':'todo';
+  const mob = st.phone && telList(st.phone).some(isMobile);
+  return '<div class="pstop '+cls+'">'+
+    '<b>'+st.at+'</b>'+
+    '<span class="pl">'+(st.concelho||'?')+'</span>'+
+    '<span class="pr">'+eur(st.price_eur)+'</span>'+
+    '<span class="nota'+(st.score<40?' thin':'')+'">'+st.score+'</span>'+
+    (st.drive_min?'<span class="leg2">+'+st.drive_min+' мин</span>':'')+
+    (lab?'<span class="stt">'+lab+(stBy(st.id)?' · '+stBy(st.id):'')+'</span>'
+        :'<span class="stt todo">не писали</span>')+
+    (st.phone?'<a href="tel:'+telHref(st.phone)+'">☎</a>':'')+
+    (mob?'<a href="'+waLink(telList(st.phone).filter(isMobile)[0])+'" target="_blank" '+
+      'rel="noopener">WA</a>':'')+
+    '<a href="'+st.url+'" target="_blank" rel="noopener">дом</a>'+
+  '</div>';
+}
+async function renderPlan(){
+  const box=document.getElementById('planbox');
+  if(!box) return;
+  if(filt!=='plan'){ box.innerHTML=''; return; }
+  const pl=await loadPlan();
+  if(!pl){ box.innerHTML='<div class="day"><div class="dh">План не загрузился</div></div>';
+    return; }
+  const week=new Set(pl.week||[]);
+  const todo=[];
+  let html='<div class="planhead">Круг из Лиссабона · <b>'+pl.houses+'</b> домов · '+
+    '<b>'+pl.total_drive_h+' ч</b> за рулём'+(pl.by_road?' по дорогам':' по прямой')+
+    '<div class="m">В неделю берём дни '+(pl.week||[]).join(', ')+
+    ' — <b>'+pl.week_houses+'</b> домов, <b>'+pl.week_drive_h+' ч</b> дороги. '+
+    'Ночуем по пути, поэтому первый дом дня без переезда.</div></div>';
+  (pl.days||[]).forEach(function(d){
+    const inWeek=week.has(d.label);
+    html+='<div class="day'+(inWeek?'':' later')+'"><div class="dh">День '+d.label+
+      ' · '+d.stops.length+' домов · '+Math.floor(d.drive_min/60)+' ч '+
+      (d.drive_min%60)+' мин за рулём'+
+      (inWeek?'':' · <i>отложить, '+d.per_house+' мин на дом</i>')+
+      '<a class="mapsbtn" target="_blank" rel="noopener" href="'+
+        'https://www.google.com/maps/dir/'+
+        d.stops.map(function(x){return x.lat+','+x.lon;}).join('/')+'">в Maps</a></div>';
+    d.stops.forEach(function(st){
+      html+=planStop(st,inWeek);
+      if(inWeek&&!stVal(st.id)) todo.push(st);
+    });
+    html+='</div>';
+  });
+  if(todo.length){
+    html='<div class="day todo"><div class="dh">Написать сегодня — '+todo.length+
+      ' домов, без них круг не соберётся</div>'+
+      todo.map(function(st){ return planStop(st,true); }).join('')+'</div>'+html;
+  }
+  box.innerHTML=html;
+}
+
 function renderStBar(){
   migrateStatus();
   renderPeople();
@@ -1171,8 +1313,8 @@ function render(){
  }
  lastOrder=list.map(function(h){ return h.id; });
  document.getElementById('count').textContent=list.length+' из '+HOUSES.length+' домов';
- document.getElementById('grid').innerHTML=(filt==='mapa'?'':list.map(card).join(''));
- renderRota(); renderMapa(list); renderStBar();
+ document.getElementById('grid').innerHTML=((filt==='mapa'||filt==='plan')?'':list.map(card).join(''));
+ renderRota(); renderMapa(list); renderStBar(); renderPlan();
  if(keepY!=null){
    const put=function(){
      if(Math.abs(window.scrollY-keepY)>2) window.scrollTo({top:keepY,behavior:'instant'});
