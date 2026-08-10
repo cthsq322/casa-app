@@ -15,6 +15,7 @@
  --card:#fffdfa;--accent:#3f6b4b;--accent-s:#e8efe7;--warn:#a8501f;--warn-s:#f7ebe3;
  --gold:#8a6d1f;--sh:0 1px 2px rgba(30,35,25,.06),0 6px 18px rgba(30,35,25,.05)}
 *{box-sizing:border-box}
+html,body{overflow-anchor:none}
 body{margin:0;background:var(--paper);color:var(--ink);
  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .wrap{max-width:1180px;margin:0 auto;padding:18px 15px 70px}
@@ -107,7 +108,8 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 .links a{flex:0 0 auto;text-decoration:none;font-size:13.5px;white-space:nowrap;
  color:var(--accent);background:var(--card);border:1px solid var(--line);
  border-radius:999px;padding:7px 14px}
-.grid{display:grid;gap:13px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+.grid{display:grid;gap:13px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));
+ overflow-anchor:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
  padding:15px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:10px}
 .card.flag{border-left:4px solid var(--warn)}
@@ -394,7 +396,8 @@ async function pull(){
 function mark(){
   const el=document.getElementById('sub');
   if(!el||!HOUSES.length) return;
-  const c=Object.keys(NOTES).filter(function(k){return (NOTES[k]||[]).length;}).length;
+  const c=Object.keys(NOTES).filter(function(k){
+    return (NOTES[k]||[]).some(function(n){return (n.text||'').trim();}); }).length;
   el.textContent=HOUSES.length+' домов · '+c+' с заметками · '+
     (SYNCED?'синхронизировано':(retryTimer?'не отправлено…':'офлайн'));
 }
@@ -443,7 +446,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-1731-4ab96eb';
+const BUILD='20260810-1740-167ba97';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -552,19 +555,20 @@ function matches(hay,query){
   });
 }
 
+// work means reaching out or writing something down - a level is neither
 function touchedBy(id,who){
   return stBy(id)===who
       || vBy(id)===who
-      || (NOTES[id]||[]).some(function(n){ return n.author===who; })
-      || isFav(id,who);
+      || (NOTES[id]||[]).some(function(n){ return n.author===who && (n.text||'').trim(); });
 }
 function myWork(who){
   return HOUSES.filter(function(h){ return touchedBy(h.id,who); });
 }
 function keep(h){
- if(filt==='mine'&&!(NOTES[h.id]||[]).length)return false;
+ if(filt==='mine'&&!(NOTES[h.id]||[]).some(function(n){return (n.text||'').trim();}))return false;
  if(filt==='work'&&!touchedBy(h.id,me))return false;
- if(filt==='fresh'&&(stVal(h.id)||(NOTES[h.id]||[]).length||vTime(h.id)))return false;
+ if(filt==='fresh'&&(stVal(h.id)||vTime(h.id)||
+   (NOTES[h.id]||[]).some(function(n){return (n.text||'').trim();})))return false;
  if(filt==='planned'&&!vTime(h.id))return false;
  if(filt==='gone'&&h.listing_status!=='gone')return false;
  if(filt==='live'&&h.listing_status==='gone')return false;
@@ -1022,7 +1026,8 @@ function renderMine(){
   if(!box||!HOUSES.length) return;
   const mine=myWork(me);
   const notes=mine.filter(function(h){
-    return (NOTES[h.id]||[]).some(function(n){return n.author===me;}); }).length;
+    return (NOTES[h.id]||[]).some(function(n){
+      return n.author===me && (n.text||'').trim(); }); }).length;
   const st=mine.filter(function(h){ return stBy(h.id)===me; }).length;
   const vis=mine.filter(function(h){ return vBy(h.id)===me; }).length;
   const fav=favList(me).length;
@@ -1089,11 +1094,49 @@ function renderStBar(){
   }).join('');
 }
 
+let frozen=null;                    // order held still while a card is worked
+function keepPlace(){ frozen=frozen||lastOrder.slice(); }
+function unfreeze(){ frozen=null; }
+let lastOrder=[];
+function renderCard(id){
+  const el=document.querySelector('[data-note="'+id+'"]');
+  const art=el&&el.closest('.card');
+  const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+  if(!art||!h){ render(); return; }
+  const focused=document.activeElement===el;
+  const caret=focused?[el.selectionStart,el.selectionEnd]:null;
+  art.outerHTML=card(h);
+  if(focused){
+    const back=document.querySelector('[data-note="'+id+'"]');
+    if(back){ back.focus(); try{ back.setSelectionRange(caret[0],caret[1]); }catch(e){} }
+  }
+  renderStBar(); renderProgress(); renderMine(); renderSoon(); mark();
+}
 function render(){
- const list=sortList(HOUSES.filter(keep));
+ const keepY=frozen?window.scrollY:null;
+ let list=sortList(HOUSES.filter(keep));
+ if(frozen){
+   const pos={}; frozen.forEach(function(id,i){ pos[id]=i; });
+   list.sort(function(a,b){
+     const ia=pos[a.id], ib=pos[b.id];
+     if(ia==null&&ib==null) return 0;
+     if(ia==null) return 1;            // anything new goes after what was on screen
+     if(ib==null) return -1;
+     return ia-ib;
+   });
+ }
+ lastOrder=list.map(function(h){ return h.id; });
  document.getElementById('count').textContent=list.length+' из '+HOUSES.length+' домов';
  document.getElementById('grid').innerHTML=(filt==='mapa'?'':list.map(card).join(''));
  renderRota(); renderMapa(list); renderStBar();
+ if(keepY!=null){
+   const put=function(){
+     if(Math.abs(window.scrollY-keepY)>2) window.scrollTo({top:keepY,behavior:'instant'});
+   };
+   put();
+   requestAnimationFrame(put);          // the browser re-anchors a frame later
+   setTimeout(put,60);                  // and once more after the images settle
+ }
 }
 
 const persist=cacheSave;
@@ -1113,7 +1156,7 @@ async function saveNote(id,text,tier,quiet){
    // nothing was there - leave whatever the line already says
    if(!prev.author) return;
    NOTES[id]=rest; soil('n',id);
-   if(!quiet) render();
+   if(!quiet) renderCard(id);
    const gone=await push(); mark();
    noteState(id,'idle','заметка удалена');
    toast(gone?'Заметка удалена':'Удалено в телефоне — отправлю позже',!gone);
@@ -1121,8 +1164,8 @@ async function saveNote(id,text,tier,quiet){
  }
 
  rest.push({house_id:id,author:me,text:text,tier:t,updated_at:now});
- NOTES[id]=rest; soil('n',id);
- if(!quiet) render();
+ NOTES[id]=rest; soil('n',id); keepPlace();
+ if(!quiet) renderCard(id);
  const okd=await push(); mark();
  noteState(id, okd?'ok':'wait',
    okd?'сохранено '+now.slice(11):'не отправлено — сохранено в телефоне');
@@ -1177,7 +1220,7 @@ document.addEventListener('click',async e=>{
    return;
  }
  const fv=e.target.closest('[data-fav]');
- if(fv){ toggleFav(fv.dataset.fav); render(); await push(); mark();
+ if(fv){ keepPlace(); toggleFav(fv.dataset.fav); renderCard(fv.dataset.fav); await push(); mark();
    toast(isFav(fv.dataset.fav)?'В избранном':'Убрано из избранного'); return; }
  const rc=e.target.closest('[data-rclr]');
  if(rc){ delete REMIND[rc.dataset.rclr]; soil('r',rc.dataset.rclr);
@@ -1192,20 +1235,22 @@ document.addEventListener('click',async e=>{
  if(f){ filt=(filt===f.dataset.f&&filt.indexOf('st:')===0)?'all':f.dataset.f;
    document.querySelectorAll('[data-f]').forEach(x=>
      x.classList.toggle('on',x.dataset.f===filt));
-   render(); return;}
+   unfreeze(); render(); return;}
  if(e.target.id==='theme'){const c=document.documentElement.dataset.theme||
    (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
    document.documentElement.dataset.theme=c==='dark'?'light':'dark';return;}
  if(e.target.id==='swap'){localStorage.removeItem('casa_user');location.reload();return;}
  const t=e.target.closest('[data-tier]');
  if(t){const id=+t.dataset.h;const ta=document.querySelector('[data-note="'+id+'"]');
-   await saveNote(id,ta?ta.value:'',+t.dataset.tier);render();return;}
+   keepPlace();
+   await saveNote(id,ta?ta.value:'',+t.dataset.tier,true);
+   renderCard(id); return;}
  const s=e.target.closest('[data-st]');
  if(s){const id=+s.dataset.h;
-   setStatus(id,s.dataset.st); await push();
+   keepPlace(); setStatus(id,s.dataset.st); await push();
    const h=HOUSES.find(x=>x.id===id); if(h)h.status=s.dataset.st;
    toast('Статус: '+(ST_SHORT[s.dataset.st]||s.dataset.st)+
-     (stTry(id)>1?' ×'+stTry(id):'')); render(); return;}
+     (stTry(id)>1?' ×'+stTry(id):'')); renderCard(id); return;}
 });
 
 document.addEventListener('change',async e=>{
@@ -1230,7 +1275,7 @@ document.addEventListener('change',async e=>{
  if(ta) saveNote(+ta.dataset.note,ta.value.trim(),null);
 });
 document.getElementById('sort').addEventListener('change',function(e){
- sortBy=e.target.value; localStorage.setItem('casa_sort',sortBy); render();
+ sortBy=e.target.value; localStorage.setItem('casa_sort',sortBy); unfreeze(); render();
 });
 document.getElementById('sort').value=localStorage.getItem('casa_sort')||'score';
 const typeTimers={};
@@ -1248,10 +1293,10 @@ const qbox=document.getElementById('q'), qclr=document.getElementById('qx');
 qbox.addEventListener('input',function(e){
   q=e.target.value.trim().toLowerCase();
   qclr.classList.toggle('on',!!q);
-  render();
+  unfreeze(); render();
 });
 qclr.addEventListener('click',function(){
-  qbox.value=''; q=''; qclr.classList.remove('on'); qbox.focus(); render();
+  qbox.value=''; q=''; qclr.classList.remove('on'); qbox.focus(); unfreeze(); render();
 });
 
 if(me){setUser(me);load();}
