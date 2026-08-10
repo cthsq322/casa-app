@@ -634,7 +634,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2157-492a4e8';
+const BUILD='20260810-2201-9abe166';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -726,6 +726,24 @@ function translit(t){
   t=t.replace(/ья/g,'ia');
   return t.replace(/[а-яё]/g,function(c){ return RU_LAT[c]!==undefined?RU_LAT[c]:c; });
 }
+// the portals' own reference codes, which survive any link mangling
+function refsOf(text){
+  const t=String(text||'').toLowerCase();
+  const out=[];
+  const re=/(id[0-9a-z]{4,}|r\d{5,}|i\d{6,}|\d{7,})/g;
+  let m;
+  while((m=re.exec(t))!==null) out.push(m[1]);
+  return out;
+}
+function sameListing(url, query){
+  if(!url||!query) return false;
+  const a=String(url).toLowerCase(), b=String(query).toLowerCase();
+  const clean=function(x){ return x.replace(/^https?:\/\//,'').replace(/^www\./,'')
+    .split('#')[0].split('?')[0].replace(/\/+$/,''); };
+  if(clean(a)===clean(b)) return true;
+  const qa=refsOf(a), qb=refsOf(b);
+  return qb.length>0 && qb.some(function(r){ return qa.indexOf(r)>=0; });
+}
 function matches(hay,query){
   hay=deaccent(hay.toLowerCase());
   const q=deaccent(query.toLowerCase()).trim();
@@ -775,6 +793,9 @@ function keep(h){
  if(filt==='favall'&&!favOwners(h.id).length)return false;
  if(filt.indexOf('by:')===0&&stBy(h.id)!==filt.slice(3))return false;
  if(q){
+  // a pasted link finds its own house whatever the tail looks like
+  if(q.indexOf('/')>=0 && sameListing(h.url, q)) return true;
+  if(q.indexOf('/')>=0 && !sameListing(h.url, q)) return false;
   const num=q.replace(/[^\d]/g,'');
   if(num.length>=3){
     // a phone: any run of digits from any number we hold for this house
