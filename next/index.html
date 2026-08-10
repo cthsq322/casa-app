@@ -589,7 +589,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2057-6fda464';
+const BUILD='20260810-2109-b64ff47';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -911,13 +911,14 @@ function msgForGroup(h){
       (d&&d.when?NL+'  '+ptDay(d):'');
   });
   return [
-    'Estamos a ver casas nesta zona e já temos a rota da semana montada.',
+    'Estamos a subir de Lisboa a fazer uma rota pela zona centro e norte, com os dias já montados — por isso as horas estão presas ao caminho.',
     'Vi que tem estas '+(all.length>1?all.length+' casas':'casa')+
       ' — interessam-nos todas:',
     lines.join(NL+NL),
     'Conseguimos passar nos dias indicados? Se alguma hora não servir, diga qual '+
       'serve nesse mesmo dia — a rota está feita e é mais fácil '+
       'trocar a hora do que o dia.',
+    'Nestes dias queremos ver o máximo possível para fechar uma lista curta; o que nos agradar tem segunda visita à sexta ou ao fim de semana.',
     'Antes de avançarmos: as casas passam no crédito e estão prontas '+
       'para a avaliação do banco? Temos aprovação do banco e vamos '+
       'à avaliação, por isso fechamos depressa.'
@@ -925,19 +926,20 @@ function msgForGroup(h){
 }
 function msgFor(h){
   const d=DAYOF[h.id];
-  const when = d && d.when ? d.when+' por volta das '+d.at : null;
-  const pt = [
-    'Estamos a ver casas nesta zona e já temos a rota da semana montada.',
+  const NL=String.fromCharCode(10);
+  const when = d && d.when ? ptDay(d) : null;
+  const parts=[
+    'Estamos a subir de Lisboa a fazer uma rota pela zona centro e norte, com os dias já montados — por isso as horas estão presas ao caminho, não à nossa vontade.',
     when
-      ? 'Esta casa fica-nos a jeito ' + ptDay(d) + ' — conseguimos passar por lá?'
-      : 'Gostávamos de ver esta casa esta semana — que dias tem disponíveis?',
+      ? 'Esta casa fica-nos a jeito ' + when + '. Conseguimos passar por lá?'
+      : 'Gostávamos de ver esta casa nestes dias — que horas tem disponíveis?',
     when
-      ? 'Se essa hora não servir, diga qual serve nesse mesmo dia: a rota está feita e é mais fácil trocar a hora do que o dia.'
+      ? 'Se essa hora não servir, diga qual serve nesse mesmo dia — é mais fácil trocar a hora do que o dia.'
       : '',
-    'Antes de avançarmos, duas coisas: a casa passa no crédito e está pronta para a avaliação do banco?',
-    'Temos aprovação do banco e vamos à avaliação, por isso conseguimos fechar depressa.'
-  ].filter(Boolean).join('\n\n');
-  return pt;
+    'Nestes dias queremos ver o máximo possível para fechar uma lista curta. Se a casa nos agradar, voltamos numa segunda visita à sexta-feira ou ao fim de semana, com calma e com família.',
+    'Antes de avançarmos, duas coisas: a casa passa no crédito e está pronta para a avaliação do banco? Temos aprovação do banco e vamos à avaliação, por isso conseguimos fechar depressa.'
+  ];
+  return parts.filter(Boolean).join(NL+NL);
 }
 function ptDay(d){
   // "суббота 15.08" -> "no sábado, dia 15/08, por volta das 09:00"
