@@ -683,7 +683,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-0014-12e01a7';
+const BUILD='20260811-0020-d91b0ce';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1081,6 +1081,7 @@ function msgFor(h){
   const NL=String.fromCharCode(10);
   const when = d && d.when ? ptDay(d) : null;
   const parts=[
+    h.url,
     'Estamos a subir de Lisboa a fazer uma rota pela zona centro e norte, com os dias já montados — por isso as horas estão presas ao caminho, não à nossa vontade.',
     when
       ? 'Esta casa fica-nos a jeito ' + when +
