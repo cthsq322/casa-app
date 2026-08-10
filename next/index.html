@@ -1,0 +1,1601 @@
+<!doctype html><html lang="pt"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Дома · тест</title>
+<style>
+:root{--paper:#f4f1ec;--ink:#1c1e1a;--soft:#5b6058;--line:#ddd8cf;--card:#fffdfa;
+ --accent:#3f6b4b;--accent-s:#e8efe7;--warn:#a8501f;--warn-s:#f7ebe3;--gold:#8a6d1f;
+ --sh:0 1px 2px rgba(30,35,25,.06),0 6px 18px rgba(30,35,25,.05)}
+@media(prefers-color-scheme:dark){:root{--paper:#14170f;--ink:#eae7df;--soft:#9aa093;
+ --line:#2b2f26;--card:#1b1f17;--accent:#7fb489;--accent-s:#1f2a20;--warn:#e0946a;
+ --warn-s:#2e211a;--gold:#c8a94a;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.3)}}
+:root[data-theme=dark]{--paper:#14170f;--ink:#eae7df;--soft:#9aa093;--line:#2b2f26;
+ --card:#1b1f17;--accent:#7fb489;--accent-s:#1f2a20;--warn:#e0946a;--warn-s:#2e211a;
+ --gold:#c8a94a;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.3)}
+:root[data-theme=light]{--paper:#f4f1ec;--ink:#1c1e1a;--soft:#5b6058;--line:#ddd8cf;
+ --card:#fffdfa;--accent:#3f6b4b;--accent-s:#e8efe7;--warn:#a8501f;--warn-s:#f7ebe3;
+ --gold:#8a6d1f;--sh:0 1px 2px rgba(30,35,25,.06),0 6px 18px rgba(30,35,25,.05)}
+*{box-sizing:border-box}
+html,body{overflow-anchor:none}
+body{margin:0;background:var(--paper);color:var(--ink);
+ font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 15px 70px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;
+ padding-bottom:12px;border-bottom:2px solid var(--ink)}
+h1{font:600 25px/1.1 Georgia,serif;margin:0}
+.sub{color:var(--soft);font-size:14px}.sp{flex:1}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);
+ color:var(--ink);border-radius:999px;padding:6px 14px}
+button.on{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.who{font-weight:600;color:var(--accent)}
+.bar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:12px 0}
+select#sort{font:inherit;font-size:14px;padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);max-width:100%}
+.nota{margin-left:8px;font:600 12.5px/1 -apple-system,sans-serif;padding:4px 8px;border-radius:999px;background:var(--accent-s);color:var(--accent);font-variant-numeric:tabular-nums}
+.nota.thin{background:transparent;border:1px solid var(--line);color:var(--soft)}
+.find{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:8px;
+ margin:0 0 2px;
+ background:var(--card);border:1px solid var(--line);border-radius:999px;
+ padding:3px 6px 3px 14px;box-shadow:var(--sh)}
+.findwrap{position:sticky;top:0;z-index:6;background:var(--paper);
+ padding:8px 0 4px;margin:0 0 4px}
+.find .mag{font-size:15px;opacity:.65}
+input[type=search]{font:inherit;font-size:16px;padding:9px 2px;border:0;outline:0;
+ background:transparent;color:var(--ink);flex:1;min-width:60px;
+ -webkit-appearance:none}
+input[type=search]::-webkit-search-cancel-button{display:none}
+#qx{border:0;background:transparent;color:var(--soft);font-size:15px;padding:7px 11px;
+ visibility:hidden}
+#qx.on{visibility:visible}
+.count{color:var(--soft);font-size:14px;padding:12px 0 6px}
+#mapbox{display:none;height:68vh;min-height:340px;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:10px 0 4px;background:var(--card)}
+#mapbox.on{display:block}
+.stoppin span{display:flex;align-items:center;justify-content:center;
+ width:30px;height:30px;border-radius:50%;color:#fff;font:700 14px/1 -apple-system,sans-serif;
+ border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.leaflet-popup-content{margin:11px 13px;font:14px/1.45 -apple-system,sans-serif}
+.pp b{font-size:15px}
+.pp a{color:var(--accent);text-decoration:none;display:inline-block;margin-top:5px}
+.pp .m{color:#666;font-size:12.5px}
+.stbar{display:flex;gap:7px;overflow-x:auto;padding:9px 0 3px;scrollbar-width:none}
+.stbar::-webkit-scrollbar{display:none}
+.stbar button{flex:0 0 auto;padding:6px 13px;font-size:13.5px;display:flex;align-items:center;gap:7px}
+.stbar button .n{font-variant-numeric:tabular-nums;font-weight:600;background:var(--accent-s);color:var(--accent);border-radius:999px;padding:1px 7px;font-size:12px}
+.stbar button.on .n{background:rgba(255,255,255,.25);color:inherit}
+.stbar button.zero{opacity:.45}
+.upd{display:none}
+.upd.on{display:flex;align-items:center;gap:10px;margin:10px 0 0;
+ background:var(--accent);color:var(--paper);border-radius:12px;
+ padding:10px 13px;font-size:14px;font-weight:600}
+.upd button{margin-left:auto;background:var(--paper);
+ border-color:var(--paper);color:var(--accent);font-weight:600}
+.soon{display:none}
+.soon.on{display:block;margin:10px 0 0;background:var(--warn-s);
+ border:1px solid var(--warn);border-radius:12px;padding:10px 13px;font-size:14px}
+.soon .s1{padding:2px 0}
+.soon b{color:var(--warn)}
+.soon a{color:var(--accent);text-decoration:none;margin-left:8px;font-weight:600}
+.cal{padding:5px 12px;font-size:12.5px;border-color:var(--accent);color:var(--accent)}
+.conf{padding:5px 12px;font-size:12.5px;border-color:var(--accent);color:var(--accent)}
+.conf.off{border-color:var(--warn);color:var(--warn);font-weight:600}
+.visit.before input{border-color:var(--warn)}
+.soon .s1.due{border-left:3px solid var(--warn);padding-left:9px;margin:3px 0}
+.mine{margin:11px 0 0;font-size:13.5px;color:var(--soft)}
+.mine b{color:var(--ink);font-variant-numeric:tabular-nums}
+.mine .empty{font-style:italic}
+.prog{margin:8px 0 2px;font-size:13.5px;color:var(--soft)}
+.prog .row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.prog b{color:var(--ink);font-variant-numeric:tabular-nums;font-size:15px}
+.prog .rest{margin-left:auto}
+.prog .pbar{height:6px;border-radius:999px;background:var(--line);margin-top:6px;
+ overflow:hidden}
+.prog .pbar i{display:block;height:100%;background:var(--accent);border-radius:999px;
+ transition:width .3s}
+@media(prefers-reduced-motion:reduce){.prog .pbar i{transition:none}}
+#people button{border-color:var(--gold)}
+#people button.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.fav{padding:2px 9px;font-size:15px;line-height:1.2;border-color:var(--line);
+ color:var(--soft);background:transparent}
+.fav.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.favo{font-size:11px;color:var(--gold)}
+.stby{font-size:12px;color:var(--soft)}
+.stby b{color:var(--accent)}
+.vby{font-size:11.5px;color:var(--soft)}
+.nsave{font-size:11.5px;min-height:15px;margin-top:-3px}
+.nsave.idle{color:var(--soft)}
+.nsave.typing{color:var(--soft)}
+.nsave.ok{color:var(--accent)}
+.nsave.wait{color:var(--warn);font-weight:600}
+.who2{font-size:12px;color:var(--soft);margin-left:6px}
+.links{display:flex;gap:8px;padding:2px 0 4px;overflow-x:auto;scrollbar-width:none}
+.links::-webkit-scrollbar{display:none}
+.links a{flex:0 0 auto;text-decoration:none;font-size:13.5px;white-space:nowrap;
+ color:var(--accent);background:var(--card);border:1px solid var(--line);
+ border-radius:999px;padding:7px 14px}
+.grid{display:grid;gap:13px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));
+ overflow-anchor:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+ padding:15px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:10px}
+.card.flag{border-left:4px solid var(--warn)}
+.card.gone{opacity:.62}
+.card.gone .price{text-decoration:line-through;text-decoration-thickness:2px}
+.dead{background:var(--warn);color:var(--paper);font-size:12.5px;font-weight:600;
+ border-radius:8px;padding:5px 10px;align-self:flex-start}
+.shot{display:block;position:relative;margin:-15px -16px 0;height:clamp(96px,26vw,150px);
+ background:var(--accent-s);overflow:hidden;border-radius:14px 14px 0 0}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot .cnt{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.5);
+ color:#fff;font-size:11px;padding:2px 8px;border-radius:999px;
+ backdrop-filter:blur(3px)}
+.shot.tile{background:#e8e4dc}
+.shot.tile img{image-rendering:auto;filter:saturate(.85)}
+.shot .pin.rough{background:transparent;border:3px dashed var(--warn);width:26px;height:26px;margin:-13px 0 0 -13px;box-shadow:none}
+.shot .pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;
+ border-radius:50%;background:var(--warn);border:2px solid #fff;
+ box-shadow:0 1px 4px rgba(0,0,0,.45)}
+.shot.none,.shot.broken{display:flex;align-items:center;justify-content:center;
+ height:auto;min-height:0;padding:9px 14px;font-size:12px;color:var(--soft);
+ background:var(--accent-s);text-align:center}
+.shot.broken img,.shot.broken .cnt{display:none}
+.shot.broken:before{content:'фото не открылось — смотри объявление'}
+.lnk{flex:0 0 auto;padding:8px 13px;border-radius:9px;border:1px solid var(--line);
+ background:transparent;font-size:15px;line-height:1.2}
+.lnk.done{border-color:var(--accent);color:var(--accent)}
+.top{display:flex;align-items:baseline;gap:9px}
+.price{font:600 22px/1 Georgia,serif}
+.ref{margin-left:auto;font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums}
+.place b{font-weight:600}.place span{color:var(--soft)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;
+ border-block:1px solid var(--line);padding:10px 0}
+.stat{text-align:center}
+.stat .v{font:600 16px/1.1 Georgia,serif;font-variant-numeric:tabular-nums}
+.stat .v.dim{color:var(--soft);font-weight:400}
+.stat .k{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--accent-s);color:var(--accent)}
+.tag.bad{background:var(--warn-s);color:var(--warn);font-weight:600}
+.tag.rooms{background:transparent;border:1px solid var(--line);color:var(--soft)}
+.exc{font-size:13px;color:var(--soft)}
+.tels{display:flex;flex-direction:column;gap:6px}
+.telrow{display:flex;gap:6px;align-items:stretch}
+.telrow .tel{flex:1}
+.wa{display:flex;align-items:center;text-decoration:none;font-size:13.5px;
+ padding:0 14px;border-radius:9px;border:1px solid var(--accent);
+ background:var(--accent);color:var(--paper);font-weight:600;white-space:nowrap}
+.tel.fixed{border-style:dashed;border-color:var(--line);background:transparent;
+ color:var(--ink);font-weight:400}
+.tel.fixed .cp{color:var(--soft)}
+.onlyfix{font-size:12px;color:var(--warn)}
+.tel{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:15px;
+ font-weight:600;font-variant-numeric:tabular-nums;border-radius:9px;
+ border:1px solid var(--accent);background:var(--accent-s);color:var(--accent)}
+.tel .cp{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);opacity:.75;font-weight:400}
+.tel.done{border-style:solid;border-color:var(--accent);color:var(--accent)}
+.tel.done .cp{color:var(--accent)}
+.tel.done .cp:after{content:' ✓'}
+.acts{display:flex;gap:7px}
+.acts a{flex:1;text-align:center;text-decoration:none;font-size:14px;padding:8px;
+ border-radius:9px;border:1px solid var(--line);color:var(--ink)}
+.acts a.pri{background:var(--accent);border-color:var(--accent);color:var(--paper);font-weight:600}
+.acts a.call{color:var(--soft)}
+.notes{border-top:1px dashed var(--line);padding-top:9px;display:flex;flex-direction:column;gap:7px}
+.note{font-size:13.5px;background:var(--accent-s);border-radius:9px;padding:7px 10px}
+.note.other{background:transparent;border:1px solid var(--line)}
+.note b{color:var(--accent)}.note .t{color:var(--soft);font-size:11px;margin-left:5px}
+textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:9px;
+ border:1px solid var(--line);background:var(--paper);color:var(--ink);resize:vertical}
+.tiers{display:flex;gap:5px;align-items:center}
+.tiers button{padding:4px 11px;font-size:14px}
+.tiers button.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.stg{display:flex;flex-direction:column;gap:4px}
+.stg .gl{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--soft)}
+.stg.why .gl{color:var(--warn)}
+.stg.why .st button.on{background:var(--warn);border-color:var(--warn);color:#fff}
+.st{display:flex;flex-wrap:wrap;gap:5px}
+.st button{padding:4px 10px;font-size:12.5px}
+.st button i{font-style:normal;font-weight:700;opacity:.85}
+.visit{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.visit .vl{font-size:12px;color:var(--soft)}
+.visit input{font:inherit;font-size:13.5px;padding:6px 8px;border-radius:8px;
+ border:1px solid var(--line);background:var(--paper);color:var(--ink);flex:1;min-width:150px}
+.visit .clr{padding:5px 11px;font-size:13px}
+#rota{margin:10px 0 0}
+.bday{font-size:12.5px;color:var(--accent);background:var(--accent-s);
+ border-radius:8px;padding:4px 9px;align-self:flex-start}
+.bday.later{color:var(--soft);background:transparent;border:1px solid var(--line)}
+.planhead{background:var(--accent-s);border:1px solid var(--accent);
+ border-radius:13px;padding:12px 14px;margin:10px 0;font-size:14.5px;color:var(--accent)}
+.planhead .m{color:var(--soft);font-size:13px;margin-top:5px;font-weight:400}
+.day.later{opacity:.6}
+.skip{padding:5px 12px;font-size:12.5px;border-color:var(--line);color:var(--soft)}
+.skip.on{border-color:var(--warn);color:var(--warn);font-weight:600}
+.pdrop{padding:9px 14px;border-top:1px solid var(--line);font-size:12.5px;
+ color:var(--soft);font-style:italic}
+.pnight{padding:9px 14px;border-top:1px solid var(--line);font-size:13px;
+ color:var(--soft);background:var(--accent-s)}
+.day.todo{border-color:var(--warn)}
+.day.todo .dh{background:var(--warn);color:var(--paper)}
+.pstop{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:9px 14px;
+ border-top:1px solid var(--line);font-size:14px}
+.pstop b{font-variant-numeric:tabular-nums}
+.pstop .pl{font-weight:600}
+.pstop .pr{color:var(--soft);font-variant-numeric:tabular-nums}
+.pstop .leg2{color:var(--soft);font-size:12.5px}
+.pstop .stt{font-size:12px;color:var(--soft)}
+.pstop .stt.todo{color:var(--warn);font-weight:600}
+.pstop a{margin-left:auto;text-decoration:none;color:var(--accent);font-size:13px;
+ border:1px solid var(--line);border-radius:8px;padding:3px 9px}
+.pstop a+a{margin-left:0}
+.pstop .st1,.pstop .st2,.pstop .st3{color:var(--gold);font-size:12.5px}
+.pstop.star3{background:linear-gradient(90deg,rgba(184,134,11,.14),transparent 60%)}
+.pstop.star3 b{color:var(--gold)}
+.pstop.nostar{opacity:.72}
+.tiero{font-size:12px;color:var(--gold)}
+.pstop.ok{background:var(--accent-s)}
+.pstop.no{opacity:.5;text-decoration:line-through}
+.day{background:var(--card);border:1px solid var(--line);border-radius:13px;
+ box-shadow:var(--sh);margin-bottom:12px;overflow:hidden}
+.dh{background:var(--accent-s);color:var(--accent);font-weight:600;padding:11px 14px;
+ font-size:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mapsbtn{margin-left:auto;font-size:13px;text-decoration:none;background:var(--accent);
+ color:var(--paper);padding:6px 13px;border-radius:999px}
+.stop{padding:11px 14px;border-top:1px solid var(--line);font-size:14.5px}
+.stop b{font-variant-numeric:tabular-nums;margin-right:8px}
+.stop .pl{font-weight:600}
+.stop .pr{color:var(--soft);font-size:13.5px;margin-left:8px}
+.stop a{text-decoration:none;color:var(--accent);font-size:18px;margin-left:8px}
+.stop .leg{font-size:12.5px;color:var(--soft);margin-top:4px}
+.stop.tight{background:var(--warn-s)}
+.stop .leg{font-variant-numeric:tabular-nums}
+.stop.tight .leg{color:var(--warn);font-weight:600}
+.gate{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;
+ justify-content:center;z-index:50}
+.gate .box{text-align:center;padding:30px}
+.gate h2{font:600 24px/1.2 Georgia,serif;margin:0 0 6px}
+.gate p{color:var(--soft);margin:0 0 22px}
+.gate .box{max-width:320px}
+.gate button{font-size:18px;padding:13px 30px;margin:5px 5px;min-width:150px}
+#toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);padding:9px 17px;
+ border-radius:9px;color:#fff;background:var(--accent);opacity:0;transition:opacity .3s;
+ pointer-events:none;z-index:60;font-size:14px}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:var(--soft);font-size:13px}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:21px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+
+<div class="gate" id="gate"><div class="box">
+  <h2>Дома</h2><p>Кто заходит?</p>
+  <button data-u="Serhii">Serhii</button>
+  <button data-u="Violeta">Violeta</button>
+  <button data-u="Milena">Milena</button>
+</div></div>
+
+<div class="wrap">
+<header>
+  <h1>Дома</h1><span class="sub" id="sub"></span><span class="sp"></span>
+  <span class="who" id="who"></span>
+  <button id="swap">выйти</button><button id="theme">◐</button>
+</header>
+<div class="bar">
+  <button data-f="all" class="on">Все</button>
+  <button data-f="work">🖐 Моя работа</button>
+  <button data-f="fresh">Не тронутые</button>
+  <button data-f="planned">📅 С датой</button>
+  <button data-f="wa">💬 Можно писать</button>
+  <button data-f="gone">🚫 Снятые</button>
+  <button data-f="plan">🧭 Круг</button>
+  <button data-f="thisweek">📆 Эта неделя</button>
+  <button data-f="skipped">🙅 Вне круга</button>
+  <button data-f="starred">★ Со звёздами</button>
+  <button data-f="mine">С заметками</button>
+  <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
+  <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
+<div class="findwrap"><div class="find"><span class="mag">🔍</span><input id="q" type="search" placeholder="Найти дом: город, адрес, № или цена"><button id="qx" title="очистить">✕</button></div></div>
+<div class="upd" id="upd"></div>
+<div class="soon" id="soon"></div>
+<div class="mine" id="mine"></div>
+<div class="prog" id="prog"></div>
+<div class="stbar" id="people"></div>
+<div class="stbar" id="stbar"></div>
+<div class="links">
+  <a href="frases.html">✍ Что писать</a>
+  <a href="lista.html">🔗 Ссылки по сайтам</a>
+</div>
+<div id="rota"></div><div id="planbox"></div><div id="mapbox"></div><div class="count" id="count"></div>
+<div class="grid" id="grid"></div>
+<footer id="foot"></footer>
+</div>
+<div id="toast"></div>
+
+<script>
+let HOUSES=[],NOTES={},STATUS={},VISITS={},sortBy=localStorage.getItem('casa_sort')||'score',filt='all',q='',me=localStorage.getItem('casa_user');
+
+const BLOB='019feb59-15e5-7ad0-81ea-0b75e08ca35a';
+const API='https://jsonblob.com/api/jsonBlob/'+BLOB;
+let DIRTY=new Set(JSON.parse(localStorage.getItem('casa_dirty')||'[]'));
+function soil(kind,id){ DIRTY.add(kind+':'+id); saveDirty(); }
+function saveDirty(){ localStorage.setItem('casa_dirty',JSON.stringify([...DIRTY])); }
+function dirtyHas(kind,id){ return DIRTY.has(kind+':'+id); }
+
+// server value wins, except where we hold something not yet confirmed sent
+function mergeMap(serverMap,localMap,kind){
+  const out=Object.assign({},serverMap||{});
+  Object.keys(localMap||{}).forEach(function(id){
+    if(dirtyHas(kind,id)) out[id]=localMap[id];
+  });
+  Object.keys(out).forEach(function(id){
+    if(out[id]==null) delete out[id];
+  });
+  return out;
+}
+// merging keeps everything, so a key I cleared has to be removed on purpose
+function dropDeleted(serverMap,localMap,kind){
+  const out=Object.assign({},serverMap||{},localMap||{});
+  DIRTY.forEach(function(d){
+    if(d.indexOf(kind+':')!==0) return;
+    const id=d.slice(kind.length+1);
+    if((localMap||{})[id]===undefined) delete out[id];
+  });
+  return out;
+}
+function mergeNotes(fresh){
+  const map=new Map((fresh||[]).map(function(n){return [key(n),n];}));
+  let pending=false;
+  Object.values(NOTES).flat().forEach(function(n){
+    const srv=map.get(key(n));
+    const ours=dirtyHas('n',n.house_id)&&n.author===me;
+    if(!srv||(ours&&(n.updated_at||'')>=(srv.updated_at||''))){
+      map.set(key(n),n);
+      if(ours) pending=true;
+    }
+  });
+  const out={};
+  [...map.values()].forEach(function(n){(out[n.house_id]=out[n.house_id]||[]).push(n);});
+  return {notes:out,pending:pending};
+}
+let FAVS={}, REMIND={}, SKIP={};
+function isSkipped(id){ return !!SKIP[id]; }
+function skipBy(id){ const x=SKIP[id]; return x&&x.by; }
+function skipWhy(id){ const x=SKIP[id]; return x&&x.why; }
+function toggleSkip(id,why){
+  if(SKIP[id]) delete SKIP[id];
+  else SKIP[id]={by:me, at:stamp(), why:why||'не подходит'};
+  soil('k',id);
+}
+// out of the circle for a reason of its own: refused, or sold
+function outOfLoop(id){
+  return isSkipped(id) || stVal(id)==='recusa';
+}
+function stVal(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.v:x; }
+function stBy(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.by:null; }
+function stAt(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.at:null; }
+function vTime(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.t:x; }
+function vBy(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.by:null; }
+function vOk(id){ const x=VISITS[id]; return !(x&&typeof x==='object'&&x.ok===false); }
+function vBefore(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.before:null; }
+function setVisitOk(id,ok,before){
+  const x=VISITS[id]||{};
+  VISITS[id]={t:(typeof x==='object'?x.t:x), by:(typeof x==='object'?x.by:me)||me,
+              ok:ok, before:ok?null:(before||vBefore(id)||defaultBefore())};
+  soil('v',id);
+}
+function defaultBefore(){
+  // agents want an answer the same evening
+  const d=new Date(); d.setHours(20,0,0,0);
+  if(d<new Date()) d.setDate(d.getDate()+1);
+  return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())+'T20:00';
+}
+function rDate(id){ const x=REMIND[id]; return x&&typeof x==='object'?x.d:x; }
+function rBy(id){ const x=REMIND[id]; return x&&typeof x==='object'?x.by:null; }
+function setRemind(id,d){ REMIND[id]={d:d,by:me}; soil('r',id); }
+function stamp(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
+const COUNTED=['escrito','ligado','semresp'];   // things you do more than once
+function stTry(id){ const x=STATUS[id]; return (x&&typeof x==='object'&&x.n)||0; }
+function setStatus(id,v){
+  const keep = v==='recusa' ? stWhy(id) : null;
+  // tapping the same reach again means you tried again
+  const n = (COUNTED.indexOf(v)>=0 && stVal(id)===v) ? stTry(id)+1 : 1;
+  STATUS[id]={v:v,by:me,at:stamp(),why:keep,n:n};
+  soil('s',id);
+}
+function setVisit(id,t){ VISITS[id]={t:t,by:me}; soil('v',id); }
+
+function favList(who){ return FAVS[who||me]||[]; }
+function isFav(id,who){ return favList(who).indexOf(String(id))>=0; }
+function toggleFav(id){
+  const l=favList().slice(), i=l.indexOf(String(id));
+  if(i>=0) l.splice(i,1); else l.push(String(id));
+  FAVS[me]=l; soil('f',me);
+}
+function favOwners(id){
+  return Object.keys(FAVS).filter(function(u){ return isFav(id,u); });
+}
+let SYNCED=false;
+
+function cacheSave(){
+  localStorage.setItem('casa_notes',JSON.stringify(Object.values(NOTES).flat()));
+  localStorage.setItem('casa_status',JSON.stringify(STATUS));
+  localStorage.setItem('casa_visits',JSON.stringify(VISITS));
+  localStorage.setItem('casa_favs',JSON.stringify(FAVS));
+  localStorage.setItem('casa_remind',JSON.stringify(REMIND));
+  localStorage.setItem('casa_skip',JSON.stringify(SKIP));
+}
+function cacheLoad(){
+  try{
+    STATUS=JSON.parse(localStorage.getItem('casa_status')||'{}');
+    VISITS=JSON.parse(localStorage.getItem('casa_visits')||'{}');
+    FAVS=JSON.parse(localStorage.getItem('casa_favs')||'{}');
+    REMIND=JSON.parse(localStorage.getItem('casa_remind')||'{}');
+    SKIP=JSON.parse(localStorage.getItem('casa_skip')||'{}');
+    return JSON.parse(localStorage.getItem('casa_notes')||'[]');
+  }catch(e){ STATUS={}; return []; }
+}
+function key(n){ return n.house_id+'|'+n.author; }
+
+async function pull(){
+  try{
+    const r=await fetch(API+'?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    SYNCED=true;
+    STATUS=mergeMap(d.status,STATUS,'s');
+    VISITS=mergeMap(d.visits,VISITS,'v');
+    FAVS=mergeMap(d.favs,FAVS,'f');
+    REMIND=mergeMap(d.remind,REMIND,'r');
+    SKIP=mergeMap(d.skip,SKIP,'k');
+    return d.notes||[];
+  }catch(e){ SYNCED=false; return cacheLoad(); }
+}
+
+// merge my change into whatever is on the server, so we never clobber
+// the other person's note
+function mark(){
+  const el=document.getElementById('sub');
+  if(!el||!HOUSES.length) return;
+  const c=Object.keys(NOTES).filter(function(k){
+    return (NOTES[k]||[]).some(function(n){return (n.text||'').trim();}); }).length;
+  el.textContent=HOUSES.length+' домов · '+c+' с заметками · '+
+    (SYNCED?'синхронизировано':(retryTimer?'не отправлено…':'офлайн'));
+}
+async function push(mine){
+  cacheSave();
+  try{
+    const r=await fetch(API+'?t='+Date.now(),{cache:'no-store'});
+    const cur = r.ok ? await r.json() : {notes:[],status:{}};
+    const map=new Map((cur.notes||[]).map(n=>[key(n),n]));
+    Object.values(NOTES).flat().forEach(n=>{
+      const old=map.get(key(n));
+      if(!old || n.author===me || (n.updated_at||'')>(old.updated_at||'')) map.set(key(n),n);
+    });
+    // a note I deleted is gone from NOTES, so merging alone would bring it back
+    DIRTY.forEach(function(d){
+      if(d.indexOf('n:')!==0) return;
+      const id=d.slice(2);
+      if(!(NOTES[id]||[]).some(function(n){return n.author===me;})) map.delete(id+'|'+me);
+    });
+    const body={notes:[...map.values()],
+                status:dropDeleted(cur.status,STATUS,'s'),
+                visits:dropDeleted(cur.visits,VISITS,'v'),
+                favs:dropDeleted(cur.favs,FAVS,'f'),
+                remind:dropDeleted(cur.remind,REMIND,'r'),
+                skip:dropDeleted(cur.skip,SKIP,'k'),v:1};
+    const w=await fetch(API,{method:'PUT',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(body)});
+    if(!w.ok) throw 0;
+    SYNCED=true;
+    NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
+    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{}; SKIP=body.skip||{};
+    cacheSave();
+    DIRTY.clear(); saveDirty();
+    return true;
+  }catch(e){ SYNCED=false; scheduleRetry(); return false; }
+}
+
+// pick up the other person's edits while the page is open
+const POLL_MIN=20000, POLL_MAX=150000;
+let pollWait=POLL_MIN, pollTimer=null, retryTimer=null;
+
+function scheduleRetry(){
+  if(retryTimer) return;                        // one pending retry is enough
+  retryTimer=setTimeout(async()=>{ retryTimer=null; await push(); mark(); }, 15000);
+}
+
+
+// The page cannot update itself in the background, but it can notice.
+const BUILD='20260810-1901-a70be27';
+let updateSeen=false;
+async function checkBuild(){
+  if(updateSeen) return;
+  try{
+    const r=await fetch('version.txt?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok) return;
+    const live=(await r.text()).trim();
+    if(!live||live===BUILD) return;
+    updateSeen=true;
+    const busy=document.activeElement&&
+      (document.activeElement.tagName==='TEXTAREA'||document.activeElement.tagName==='INPUT');
+    if(!busy&&!DIRTY.size){ location.reload(); return; }   // nothing to lose
+    const bar=document.getElementById('upd');
+    if(bar){ bar.className='upd on';
+      bar.innerHTML='Вышла новая версия сайта <button id="updgo">обновить</button>'; }
+  }catch(e){}
+}
+
+async function tick(){
+  if(!document.hidden){
+    const fresh=await pull();
+    if(SYNCED){
+      pollWait=POLL_MIN;                        // the server is answering again
+      const before=JSON.stringify(Object.values(NOTES).flat()
+        .map(function(n){return key(n)+'|'+(n.text||'')+'|'+(n.tier||'');}).sort());
+      const m=mergeNotes(fresh);
+      NOTES=m.notes;
+      const after=JSON.stringify(Object.values(NOTES).flat()
+        .map(function(n){return key(n)+'|'+(n.text||'')+'|'+(n.tier||'');}).sort());
+      if(before!==after){ cacheSave(); render(); }
+      if(m.pending||DIRTY.size) scheduleRetry();   // we are ahead of the server
+    } else {
+      pollWait=Math.min(pollWait*2, POLL_MAX);  // throttled or offline - ease off
+    }
+    mark();
+    checkBuild();
+  }
+  pollTimer=setTimeout(tick, pollWait);
+}
+pollTimer=setTimeout(tick, POLL_MIN);
+
+// coming back to the tab, or back online, is worth an immediate look
+document.addEventListener('visibilitychange',function(){
+  if(!document.hidden){ clearTimeout(pollTimer); pollWait=POLL_MIN; tick(); }
+});
+addEventListener('online',function(){ clearTimeout(pollTimer); pollWait=POLL_MIN; tick(); });
+
+
+const eur=n=>n?new Intl.NumberFormat('pt-PT').format(n)+' €':'—';
+const m2=n=>n?new Intl.NumberFormat('pt-PT').format(Math.round(n)):'—';
+const esc=s=>(s||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+
+function toast(m,bad){const t=document.getElementById('toast');t.textContent=m;
+ t.style.background=bad?'#b3261e':'var(--accent)';t.style.opacity='1';
+ clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',1500);}
+
+function setUser(u){me=u;localStorage.setItem('casa_user',u);
+ document.getElementById('who').textContent=u;
+ document.getElementById('gate').style.display='none';}
+
+async function load(){
+ HOUSES=await (await fetch('data.json?v='+Date.now())).json();
+ const all=await pull();
+ NOTES={};all.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
+ mark();
+ loadPlan();
+ if(DIRTY.size){ push().then(mark); }
+ document.getElementById('foot').innerHTML=
+  '«выше округи» — насколько дом выше среднего рельефа в радиусе 15 км. '+
+  '«до соседа» — до ближайшей постройки по карте. '+
+  'Оценка: земля 30, комнаты 15, высота 15, без соседей 15, туалеты 10, лес 10, площадь 5. '+
+  'Заметки общие — Serhii, Violeta, Milena.';
+ render();
+}
+
+
+// "Лейрия" should find Leiria. Nobody spells a foreign name the same way twice,
+// so transliterate and then match loosely rather than demanding an exact hit.
+const RU_LAT={а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'e',ж:'j',з:'z',и:'i',й:'i',
+  к:'c',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',
+  ц:'c',ч:'ch',ш:'sh',щ:'sh',ъ:'',ы:'i',ь:'',э:'e',ю:'iu',я:'ia'};
+function deaccent(t){ return t.normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function translit(t){
+  // portuguese endings sound nothing like they are written
+  // \b is ASCII-only in JS, so end-of-word has to be spelled out
+  const E='(?![а-яё])';
+  [['ия','ia'],['ий','i'],['уш','os'],['ош','os'],['иш','es'],['аш','as'],['ш','s']]
+    .forEach(function(r){ t=t.replace(new RegExp(r[0]+E,'g'),r[1]); });
+  t=t.replace(/ья/g,'ia');
+  return t.replace(/[а-яё]/g,function(c){ return RU_LAT[c]!==undefined?RU_LAT[c]:c; });
+}
+function matches(hay,query){
+  hay=deaccent(hay.toLowerCase());
+  const q=deaccent(query.toLowerCase()).trim();
+  if(!q) return true;
+  if(hay.includes(q)) return true;
+  const words=hay.split(/[\s,·]+/);
+  // "Порту де Мош" is three words, each with its own spelling problem
+  return q.split(/\s+/).every(function(part){
+    if(hay.includes(part)) return true;
+    if(!/[а-яё]/.test(part)) return false;
+    const t=translit(part);
+    if(hay.includes(t)) return true;
+    // the tail of a transliteration is the least reliable part - drop it
+    const stem=t.slice(0,Math.max(3,t.length-1));
+    return words.some(function(w){ return w.startsWith(stem); });
+  });
+}
+
+// work means reaching out or writing something down - a level is neither
+function touchedBy(id,who){
+  return stBy(id)===who
+      || vBy(id)===who
+      || (NOTES[id]||[]).some(function(n){ return n.author===who && (n.text||'').trim(); });
+}
+function myWork(who){
+  return HOUSES.filter(function(h){ return touchedBy(h.id,who); });
+}
+function keep(h){
+ if(filt==='mine'&&!(NOTES[h.id]||[]).some(function(n){return (n.text||'').trim();}))return false;
+ if(filt==='work'&&!touchedBy(h.id,me))return false;
+ if(filt==='fresh'&&(stVal(h.id)||vTime(h.id)||
+   (NOTES[h.id]||[]).some(function(n){return (n.text||'').trim();})))return false;
+ if(filt==='planned'&&!vTime(h.id))return false;
+ if(filt==='plan')return false;          // the plan draws itself
+ if(filt==='thisweek'&&(!(DAYOF[h.id]&&DAYOF[h.id].week)||outOfLoop(h.id)))return false;
+ if(filt==='skipped'&&!isSkipped(h.id))return false;
+ if(filt==='starred'&&!bestTier(h.id))return false;
+ if(filt==='gone'&&!isSold(h))return false;
+ if(filt==='live'&&isSold(h))return false;
+ if(filt==='wa'&&!(h.agent_phone&&telList(h.agent_phone).some(isMobile)))return false;
+ if(filt==='flag'&&!h.desc_blockers)return false;
+ if(filt==='rota'&&!vTime(h.id))return false;
+ if(filt==='mapa'&&!h.lat)return false;
+ if(filt.indexOf('st:')===0&&stVal(h.id)!==filt.slice(3))return false;
+ if(filt==='fav'&&!isFav(h.id))return false;
+ if(filt==='favall'&&!favOwners(h.id).length)return false;
+ if(filt.indexOf('by:')===0&&stBy(h.id)!==filt.slice(3))return false;
+ if(q){
+  const num=q.replace(/[^\d]/g,'');
+  if(num.length>=3){
+    const hit=String(h.id)===num||String(Math.round(h.price_eur||0)).startsWith(num)||
+      (h.url||'').includes(num);
+    if(hit) return true;
+  }
+  const hay=[h.concelho,h.freguesia,h.district,h.agency_name,h.address,h.url]
+    .filter(Boolean).join(' ');
+  if(!matches(hay,q))return false;}
+ return true;
+}
+
+function noteBlock(h){
+ const list=(NOTES[h.id]||[]);
+ const mine=list.find(n=>n.author===me);
+ const others=list.filter(n=>n.author!==me);
+ return '<div class="notes">'+
+  (tierOwners(h.id).length>1
+    ? '<div class="tiero">'+tierOwners(h.id).join(' · ')+'</div>' : '')+
+  others.map(n=>'<div class="note other"><b>'+n.author+'</b><span class="t">'+
+    (n.updated_at||'').slice(5,16).replace('T',' ').replace(' ',' в ')+'</span><br>'+esc(n.text)+'</div>').join('')+
+  '<div class="tiers"><span style="font-size:12px;color:var(--soft)">уровень</span>'+
+   [1,2,3].map(t=>'<button data-tier="'+t+'" data-h="'+h.id+'"'+
+     (mine&&mine.tier===t?' class="on"':'')+'>'+'★'.repeat(t)+'</button>').join('')+'</div>'+
+  '<textarea data-note="'+h.id+'" placeholder="'+(me||'')+': твоя заметка…">'+
+    esc(mine?mine.text:'')+'</textarea>'+
+  '<div class="nsave '+((SAVEMSG[h.id]||{}).state||'idle')+'" data-nsave="'+h.id+'">'+
+    ((SAVEMSG[h.id]||{}).txt || (mine&&mine.text?'сохранено '+
+      (mine.updated_at||'').slice(11):''))+'</div>'+
+  '<div class="visit"><span class="vl">визит</span>'+
+   '<input type="datetime-local" data-visit="'+h.id+'" value="'+(vTime(h.id)||'')+'">'+
+   (vTime(h.id)?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+
+   (vBy(h.id)?'<span class="vby">'+vBy(h.id)+'</span>':'')+
+   (vTime(h.id)?'<button class="cal" data-cal="'+h.id+'">в календарь</button>':'')+
+   '<button class="skip'+(isSkipped(h.id)?' on':'')+'" data-skip="'+h.id+'">'+
+     (isSkipped(h.id)?'вернуть в круг':'убрать из круга')+'</button>'+
+   (vTime(h.id)?'<button class="conf'+(vOk(h.id)?'':' off')+'" data-conf="'+h.id+'" '+
+     'title="подтверждён или ещё нет">'+(vOk(h.id)?'✓ точно':'? не точно')+'</button>':'')+
+   '</div>'+
+   (vTime(h.id)&&!vOk(h.id)
+     ? '<div class="visit before"><span class="vl">ответить до</span>'+
+       '<input type="datetime-local" data-before="'+h.id+'" value="'+
+         (vBefore(h.id)||defaultBefore())+'"></div>'
+     : '')+
+  '<div class="visit"><span class="vl">напомнить</span>'+
+   '<input type="date" data-remind="'+h.id+'" value="'+(rDate(h.id)||'')+'">'+
+   (rDate(h.id)?'<button class="clr" data-rclr="'+h.id+'">x</button>':'')+
+   (rBy(h.id)?'<span class="vby">'+rBy(h.id)+'</span>':'')+'</div>'+
+  (stBy(h.id)?'<div class="stby">'+(ST_SHORT[stVal(h.id)]||stVal(h.id))+
+     (stTry(h.id)>1?' ×'+stTry(h.id):'')+
+     (stWhy(h.id)?' · '+(WHY[stWhy(h.id)]||stWhy(h.id)):'')+
+     ' · <b>'+stBy(h.id)+'</b>'+(stAt(h.id)?' · '+stAt(h.id).slice(5,16).replace(' ',' в '):'')+'</div>':'')+
+  '<div class="stg"><span class="gl">что сделал</span><div class="st">'+
+    ST_REACH.map(s=>'<button data-st="'+s+'" data-h="'+h.id+'"'+
+      ((stVal(h.id)||h.status)===s?' class="on"':'')+'>'+ST_SHORT[s]+
+      (stVal(h.id)===s&&stTry(h.id)>1?' <i>&times;'+stTry(h.id)+'</i>':'')+
+      '</button>').join('')+
+  '</div></div>'+
+  '<div class="stg"><span class="gl">что в ответ</span><div class="st">'+
+    ST_BACK.map(s=>'<button data-st="'+s+'" data-h="'+h.id+'"'+
+      ((stVal(h.id)||h.status)===s?' class="on"':'')+'>'+ST_SHORT[s]+'</button>').join('')+
+  '</div></div>'+
+  (stVal(h.id)==='recusa'
+    ? '<div class="stg why"><span class="gl">почему отказ</span><div class="st">'+
+      Object.keys(WHY).map(w=>'<button data-why="'+w+'" data-h="'+h.id+'"'+
+        (stWhy(h.id)===w?' class="on"':'')+'>'+WHY[w]+'</button>').join('')+
+      '</div></div>'
+    : '')+
+  '</div>';
+}
+
+function digits9(raw){
+  const d=String(raw).replace(/[^0-9]/g,'');
+  return d.length>9?d.slice(-9):d;
+}
+function isMobile(raw){ return digits9(raw).startsWith('9'); }
+function telList(raw){
+  // mobiles first - they are the ones you can write to
+  return String(raw).split(';').map(function(t){return t.trim();}).filter(Boolean)
+    .sort(function(a,b){ return (isMobile(b)?1:0)-(isMobile(a)?1:0); });
+}
+function waLink(raw){ return 'https://wa.me/351'+digits9(raw); }
+function telHref(raw){
+  const first=String(raw).split(';')[0].trim().replace(/[^\d+]/g,'');
+  return first.startsWith('+')?first:'+351'+first;
+}
+function prettyTel(raw){
+  const d=String(raw).replace(/[^\d]/g,'');
+  const nine=d.length>9?d.slice(-9):d;                 // drop the country code
+  return '+351 '+nine.replace(/(\d{3})(\d{3})(\d{3})/,'$1 $2 $3');
+}
+function copyText(text){
+  if(navigator.clipboard&&window.isSecureContext) return navigator.clipboard.writeText(text);
+  return new Promise(function(res,rej){
+    const a=document.createElement('textarea');
+    a.value=text; a.style.position='fixed'; a.style.opacity='0';
+    document.body.appendChild(a); a.select();
+    try{ document.execCommand('copy'); res(); }catch(e){ rej(e); }
+    document.body.removeChild(a);
+  });
+}
+// slippy-map maths: which tile holds this point, and where inside it
+function tileFor(lat,lon,z){
+  const n=Math.pow(2,z);
+  const x=(lon+180)/360*n;
+  const r=lat*Math.PI/180;
+  const y=(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n;
+  return {x:Math.floor(x), y:Math.floor(y), z:z,
+          dx:(x-Math.floor(x))*100, dy:(y-Math.floor(y))*100};
+}
+function mapThumb(h){
+  // the house if we have it, otherwise the town - and the label says which
+  const exact=!!h.lat;
+  const la=exact?h.lat:h.town_lat, lo=exact?h.lon:h.town_lon;
+  if(!la) return '<div class="shot none">нет фото и нет координат</div>';
+  const t=tileFor(la,lo,exact?14:12);
+  return '<a class="shot tile" href="https://www.google.com/maps/search/?api=1&query='+
+    la+','+lo+'" target="_blank" rel="noopener">'+
+    '<img src="https://tile.openstreetmap.org/'+t.z+'/'+t.x+'/'+t.y+'.png" '+
+      'alt="" loading="lazy" decoding="async">'+
+    '<span class="pin'+(exact?'':' rough')+'" style="left:'+t.dx.toFixed(1)+
+      '%;top:'+t.dy.toFixed(1)+'%"></span>'+
+    '<span class="cnt">'+(exact?'фото нет — вот место':'фото нет — примерно этот город')+
+    '</span></a>';
+}
+// gone by two roads: the ad stopped opening, or someone told us it is sold
+function isSold(h){
+  return h.listing_status==='gone' || stWhy(h.id)==='vendido';
+}
+function card(h){
+ const flags=(h.desc_blockers||'').split(';').map(s=>s.trim()).filter(Boolean);
+ const goods=(h.desc_goods||'').split(';').map(s=>s.trim()).filter(Boolean);
+ const rooms=(h.desc_rooms||'').split(';').map(s=>s.trim()).filter(Boolean);
+ const rel=h.elevation_relative_m;
+ const relT=rel==null?'—':(rel>0?'+'+Math.round(rel):Math.round(rel));
+ return '<article class="card'+(flags.length?' flag':'')+
+   (isSold(h)?' gone':'')+'">'+
+  '<div class="top"><span class="price">'+eur(h.price_eur)+'</span>'+
+   (h.auto_score!=null?'<span class="nota'+(h.score_parts<5?' thin':'')+
+     '" title="известно '+h.score_parts+' из 7 критериев">'+h.auto_score+'</span>':'')+
+   '<button class="fav'+(isFav(h.id)?' on':'')+'" data-fav="'+h.id+'" '+
+     'title="моё избранное">★</button>'+
+   (favOwners(h.id).filter(function(u){return u!==me;}).length?
+     '<span class="favo">'+favOwners(h.id).filter(function(u){return u!==me;})
+       .join(', ')+'</span>':'')+
+   '<span class="ref">#'+h.id+'</span></div>'+
+  (h.first_photo_url
+    ? '<a class="shot" href="'+h.url+'" target="_blank" rel="noopener">'+
+        '<img src="'+h.first_photo_url+'" alt="" loading="lazy" decoding="async" '+
+        'onerror="this.closest(\'.shot\').classList.add(\'broken\')">'+
+        (h.photo_count?'<span class="cnt">'+h.photo_count+' фото</span>':'')+
+      '</a>'
+    : mapThumb(h))+
+  (isSold(h)
+    ? '<div class="dead">'+
+      (stWhy(h.id)==='vendido'
+        ? 'продан — сказал '+(stBy(h.id)||'кто-то')+
+          (stAt(h.id)?' '+stAt(h.id).slice(5,16).replace(' ',' в '):'')
+        : 'объявление снято с сайта'+
+          (h.listing_checked?' · проверено '+h.listing_checked.slice(5,10):''))+
+      '</div>'
+    : '')+
+  (DAYOF[h.id]&&!outOfLoop(h.id)
+    ? '<div class="bday'+(DAYOF[h.id].week?'':' later')+'">'+
+      (DAYOF[h.id].week
+        ? 'звать на <b>'+(DAYOF[h.id].when||('день '+DAYOF[h.id].label))+'</b>, около '+
+          DAYOF[h.id].at+
+          (DAYOF[h.id].swap&&DAYOF[h.id].swap.length
+            ? ' · можно сдвинуть на '+DAYOF[h.id].swap.join(' или ') : '')
+        : 'в круге на день '+DAYOF[h.id].label+' — эта часть отложена')+
+      '</div>'
+    : '')+
+  '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
+  '<div class="stats">'+
+   '<div class="stat"><div class="v">'+m2(h.land_area_m2)+'</div><div class="k">земля м²</div></div>'+
+   '<div class="stat"><div class="v'+(h.area_m2?'':' dim')+'">'+m2(h.area_m2)+'</div><div class="k">дом м²</div></div>'+
+   '<div class="stat"><div class="v'+(h.bedrooms?'':' dim')+'">'+(h.bedrooms?'T'+h.bedrooms:'—')+'</div><div class="k">комнаты</div></div>'+
+   '<div class="stat"><div class="v'+(h.bathrooms?'':' dim')+'">'+(h.bathrooms||'—')+'</div><div class="k">туалеты</div></div></div>'+
+  '<div class="stats">'+
+   '<div class="stat"><div class="v'+(h.elevation_m?'':' dim')+'">'+(h.elevation_m?Math.round(h.elevation_m)+' м':'—')+'</div><div class="k">высота</div></div>'+
+   '<div class="stat"><div class="v'+(rel?'':' dim')+'">'+relT+'</div><div class="k">выше округи</div></div>'+
+   '<div class="stat"><div class="v'+(h.nearest_building_m?'':' dim')+'">'+(h.nearest_building_m?Math.round(h.nearest_building_m)+' м':'—')+'</div><div class="k">до соседа</div></div>'+
+   '<div class="stat"><div class="v'+(h.dist_lisbon_km?'':' dim')+'">'+(h.dist_lisbon_km?Math.round(h.dist_lisbon_km):'—')+'</div><div class="k">км до Лиссабона</div></div></div>'+
+  (flags.length?'<div class="tags">'+flags.map(f=>'<span class="tag bad">⚠ '+f+'</span>').join('')+'</div>':'')+
+  (goods.length?'<div class="tags">'+goods.slice(0,6).map(g=>'<span class="tag">'+g+'</span>').join('')+'</div>':'')+
+  (rooms.length?'<div class="tags">'+rooms.slice(0,5).map(r=>'<span class="tag rooms">'+r+'</span>').join('')+'</div>':'')+
+
+  (h.agent_phone?'<div class="tels">'+
+    telList(h.agent_phone).slice(0,3).map(function(t){
+      const m=isMobile(t);
+      return '<div class="telrow">'+
+        '<button class="tel'+(m?'':' fixed')+'" data-tel="'+t+'">'+prettyTel(t)+
+          '<span class="cp">'+(m?'моб':'стац')+'</span></button>'+
+        (m?'<a class="wa" href="'+waLink(t)+'" target="_blank" rel="noopener">WhatsApp</a>':'')+
+        '</div>';
+    }).join('')+
+    (telList(h.agent_phone).every(function(t){return !isMobile(t);})
+      ? '<div class="onlyfix">только стационарный — WhatsApp не дойдёт, звонить</div>'
+      : '')+
+    '</div>':'')+
+  '<div class="acts">'+
+   (h.agent_phone?'<a class="call" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
+
+   '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление</a>'+
+   '<button class="lnk" data-link="'+h.id+'" title="скопировать ссылку">🔗</button></div>'+
+  noteBlock(h)+'</article>';
+}
+
+
+function visitWord(n){
+  const t=n%10, h=n%100;
+  if(t===1&&h!==11) return 'визит';
+  if(t>=2&&t<=4&&(h<12||h>14)) return 'визита';
+  return 'визитов';
+}
+
+// OSRM's demo router: no key, and it answers with the road itself
+const ROADS={};                                  // "lat,lon;lat,lon" -> {km,min,line}
+function roadKey(a,b){ return a.lat+','+a.lon+';'+b.lat+','+b.lon; }
+async function roadBetween(a,b){
+  if(!a.lat||!b.lat) return null;
+  const k=roadKey(a,b);
+  if(ROADS[k]!==undefined) return ROADS[k];
+  ROADS[k]=null;                                 // do not ask twice while in flight
+  try{
+    const u='https://router.project-osrm.org/route/v1/driving/'+
+      a.lon+','+a.lat+';'+b.lon+','+b.lat+'?overview=full&geometries=geojson';
+    const r=await fetch(u,{cache:'no-store'});
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    const rt=d.routes&&d.routes[0];
+    if(!rt) throw 0;
+    ROADS[k]={km:rt.distance/1000, min:rt.duration/60,
+              line:rt.geometry.coordinates.map(function(c){return [c[1],c[0]];})};
+  }catch(e){ ROADS[k]=false; }                   // false = asked and failed
+  return ROADS[k];
+}
+async function fillRoads(items){
+  let got=false;
+  for(let i=1;i<items.length;i++){
+    const r=await roadBetween(items[i-1].h,items[i].h);
+    if(r) got=true;
+  }
+  return got;
+}
+function gapWords(min){
+  const h=Math.floor(min/60), m=Math.round(min%60);
+  return (h?h+' ч ':'')+(m?m+' мин':(h?'':'0 мин'));
+}
+
+function fmtDay(v){
+  var d=new Date(v+'T00:00'); if(isNaN(d)) return v;
+  return d.toLocaleDateString('ru-RU',{weekday:'long',day:'2-digit',month:'2-digit'});
+}
+function fmtTime(v){ return (v||'').slice(11,16); }
+function kmBetween(a,b){
+  if(!a.lat||!b.lat) return null;
+  var R=6371, r=function(x){return x*Math.PI/180;};
+  var dp=r(b.lat-a.lat), dl=r(b.lon-a.lon);
+  var q=Math.pow(Math.sin(dp/2),2)+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.pow(Math.sin(dl/2),2);
+  return 2*R*Math.asin(Math.sqrt(q));
+}
+function renderRota(){
+  var box=document.getElementById('rota');
+  var ids=Object.keys(VISITS).filter(function(k){return vTime(k);});
+  if(filt!=='rota'||!ids.length){ box.innerHTML=''; return; }
+  var items=ids.map(function(id){
+      return {h:HOUSES.filter(function(x){return String(x.id)===String(id);})[0], t:vTime(id), by:vBy(id)};
+    }).filter(function(x){return x.h;})
+      .sort(function(a,b){return a.t.localeCompare(b.t);});
+  var days={};
+  items.forEach(function(it){ var d=it.t.slice(0,10); (days[d]=days[d]||[]).push(it); });
+  var html='';
+  Object.keys(days).sort().forEach(function(d){
+    var list=days[d];
+    var pts=list.filter(function(x){return x.h.lat;})
+                .map(function(x){return x.h.lat+','+x.h.lon;});
+    var maps=pts.length?'https://www.google.com/maps/dir/'+pts.join('/'):'';
+    html+='<div class="day"><div class="dh">'+fmtDay(d)+' &middot; '+list.length+
+          ' '+visitWord(list.length)+
+          (maps?'<a class="mapsbtn" target="_blank" rel="noopener" href="'+maps+'">открыть в Maps</a>':'')+
+          '</div>';
+    list.forEach(function(it,i){
+      var prev=i?list[i-1].h:null;
+      var road=prev?ROADS[roadKey(prev,it.h)]:null;
+      var byRoad=!!road;
+      var dist=prev?(byRoad?road.km:kmBetween(prev,it.h)):null;
+      var drive=dist!=null?Math.round(byRoad?road.min:dist):null;
+      var gap=prev?(new Date(it.t)-new Date(list[i-1].t))/60000:null;
+      var spare=(drive!=null&&gap!=null)?gap-drive-45:null;   // 45 min to look round
+      var tight=(spare!=null&&spare<0);
+      html+='<div class="stop'+(tight?' tight':'')+'">'+
+        '<b>'+fmtTime(it.t)+'</b>'+
+        '<span class="pl">'+(it.h.concelho||'?')+'</span>'+
+        '<span class="pr">'+(it.h.price_eur?new Intl.NumberFormat('pt-PT').format(it.h.price_eur)+' &euro;':'')+'</span>'+
+        (it.by?'<span class="who2">'+it.by+'</span>':'')+
+        (it.h.agent_phone?'<a href="tel:+351'+it.h.agent_phone+'">&#9742;</a>':'')+
+        (dist!=null?'<div class="leg">'+Math.round(dist)+' км &middot; '+drive+
+           ' мин за рулём'+(byRoad?' по дороге':' по прямой')+
+           (spare!=null?(spare>=0?' &middot; в запасе '+gapWords(spare)
+                                : ' &middot; не хватает '+gapWords(-spare)):'')+
+           '</div>':'')+
+        '</div>';
+    });
+    html+='</div>';
+  });
+  box.innerHTML=html;
+  var need=[];
+  Object.keys(days).forEach(function(d){ need=need.concat(days[d]); });
+  fillRoads(need).then(function(got){ if(got&&filt==='rota') renderRota(); });
+}
+
+
+var MAP=null, LAYER=null, ROUTE=null, LEAFLET=false;
+var DAY_COLOURS=['#c25a2b','#2e6b4f','#7b3fb5','#1f6f8b','#8a6d1f'];
+function loadLeaflet(cb){
+  if(LEAFLET) return cb();
+  var css=document.createElement('link');
+  css.rel='stylesheet'; css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(css);
+  var js=document.createElement('script');
+  js.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  js.onload=function(){LEAFLET=true;cb();};
+  js.onerror=function(){toast('Карта не загрузилась',true);};
+  document.head.appendChild(js);
+}
+function pinColour(h){
+  var t=bestTier(h.id);
+  if(t===3) return '#b8860b';          // both of us
+  if(t===2) return '#c9a227';
+  if(t===1) return '#d9c26a';
+  if(stVal(h.id)==='top') return '#c25a2b';
+  if(isFav(h.id)) return '#c9a227';
+  if(vTime(h.id)) return '#7b3fb5';
+  if(h.desc_blockers) return '#b03a3a';
+  var t=(NOTES[h.id]||[]).filter(function(n){return n.author===me&&n.tier;})[0];
+  if(t&&t.tier>=3) return '#2e6b4f';
+  return '#5a7f9c';
+}
+function renderMapa(list){
+  var box=document.getElementById('mapbox');
+  if(filt!=='mapa'){ box.classList.remove('on'); return; }
+  box.classList.add('on');
+  loadLeaflet(function(){
+    if(!MAP){
+      MAP=L.map(box,{scrollWheelZoom:true}).setView([39.9,-8.4],8);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(MAP);
+    }
+    if(LAYER) MAP.removeLayer(LAYER);
+    if(ROUTE) MAP.removeLayer(ROUTE);
+    var pts=[];
+    LAYER=L.layerGroup(list.filter(function(h){return h.lat;}).map(function(h){
+      pts.push([h.lat,h.lon]);
+      var booked=!!vTime(h.id);
+      var t=bestTier(h.id);
+      var r = booked ? 4 : (t===3?13 : t===2?11 : t===1?9 : 6);
+      var m=L.circleMarker([h.lat,h.lon],{radius:r,weight:booked?1:(t?3:2),
+        color:t?'#fff':'#ffffffcc',fillColor:pinColour(h),
+        fillOpacity:booked?.35:(t?1:.6)});
+      var det=[];
+      if(bestTier(h.id)) det.push('★'.repeat(bestTier(h.id))+' '+
+        tierOwners(h.id).join(', '));
+      if(h.bedrooms) det.push('T'+h.bedrooms);
+      if(h.land_area_m2) det.push('земля '+new Intl.NumberFormat('pt-PT').format(h.land_area_m2)+' м²');
+      if(h.elevation_m) det.push(Math.round(h.elevation_m)+' м высота');
+      m.bindPopup('<div class="pp"><b>'+(h.concelho||'?')+'</b> &middot; '+eur(h.price_eur)+
+        '<div class="m">'+det.join(' &middot; ')+'</div>'+
+        (vTime(h.id)?'<div class="m">визит '+vTime(h.id).replace('T',' ')+
+          (vBy(h.id)?' · '+vBy(h.id):'')+'</div>':'')+
+        '<a href="'+h.url+'" target="_blank" rel="noopener">объявление</a>'+
+        (h.agent_phone?' &nbsp; <a href="tel:+351'+h.agent_phone+'">позвонить</a>':'')+
+        ' &nbsp; <a href="https://www.google.com/maps/search/?api=1&query='+h.lat+','+h.lon+
+        '" target="_blank" rel="noopener">маршрут</a></div>');
+      return m;
+    })).addTo(MAP);
+    // the booked days, in order, over the top of everything else
+    var byDay={};
+    Object.keys(VISITS).forEach(function(id){
+      var t=vTime(id); if(!t) return;
+      var hh=list.filter(function(x){return String(x.id)===String(id);})[0];
+      if(!hh||!hh.lat) return;
+      (byDay[t.slice(0,10)]=byDay[t.slice(0,10)]||[]).push({h:hh,t:t});
+    });
+    var days=Object.keys(byDay).sort(), routeBits=[], routePts=[];
+    days.forEach(function(d,di){
+      var col=DAY_COLOURS[di%DAY_COLOURS.length];
+      var stops=byDay[d].sort(function(a,b){ return a.t.localeCompare(b.t); });
+      var line=stops.map(function(x){ return [x.h.lat,x.h.lon]; });
+      for(var q=1;q<stops.length;q++){
+        var rd=ROADS[roadKey(stops[q-1].h,stops[q].h)];
+        routeBits.push(rd
+          ? L.polyline(rd.line,{color:col,weight:4,opacity:.9})
+          : L.polyline([[stops[q-1].h.lat,stops[q-1].h.lon],
+                        [stops[q].h.lat,stops[q].h.lon]],
+              {color:col,weight:3,opacity:.7,dashArray:'7 6'}));
+      }
+      stops.forEach(function(x,i){
+        routePts.push([x.h.lat,x.h.lon]);
+        routeBits.push(L.marker([x.h.lat,x.h.lon],{icon:L.divIcon({
+          className:'stoppin', iconSize:[30,30], iconAnchor:[15,15],
+          html:'<span style="background:'+col+'">'+(i+1)+'</span>'})})
+          .bindPopup('<div class="pp"><b>'+fmtDay(d)+' '+x.t.slice(11,16)+'</b> · '+
+            (x.h.concelho||'?')+'<div class="m">'+eur(x.h.price_eur)+'</div>'+
+            '<a href="'+x.h.url+'" target="_blank" rel="noopener">объявление</a>'+
+            (x.h.agent_phone?' &nbsp; <a href="tel:'+telHref(x.h.agent_phone)+
+              '">позвонить</a>':'')+'</div>'));
+      });
+    });
+    ROUTE = routeBits.length ? L.layerGroup(routeBits).addTo(MAP) : null;
+    days.forEach(function(d){
+      fillRoads(byDay[d].sort(function(a,b){return a.t.localeCompare(b.t);}))
+        .then(function(got){ if(got&&filt==='mapa') renderMapa(list); });
+    });
+    if(routePts.length){ MAP.fitBounds(routePts,{padding:[45,45],maxZoom:11}); }
+    else if(pts.length){ MAP.fitBounds(pts,{padding:[30,30],maxZoom:12}); }
+    setTimeout(function(){MAP.invalidateSize();},80);
+  });
+}
+
+
+// three stars means both of them liked it, so the best star wins
+function bestTier(id){
+  return (NOTES[id]||[]).reduce(function(a,n){
+    return Math.max(a, n.tier || 0); }, 0);
+}
+function tierOwners(id){
+  return (NOTES[id]||[]).filter(function(n){ return n.tier; })
+    .map(function(n){ return n.author+' '+'★'.repeat(n.tier); });
+}
+function myTier(h){
+  var n=(NOTES[h.id]||[]).filter(function(x){return x.author===me;})[0];
+  return n&&n.tier?n.tier:0;
+}
+var SORTS={
+  score : [function(h){return h.auto_score;},        -1],
+  tier  : [function(h){return myTier(h)||null;},     -1],
+  land  : [function(h){return h.land_area_m2;},      -1],
+  price : [function(h){return h.price_eur;},          1],
+  price_d:[function(h){return h.price_eur;},         -1],
+  ppm   : [function(h){return h.price_per_m2;},       1],
+  area  : [function(h){return h.area_m2;},           -1],
+  rooms : [function(h){return h.bedrooms;},          -1],
+  wc    : [function(h){return h.bathrooms;},         -1],
+  alt   : [function(h){return h.elevation_m;},       -1],
+  alone : [function(h){return h.nearest_building_m;},-1]
+};
+function sortList(list){
+  var s=SORTS[sortBy]||SORTS.score, get=s[0], dir=s[1];
+  return list.slice().sort(function(a,b){
+    var x=get(a), y=get(b);
+    // anything we do not know goes to the bottom, whichever way we are sorting
+    if(x==null&&y==null) return (b.auto_score||0)-(a.auto_score||0);
+    if(x==null) return 1;
+    if(y==null) return -1;
+    if(x===y) return (b.auto_score||0)-(a.auto_score||0);
+    return (x-y)*dir;
+  });
+}
+
+
+const ST_REACH=['escrito','ligado','semresp','semtel'];
+const ST_BACK=['espera','resposta','marcado','visto','top','recusa'];
+const ST_LABELS={escrito:'✍ написал',ligado:'☎ позвонил',
+  semresp:'📵 не дозвонился',semtel:'🚫 нет номера',
+  espera:'⏳ жду',resposta:'↩ ответили',marcado:'📅 договорились',
+  visto:'👁 посмотрели',top:'★ фаворит',recusa:'✕ отказ'};
+const ST_SHORT={escrito:'написал',ligado:'позвонил',semresp:'не дозвонился',
+  semtel:'нет номера',espera:'жду',resposta:'ответили',marcado:'договорились',
+  visto:'посмотрели',top:'фаворит',recusa:'отказ'};
+// why a no is a no - the part worth remembering
+const WHY={credito:'не под кредит',vendido:'уже продан',caro:'дорого',
+  docs:'проблемы с документами',naoserve:'не подходит',outro:'другое'};
+function stWhy(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.why:null; }
+function setWhy(id,w){
+  const x=STATUS[id];
+  STATUS[id]={v:(x&&x.v)||'recusa',by:me,at:stamp(),why:w};
+  soil('s',id);
+}
+function migrateStatus(){
+  let moved=false;
+  Object.keys(STATUS).forEach(function(id){
+    const v=stVal(id);
+    const to = v==='visita' ? 'marcado' : (v==='arquivo' ? 'recusa' : null);
+    if(to){ STATUS[id]={v:to,by:stBy(id),at:stAt(id),why:stWhy(id)}; moved=true; }
+  });
+  if(moved){ cacheSave(); }
+}
+function pad2(n){ return (n<10?'0':'')+n; }
+function icsFor(h,t){
+  // 90 minutes is a viewing plus the walk round the land
+  const start=new Date(t), end=new Date(start.getTime()+90*60000);
+  const z=d=>d.getUTCFullYear()+pad2(d.getUTCMonth()+1)+pad2(d.getUTCDate())+'T'+
+    pad2(d.getUTCHours())+pad2(d.getUTCMinutes())+'00Z';
+  const esc=x=>String(x||'').replace(/[\\;,]/g,m=>'\\'+m).replace(/\n/g,'\\n');
+  const where=[h.concelho,h.freguesia].filter(Boolean).join(', ');
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//casa//RU','CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT','UID:casa-'+h.id+'@cthsq322.github.io','DTSTAMP:'+z(new Date()),
+    'DTSTART:'+z(start),'DTEND:'+z(end),
+    'SUMMARY:'+esc((vOk(h.id)?'':'(не подтверждён) ')+'Осмотр дома — '+where+' — '+eur(h.price_eur)),
+    'LOCATION:'+esc(h.lat?h.lat+','+h.lon:where),
+    'DESCRIPTION:'+esc((h.agent_phone||'')+'  '+h.url),
+    'BEGIN:VALARM','TRIGGER:-P1D','ACTION:DISPLAY',
+    'DESCRIPTION:'+esc('Завтра осмотр — '+where),'END:VALARM',
+    'BEGIN:VALARM','TRIGGER:-PT2H','ACTION:DISPLAY',
+    'DESCRIPTION:'+esc('Через 2 часа осмотр — '+where),'END:VALARM',
+    'END:VEVENT','END:VCALENDAR'].join('\r\n');
+}
+function renderSoon(){
+  const box=document.getElementById('soon');
+  if(!box||!HOUSES.length) return;
+  const now=new Date();
+  const rem=Object.keys(REMIND).map(function(id){
+    const dt=rDate(id); if(!dt) return null;
+    const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    if(!h) return null;
+    const when=new Date(dt+'T09:00');
+    const hours=(when-now)/3600000;
+    return (hours>-24 && hours<96) ? {h:h,when:when,hours:hours,note:true} : null;
+  }).filter(Boolean);
+  const due=Object.keys(VISITS).map(function(id){
+    if(vOk(id)||!vTime(id)) return null;
+    const bf=vBefore(id); if(!bf) return null;
+    const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    if(!h) return null;
+    const when=new Date(bf), hours=(when-now)/3600000;
+    return hours<48 ? {h:h,when:when,hours:hours,due:true,visit:vTime(id)} : null;
+  }).filter(Boolean);
+  const items=Object.keys(VISITS).map(function(id){
+    const t=vTime(id); if(!t) return null;
+    const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    if(!h) return null;
+    const when=new Date(t);
+    const hours=(when-now)/3600000;
+    return (hours>-3 && hours<96) ? {h:h,t:t,when:when,hours:hours} : null;
+  }).filter(Boolean).concat(rem).concat(due)
+   .sort(function(a,b){ return (b.due?1:0)-(a.due?1:0) || a.when-b.when; });
+  if(!items.length){ box.innerHTML=''; box.className='soon'; return; }
+  box.className='soon on';
+  box.innerHTML=items.map(function(it){
+    const d=it.when;
+    const midnight=new Date(now); midnight.setHours(0,0,0,0);
+    const days=Math.floor((new Date(d).setHours(0,0,0,0)-midnight)/86400000);
+    const today=days===0;
+    const dayWord = days===0?'сегодня' : days===1?'завтра' :
+      days===2?'послезавтра' : pad2(d.getDate())+'.'+pad2(d.getMonth()+1);
+    if(it.due){
+      const v=new Date(it.visit);
+      return '<div class="s1 due"><b>'+(it.hours<0?'просрочено — ':'ответить '+
+        (days===0?'сегодня до ':days===1?'завтра до ':dayWord+' до '))+
+        pad2(d.getHours())+':'+pad2(d.getMinutes())+'</b> · '+(it.h.concelho||'?')+
+        ' · осмотр '+pad2(v.getDate())+'.'+pad2(v.getMonth()+1)+' в '+
+        pad2(v.getHours())+':'+pad2(v.getMinutes())+
+        (it.h.agent_phone?' <a href="tel:'+telHref(it.h.agent_phone)+'">позвонить</a>':'')+
+        '</div>';
+    }
+    const word = it.note
+      ? (it.hours<0&&!today ? 'просрочено напоминание' : dayWord+' напомнить')
+      : it.hours<0 ? 'идёт сейчас'
+      : dayWord+' в '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+    return '<div class="s1"><b>'+word+'</b> · '+(it.h.concelho||'?')+
+      (it.by?' · '+it.by:'')+
+      (it.h.agent_phone?' <a href="tel:'+telHref(it.h.agent_phone)+'">позвонить</a>':'')+
+      (it.h.lat?' <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+
+        it.h.lat+','+it.h.lon+'">маршрут</a>':'')+'</div>';
+  }).join('');
+}
+function renderMine(){
+  const box=document.getElementById('mine');
+  if(!box||!HOUSES.length) return;
+  const mine=myWork(me);
+  const notes=mine.filter(function(h){
+    return (NOTES[h.id]||[]).some(function(n){
+      return n.author===me && (n.text||'').trim(); }); }).length;
+  const st=mine.filter(function(h){ return stBy(h.id)===me; }).length;
+  const vis=mine.filter(function(h){ return vBy(h.id)===me; }).length;
+  const fav=favList(me).length;
+  if(!mine.length){
+    box.innerHTML='<span class="empty">'+me+': пока ничего не отмечено</span>';
+    return;
+  }
+  box.innerHTML='<b>'+me+'</b> вёл <b>'+mine.length+'</b> '+
+    (mine.length===1?'дом':'домов')+
+    (st?' · статусов <b>'+st+'</b>':'')+
+    (notes?' · заметок <b>'+notes+'</b>':'')+
+    (vis?' · визитов <b>'+vis+'</b>':'')+
+    (fav?' · в избранном <b>'+fav+'</b>':'');
+}
+function renderProgress(){
+  const box=document.getElementById('prog');
+  if(!box||!HOUSES.length) return;
+  const done=HOUSES.filter(function(h){ return stVal(h.id); }).length;
+  const marked=HOUSES.filter(function(h){ return stVal(h.id)==='marcado'; }).length;
+  const seen=HOUSES.filter(function(h){ return stVal(h.id)==='visto'; }).length;
+  const pct=Math.round(done/HOUSES.length*100);
+  box.innerHTML='<div class="row">отработано <b>'+done+'</b> из <b>'+HOUSES.length+'</b>'+
+    (marked?' · договорились <b>'+marked+'</b>':'')+
+    (seen?' · посмотрели <b>'+seen+'</b>':'')+
+    '<span class="rest">осталось <b>'+(HOUSES.length-done)+'</b></span></div>'+
+    '<div class="pbar"><i style="width:'+pct+'%"></i></div>';
+}
+function renderPeople(){
+  const box=document.getElementById('people');
+  if(!box) return;
+  const n={};
+  Object.keys(STATUS).forEach(function(id){
+    const by=stBy(id); if(by) n[by]=(n[by]||0)+1;
+  });
+  const mine=favList().length;
+  let html='<button data-f="fav"'+(filt==='fav'?' class="on"':'')+'>★ мои'+
+    '<span class="n">'+mine+'</span></button>';
+  const others=Object.keys(FAVS).filter(function(u){return u!==me&&favList(u).length;});
+  if(others.length) html+='<button data-f="favall"'+(filt==='favall'?' class="on"':'')+
+    '>★ все избранные<span class="n">'+
+    new Set(Object.keys(FAVS).flatMap(function(u){return favList(u);})).size+'</span></button>';
+  Object.keys(n).sort().forEach(function(u){
+    html+='<button data-f="by:'+u+'"'+(filt==='by:'+u?' class="on"':'')+'>'+u+
+      '<span class="n">'+n[u]+'</span></button>';
+  });
+  box.innerHTML=html;
+}
+
+let PLAN=null, planAsked=false, DAYOF={};      // house id -> its day in the loop
+async function loadPlan(){
+  if(planAsked) return PLAN;
+  planAsked=true;
+  try{
+    const r=await fetch('plan.json?t='+Date.now(),{cache:'no-store'});
+    if(r.ok){
+      PLAN=await r.json();
+      (PLAN.days||[]).forEach(function(d){
+        d.stops.forEach(function(st){
+          const near=(d.swap_with||[]).map(function(lb){
+            const nd=(PLAN.days||[]).filter(function(x){return x.label===lb;})[0];
+            return nd&&nd.when?nd.when:null;
+          }).filter(Boolean);
+          DAYOF[st.id]={label:d.label, when:d.when, at:st.at, swap:near,
+                        week:(PLAN.week||[]).indexOf(d.label)>=0};
+        });
+      });
+      render();
+    }
+  }catch(e){}
+  return PLAN;
+}
+function planStop(st,weekly){
+  const v=stVal(st.id), lab=v?(ST_SHORT[v]||v):'';
+  const cls = v==='marcado'?'ok' : v==='recusa'?'no' : v?'mid':'todo';
+  const mob = st.phone && telList(st.phone).some(isMobile);
+  const t = bestTier(st.id);
+  return '<div class="pstop '+cls+(t?' star'+t:' nostar')+'">'+
+    '<b>'+st.at+'</b>'+
+    (t?'<span class="st'+t+'">'+'★'.repeat(t)+'</span>':'')+
+    '<span class="pl">'+(st.concelho||'?')+'</span>'+
+    '<span class="pr">'+eur(st.price_eur)+'</span>'+
+    '<span class="nota'+(st.score<40?' thin':'')+'">'+st.score+'</span>'+
+    (st.drive_min?'<span class="leg2">+'+st.drive_min+' мин</span>':'')+
+    (lab?'<span class="stt">'+lab+(stBy(st.id)?' · '+stBy(st.id):'')+'</span>'
+        :'<span class="stt todo">не писали</span>')+
+    (st.phone?'<a href="tel:'+telHref(st.phone)+'">☎</a>':'')+
+    (mob?'<a href="'+waLink(telList(st.phone).filter(isMobile)[0])+'" target="_blank" '+
+      'rel="noopener">WA</a>':'')+
+    '<a href="'+st.url+'" target="_blank" rel="noopener">дом</a>'+
+  '</div>';
+}
+async function renderPlan(){
+  const box=document.getElementById('planbox');
+  if(!box) return;
+  if(filt!=='plan'){ box.innerHTML=''; return; }
+  const pl=await loadPlan();
+  if(!pl){ box.innerHTML='<div class="day"><div class="dh">План не загрузился</div></div>';
+    return; }
+  const week=new Set(pl.week||[]);
+  const todo=[];
+  let freedTotal=0, droppedTotal=0, html='';
+  (pl.days||[]).forEach(function(d){
+    const inWeek=week.has(d.label);
+    const live=d.stops.filter(function(st){ return !outOfLoop(st.id); });
+    const starred=live.filter(function(st){ return bestTier(st.id); }).length;
+    const dropped=d.stops.filter(function(st){ return outOfLoop(st.id); });
+    const freed=dropped.reduce(function(a,st){ return a+40+st.drive_min; },0);
+    freedTotal+=freed; droppedTotal+=dropped.length;
+    html+='<div class="day'+(inWeek?'':' later')+'"><div class="dh">'+
+      (d.when?d.when.charAt(0).toUpperCase()+d.when.slice(1):'День '+d.label)+
+      ' · '+live.length+' домов'+
+      (starred?' · <b>'+starred+' со звёздами</b>':'')+
+      (dropped.length?' <s>'+d.stops.length+'</s>':'')+' · '+
+      Math.floor(d.drive_min/60)+' ч '+
+      (d.drive_min%60)+' мин за рулём'+
+      (d.night_in?' · <i>приехали накануне вечером, '+d.night_in+' мин</i>':'')+
+      (inWeek?'':' · <i>отложить, '+d.per_house+' мин на дом</i>')+
+      '<a class="mapsbtn" target="_blank" rel="noopener" href="'+
+        'https://www.google.com/maps/dir/'+
+        live.map(function(x){return x.lat+','+x.lon;}).join('/')+'">в Maps</a></div>';
+    live.forEach(function(st){
+      html+=planStop(st,inWeek);
+      if(inWeek&&!stVal(st.id)) todo.push(st);
+    });
+    if(dropped.length) html+='<div class="pdrop">вне круга: '+
+      dropped.map(function(st){ return (st.concelho||'?')+
+        (skipWhy(st.id)?' ('+skipWhy(st.id)+')':' (отказ)'); }).join(', ')+
+      ' · освободилось '+Math.floor(freed/60)+' ч '+(freed%60)+' мин</div>';
+    if(d.night_out) html+='<div class="pnight">вечером переезд '+
+      Math.floor(d.night_out/60)+' ч '+(d.night_out%60)+' мин — ночуем в новой зоне</div>';
+    html+='</div>';
+  });
+  const head='<div class="planhead">Круг из Лиссабона · <b>'+pl.houses+'</b> домов · '+
+    '<b>'+pl.total_drive_h+' ч</b> за рулём'+(pl.by_road?' по дорогам':' по прямой')+
+    '<div class="m">В неделю берём дни '+(pl.week||[]).join(', ')+
+    ' — <b>'+pl.week_houses+'</b> домов, <b>'+pl.week_drive_h+' ч</b> дороги. '+
+    'Ночуем по пути, поэтому первый дом дня без переезда.'+
+    (droppedTotal?'<br>Вне круга <b>'+droppedTotal+'</b> домов — освободилось <b>'+
+      Math.floor(freedTotal/60)+' ч '+(freedTotal%60)+' мин</b>.':'')+
+    '</div></div>';
+  html=head+html;
+  if(todo.length){
+    html='<div class="day todo"><div class="dh">Написать сегодня — '+todo.length+
+      ' домов, без них круг не соберётся</div>'+
+      todo.map(function(st){ return planStop(st,true); }).join('')+'</div>'+html;
+  }
+  box.innerHTML=html;
+}
+
+function renderStBar(){
+  migrateStatus();
+  renderPeople();
+  renderProgress();
+  renderMine();
+  renderSoon();
+  const box=document.getElementById('stbar');
+  if(!box) return;
+  const n={}; Object.keys(ST_LABELS).forEach(function(k){n[k]=0;});
+  Object.keys(STATUS).forEach(function(id){
+    const v=stVal(id); if(n[v]!=null) n[v]++;
+  });
+  box.innerHTML=Object.keys(ST_LABELS).map(function(k){
+    return '<button data-f="st:'+k+'"'+
+      (filt==='st:'+k?' class="on"':(n[k]?'':' class="zero"'))+'>'+
+      ST_LABELS[k]+'<span class="n">'+n[k]+'</span></button>';
+  }).join('');
+}
+
+let frozen=null;                    // order held still while a card is worked
+function keepPlace(){ frozen=frozen||lastOrder.slice(); }
+function unfreeze(){ frozen=null; }
+let lastOrder=[];
+function renderCard(id){
+  const el=document.querySelector('[data-note="'+id+'"]');
+  const art=el&&el.closest('.card');
+  const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+  if(!art||!h){ render(); return; }
+  const focused=document.activeElement===el;
+  const caret=focused?[el.selectionStart,el.selectionEnd]:null;
+  art.outerHTML=card(h);
+  if(focused){
+    const back=document.querySelector('[data-note="'+id+'"]');
+    if(back){ back.focus(); try{ back.setSelectionRange(caret[0],caret[1]); }catch(e){} }
+  }
+  renderStBar(); renderProgress(); renderMine(); renderSoon(); mark();
+}
+function render(){
+ const keepY=frozen?window.scrollY:null;
+ let list=sortList(HOUSES.filter(keep));
+ if(frozen){
+   const pos={}; frozen.forEach(function(id,i){ pos[id]=i; });
+   list.sort(function(a,b){
+     const ia=pos[a.id], ib=pos[b.id];
+     if(ia==null&&ib==null) return 0;
+     if(ia==null) return 1;            // anything new goes after what was on screen
+     if(ib==null) return -1;
+     return ia-ib;
+   });
+ }
+ lastOrder=list.map(function(h){ return h.id; });
+ document.getElementById('count').textContent=list.length+' из '+HOUSES.length+' домов';
+ document.getElementById('grid').innerHTML=((filt==='mapa'||filt==='plan')?'':list.map(card).join(''));
+ renderRota(); renderMapa(list); renderStBar(); renderPlan();
+ if(keepY!=null){
+   const put=function(){
+     if(Math.abs(window.scrollY-keepY)>2) window.scrollTo({top:keepY,behavior:'instant'});
+   };
+   put();
+   requestAnimationFrame(put);          // the browser re-anchors a frame later
+   setTimeout(put,60);                  // and once more after the images settle
+ }
+}
+
+const persist=cacheSave;
+const SAVEMSG={};                     // id -> what the line under the note says
+function noteState(id,state,txt){
+  SAVEMSG[id]={state:state,txt:txt};
+  const el=document.querySelector('[data-nsave="'+id+'"]');
+  if(el){ el.textContent=txt; el.className='nsave '+state; }
+}
+async function saveNote(id,text,tier,quiet){
+ const prev=(NOTES[id]||[]).find(n=>n.author===me)||{};
+ const rest=(NOTES[id]||[]).filter(n=>n.author!==me);
+ const t = tier!=null ? tier : (prev.tier??null);
+ const now=new Date().toISOString().slice(0,16).replace('T',' ');
+
+ if(!text && t==null){                // nothing left worth keeping - delete it
+   // nothing was there - leave whatever the line already says
+   if(!prev.author) return;
+   NOTES[id]=rest; soil('n',id);
+   if(!quiet) renderCard(id);
+   const gone=await push(); mark();
+   noteState(id,'idle','заметка удалена');
+   toast(gone?'Заметка удалена':'Удалено в телефоне — отправлю позже',!gone);
+   return;
+ }
+
+ rest.push({house_id:id,author:me,text:text,tier:t,updated_at:now});
+ NOTES[id]=rest; soil('n',id); keepPlace();
+ if(!quiet) renderCard(id);
+ const okd=await push(); mark();
+ noteState(id, okd?'ok':'wait',
+   okd?'сохранено '+now.slice(11):'не отправлено — сохранено в телефоне');
+ if(!quiet) toast(okd?'Сохранено ✓':'Сохранено в телефоне — отправлю позже',!okd);
+}
+
+document.addEventListener('click',async e=>{
+ if(e.target.id==='updgo'){ location.reload(); return; }
+ const cf=e.target.closest('[data-conf]');
+ if(cf){ const id=cf.dataset.conf, now=vOk(id);
+   setVisitOk(id,!now);
+   const okc=await push(); render(); mark();
+   toast(okc?(now?'Помечено: ещё не точно':'Подтверждено'):'Сохранено в телефоне',!okc);
+   return; }
+ const sk=e.target.closest('[data-skip]');
+ if(sk){ const id=sk.dataset.skip, was=isSkipped(id);
+   toggleSkip(id);
+   const oks=await push(); renderCard(id); renderPlan(); mark();
+   toast(oks?(was?'Вернул в круг':'Убрал из круга'):'Сохранено в телефоне',!oks);
+   return; }
+ const cal=e.target.closest('[data-cal]');
+ if(cal){
+   const h=HOUSES.find(function(x){return String(x.id)===String(cal.dataset.cal);});
+   const t=vTime(cal.dataset.cal);
+   if(h&&t){
+     const blob=new Blob([icsFor(h,t)],{type:'text/calendar;charset=utf-8'});
+     const a=document.createElement('a');
+     a.href=URL.createObjectURL(blob);
+     a.download='osmotr-'+h.id+'.ics';
+     document.body.appendChild(a); a.click(); document.body.removeChild(a);
+     setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
+     toast('Добавь в календарь — напомнит за день');
+   }
+   return;
+ }
+ const lk=e.target.closest('[data-link]');
+ if(lk){
+   const h=HOUSES.find(function(x){return String(x.id)===String(lk.dataset.link);});
+   if(h) copyText(h.url).then(function(){
+     lk.classList.add('done');
+     setTimeout(function(){ lk.classList.remove('done'); },1600);
+     toast('Ссылка скопирована');
+   },function(){ toast('Не получилось скопировать',true); });
+   return;
+ }
+ const wy=e.target.closest('[data-why]');
+ if(wy){ setWhy(wy.dataset.h,wy.dataset.why); render();
+   const okw=await push(); mark();
+   toast(okw?'Причина: '+WHY[wy.dataset.why]:'Сохранено в телефоне',!okw); return; }
+ const tl=e.target.closest('[data-tel]');
+ if(tl){
+   const num=prettyTel(tl.dataset.tel).replace(/\s/g,'');
+   copyText(num).then(function(){
+     tl.classList.add('done');
+     setTimeout(function(){ tl.classList.remove('done'); },1600);
+     toast('Номер скопирован: '+num);
+   },function(){ toast('Не получилось скопировать',true); });
+   return;
+ }
+ const fv=e.target.closest('[data-fav]');
+ if(fv){ keepPlace(); toggleFav(fv.dataset.fav); renderCard(fv.dataset.fav); await push(); mark();
+   toast(isFav(fv.dataset.fav)?'В избранном':'Убрано из избранного'); return; }
+ const rc=e.target.closest('[data-rclr]');
+ if(rc){ delete REMIND[rc.dataset.rclr]; soil('r',rc.dataset.rclr);
+   await push(); render(); mark(); toast('Напоминание убрано'); return; }
+ const cl=e.target.closest('[data-clr]');
+ if(cl){ const id=cl.dataset.clr;
+   delete VISITS[id]; soil('v',id);
+   if(stVal(id)==='marcado'){ setStatus(id,'resposta'); }   // agreed, then unagreed
+   await push(); render(); mark(); toast('Визит убран'); return; }
+ const u=e.target.closest('[data-u]'); if(u){setUser(u.dataset.u);load();return;}
+ const f=e.target.closest('[data-f]');
+ if(f){ filt=(filt===f.dataset.f&&filt.indexOf('st:')===0)?'all':f.dataset.f;
+   document.querySelectorAll('[data-f]').forEach(x=>
+     x.classList.toggle('on',x.dataset.f===filt));
+   unfreeze(); render(); return;}
+ if(e.target.id==='theme'){const c=document.documentElement.dataset.theme||
+   (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+   document.documentElement.dataset.theme=c==='dark'?'light':'dark';return;}
+ if(e.target.id==='swap'){localStorage.removeItem('casa_user');location.reload();return;}
+ const t=e.target.closest('[data-tier]');
+ if(t){const id=+t.dataset.h;const ta=document.querySelector('[data-note="'+id+'"]');
+   keepPlace();
+   await saveNote(id,ta?ta.value:'',+t.dataset.tier,true);
+   renderCard(id); return;}
+ const s=e.target.closest('[data-st]');
+ if(s){const id=+s.dataset.h;
+   keepPlace(); setStatus(id,s.dataset.st); await push();
+   const h=HOUSES.find(x=>x.id===id); if(h)h.status=s.dataset.st;
+   toast('Статус: '+(ST_SHORT[s.dataset.st]||s.dataset.st)+
+     (stTry(id)>1?' ×'+stTry(id):'')); renderCard(id); return;}
+});
+
+document.addEventListener('change',async e=>{
+ const bf=e.target.closest('[data-before]');
+ if(bf){ setVisitOk(bf.dataset.before,false,bf.value);
+   const okb=await push(); render(); mark();
+   toast(okb?'Напомню ответить':'Сохранено в телефоне',!okb); return; }
+ const rm=e.target.closest('[data-remind]');
+ if(rm){ const id=rm.dataset.remind;
+   if(rm.value) setRemind(id,rm.value); else { delete REMIND[id]; soil('r',id); }
+   const okr=await push(); render(); mark();
+   toast(okr?(rm.value?'Напомню в этот день':'Напоминание убрано'):'Сохранено в телефоне',!okr);
+   return; }
+ const vi=e.target.closest('[data-visit]');
+ if(vi){ const id=vi.dataset.visit;
+   if(vi.value){ setVisit(id,vi.value); setStatus(id,'marcado'); }
+   else { delete VISITS[id]; soil('v',id);
+     if(stVal(id)==='marcado'){ setStatus(id,'resposta'); } }
+   const okd=await push(); render(); mark();
+   toast(okd?'Визит назначен':'Сохранено в телефоне',!okd); return; }
+ const ta=e.target.closest('[data-note]');
+ if(ta) saveNote(+ta.dataset.note,ta.value.trim(),null);
+});
+document.getElementById('sort').addEventListener('change',function(e){
+ sortBy=e.target.value; localStorage.setItem('casa_sort',sortBy); unfreeze(); render();
+});
+document.getElementById('sort').value=localStorage.getItem('casa_sort')||'score';
+const typeTimers={};
+document.addEventListener('input',function(e){
+  const ta=e.target.closest('[data-note]');
+  if(!ta) return;
+  const id=+ta.dataset.note;
+  noteState(id,'typing','печатаешь…');
+  clearTimeout(typeTimers[id]);
+  typeTimers[id]=setTimeout(function(){
+    saveNote(id,ta.value.trim(),null,true);      // quiet: no re-render mid-typing
+  },1200);
+});
+const qbox=document.getElementById('q'), qclr=document.getElementById('qx');
+qbox.addEventListener('input',function(e){
+  q=e.target.value.trim().toLowerCase();
+  qclr.classList.toggle('on',!!q);
+  unfreeze(); render();
+});
+qclr.addEventListener('click',function(){
+  qbox.value=''; q=''; qclr.classList.remove('on'); qbox.focus(); unfreeze(); render();
+});
+
+if(me){setUser(me);load();}
+</script>
+</body></html>
