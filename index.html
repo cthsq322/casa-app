@@ -32,6 +32,17 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 input[type=search]{font:inherit;padding:7px 12px;border:1px solid var(--line);
  border-radius:999px;background:var(--card);color:var(--ink);flex:1;min-width:160px}
 .count{color:var(--soft);font-size:14px;padding:12px 0 6px}
+#mapbox{display:none;height:68vh;min-height:340px;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:10px 0 4px;background:var(--card)}
+#mapbox.on{display:block}
+.leaflet-popup-content{margin:11px 13px;font:14px/1.45 -apple-system,sans-serif}
+.pp b{font-size:15px}
+.pp a{color:var(--accent);text-decoration:none;display:inline-block;margin-top:5px}
+.pp .m{color:#666;font-size:12.5px}
+.links{display:flex;gap:8px;padding:2px 0 4px;overflow-x:auto;scrollbar-width:none}
+.links::-webkit-scrollbar{display:none}
+.links a{flex:0 0 auto;text-decoration:none;font-size:13.5px;white-space:nowrap;
+ color:var(--accent);background:var(--card);border:1px solid var(--line);
+ border-radius:999px;padding:7px 14px}
 .grid{display:grid;gap:13px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
  padding:15px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:10px}
@@ -118,10 +129,14 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="high">Em altura</button>
   <button data-f="alone">Sem vizinhos</button>
   <button data-f="mine">Com notas</button>
-  <button data-f="flag">⚠ Alerta</button><button data-f="rota">🗺 Rota</button>
+  <button data-f="flag">⚠ Alerta</button><button data-f="rota">🗺 Rota</button><button data-f="mapa">📍 Mapa</button>
   <input id="q" type="search" placeholder="concelho, agência…">
 </div>
-<div id="rota"></div><div class="count" id="count"></div>
+<div class="links">
+  <a href="frases.html">✍ O que escrever</a>
+  <a href="lista.html">🔗 Links por site</a>
+</div>
+<div id="rota"></div><div id="mapbox"></div><div class="count" id="count"></div>
 <div class="grid" id="grid"></div>
 <footer id="foot"></footer>
 </div>
@@ -231,6 +246,7 @@ function keep(h){
  if(filt==='mine'&&!(NOTES[h.id]||[]).length)return false;
  if(filt==='flag'&&!h.desc_blockers)return false;
  if(filt==='rota'&&!VISITS[h.id])return false;
+ if(filt==='mapa'&&!h.lat)return false;
  if(q){const hay=[h.concelho,h.freguesia,h.district,h.agency_name].filter(Boolean).join(' ').toLowerCase();
   if(!hay.includes(q))return false;}
  return true;
@@ -339,11 +355,66 @@ function renderRota(){
   box.innerHTML=html;
 }
 
+
+var MAP=null, LAYER=null, LEAFLET=false;
+function loadLeaflet(cb){
+  if(LEAFLET) return cb();
+  var css=document.createElement('link');
+  css.rel='stylesheet'; css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(css);
+  var js=document.createElement('script');
+  js.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  js.onload=function(){LEAFLET=true;cb();};
+  js.onerror=function(){toast('Mapa nao carregou',true);};
+  document.head.appendChild(js);
+}
+function pinColour(h){
+  if(STATUS[h.id]==='top') return '#c25a2b';
+  if(VISITS[h.id]) return '#7b3fb5';
+  if(h.desc_blockers) return '#b03a3a';
+  var t=(NOTES[h.id]||[]).filter(function(n){return n.author===me&&n.tier;})[0];
+  if(t&&t.tier>=3) return '#2e6b4f';
+  return '#5a7f9c';
+}
+function renderMapa(list){
+  var box=document.getElementById('mapbox');
+  if(filt!=='mapa'){ box.classList.remove('on'); return; }
+  box.classList.add('on');
+  loadLeaflet(function(){
+    if(!MAP){
+      MAP=L.map(box,{scrollWheelZoom:true}).setView([39.9,-8.4],8);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(MAP);
+    }
+    if(LAYER) MAP.removeLayer(LAYER);
+    var pts=[];
+    LAYER=L.layerGroup(list.filter(function(h){return h.lat;}).map(function(h){
+      pts.push([h.lat,h.lon]);
+      var m=L.circleMarker([h.lat,h.lon],{radius:8,weight:2,color:'#fff',
+        fillColor:pinColour(h),fillOpacity:.95});
+      var det=[];
+      if(h.bedrooms) det.push('T'+h.bedrooms);
+      if(h.land_area_m2) det.push('terreno '+new Intl.NumberFormat('pt-PT').format(h.land_area_m2)+' m²');
+      if(h.elevation_m) det.push(Math.round(h.elevation_m)+' m alt.');
+      m.bindPopup('<div class="pp"><b>'+(h.concelho||'?')+'</b> &middot; '+eur(h.price_eur)+
+        '<div class="m">'+det.join(' &middot; ')+'</div>'+
+        (VISITS[h.id]?'<div class="m">visita '+VISITS[h.id].replace('T',' ')+'</div>':'')+
+        '<a href="'+h.url+'" target="_blank" rel="noopener">ver anúncio</a>'+
+        (h.agent_phone?' &nbsp; <a href="tel:+351'+h.agent_phone+'">ligar</a>':'')+
+        ' &nbsp; <a href="https://www.google.com/maps/search/?api=1&query='+h.lat+','+h.lon+
+        '" target="_blank" rel="noopener">rota</a></div>');
+      return m;
+    })).addTo(MAP);
+    if(pts.length){ MAP.fitBounds(pts,{padding:[30,30],maxZoom:12}); }
+    setTimeout(function(){MAP.invalidateSize();},80);
+  });
+}
+
 function render(){
  const list=HOUSES.filter(keep);
  document.getElementById('count').textContent=list.length+' de '+HOUSES.length+' imóveis';
- document.getElementById('grid').innerHTML=list.map(card).join('');
- renderRota();
+ document.getElementById('grid').innerHTML=(filt==='mapa'?'':list.map(card).join(''));
+ renderRota(); renderMapa(list);
 }
 
 const persist=cacheSave;
@@ -404,11 +475,6 @@ document.addEventListener('click',e=>{
  if(e.target.id==='imp'){document.getElementById('impf').click();}
 });
 document.addEventListener('change',async e=>{
- const vi=e.target.closest('[data-visit]');
- if(vi){ const id=vi.dataset.visit;
-   if(vi.value){ VISITS[id]=vi.value; STATUS[id]='visita'; } else { delete VISITS[id]; }
-   const okd=await push(); render();
-   toast(okd?'Visita marcada':'Guardado no telemovel',!okd); return; }
  if(e.target.id!=='impf')return;
  const f=e.target.files[0]; if(!f)return;
  const r=new FileReader();
