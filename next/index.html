@@ -664,7 +664,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2327-facb7c1';
+const BUILD='20260811-0000-5bc9174';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1935,7 +1935,7 @@ function noteState(id,state,txt){
 async function saveNote(id,text,tier,quiet){
  const prev=(NOTES[id]||[]).find(n=>n.author===me)||{};
  const rest=(NOTES[id]||[]).filter(n=>n.author!==me);
- const t = tier!=null ? tier : (prev.tier??null);
+ const t = tier===0 ? null : (tier!=null ? tier : (prev.tier??null));
  const now=new Date().toISOString().slice(0,16).replace('T',' ');
 
  if(!text && t==null){                // nothing left worth keeping - delete it
@@ -2098,8 +2098,13 @@ document.addEventListener('click',async e=>{
  const t=e.target.closest('[data-tier]');
  if(t){const id=+t.dataset.h;const ta=document.querySelector('[data-note="'+id+'"]');
    keepPlace();
-   await saveNote(id,ta?ta.value:'',+t.dataset.tier,true);
-   renderCard(id); return;}
+   const mine=(NOTES[id]||[]).find(function(n){return n.author===me;});
+   const tapped=+t.dataset.tier;
+   const val=(mine&&mine.tier===tapped)?0:tapped;     // повторный тап снимает
+   await saveNote(id,ta?ta.value:'',val,true);
+   renderCard(id);
+   toast(val===0?'Уровень снят':'Уровень: '+'★'.repeat(val));
+   return;}
  const s=e.target.closest('[data-st]');
  if(s){const id=+s.dataset.h;
    keepPlace(); setStatus(id,s.dataset.st); await push();
