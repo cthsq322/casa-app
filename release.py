@@ -33,11 +33,12 @@ def run(*args):
 
 def stage():
     NEXT.mkdir(exist_ok=True)
-    subprocess.run([sys.executable, "deploy.py"], cwd=HERE, check=True)
     for f in FILES:
         src = HERE / f
         if src.exists():
             shutil.copy2(src, NEXT / f)
+    # stamp the copy, never the file the live site is built from
+    subprocess.run([sys.executable, str(HERE / "deploy.py")], cwd=NEXT, check=True)
     # the copy under /next/ must not tell phones on the real site to reload
     idx = NEXT / "index.html"
     idx.write_text(idx.read_text(encoding="utf-8")

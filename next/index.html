@@ -120,6 +120,7 @@ input[type=search]::-webkit-search-cancel-button{display:none}
  padding:15px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:10px}
 .card.flag{border-left:4px solid var(--warn)}
 .card.gone{opacity:.62}
+.dead.held{background:var(--gold)}
 .card.gone .price{text-decoration:line-through;text-decoration-thickness:2px}
 .dead{background:var(--warn);color:var(--paper);font-size:12.5px;font-weight:600;
  border-radius:8px;padding:5px 10px;align-self:flex-start}
@@ -794,6 +795,7 @@ function mapThumb(h){
 function isSold(h){
   return h.listing_status==='gone' || stWhy(h.id)==='vendido';
 }
+function isReserved(h){ return stWhy(h.id)==='reservado'; }
 
 // agents list more than one house, and a single message can cover them all
 function agentKey(h){
@@ -841,9 +843,13 @@ function card(h){
         (h.photo_count?'<span class="cnt">'+h.photo_count+' фото</span>':'')+
       '</a>'
     : mapThumb(h))+
-  (isSold(h)
-    ? '<div class="dead">'+
-      (stWhy(h.id)==='vendido'
+  ((isSold(h)||isReserved(h))
+    ? '<div class="dead'+(isReserved(h)?' held':'')+'">'+
+      (stWhy(h.id)==='reservado'
+        ? 'зарезервирован — сказал '+(stBy(h.id)||'кто-то')+
+          (stAt(h.id)?' '+stAt(h.id).slice(5,16).replace(' ',' в '):'')+
+          ' · бронь может сорваться, держим на виду'
+      : stWhy(h.id)==='vendido'
         ? 'продан — сказал '+(stBy(h.id)||'кто-то')+
           (stAt(h.id)?' '+stAt(h.id).slice(5,16).replace(' ',' в '):'')
         : 'объявление снято с сайта'+
@@ -1168,7 +1174,8 @@ const ST_SHORT={escrito:'написал',ligado:'позвонил',semresp:'не
   semtel:'нет номера',espera:'жду',resposta:'ответили',marcado:'договорились',
   visto:'посмотрели',top:'фаворит',recusa:'отказ'};
 // why a no is a no - the part worth remembering
-const WHY={credito:'не под кредит',vendido:'уже продан',caro:'дорого',
+const WHY={credito:'не под кредит',vendido:'уже продан',
+  reservado:'зарезервирован',caro:'дорого',
   docs:'проблемы с документами',naoserve:'не подходит',outro:'другое'};
 function stWhy(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.why:null; }
 function setWhy(id,w){

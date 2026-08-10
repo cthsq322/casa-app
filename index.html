@@ -1,6 +1,6 @@
 <!doctype html><html lang="pt"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Дома</title>
+<title>Дома · тест</title>
 <style>
 :root{--paper:#f4f1ec;--ink:#1c1e1a;--soft:#5b6058;--line:#ddd8cf;--card:#fffdfa;
  --accent:#3f6b4b;--accent-s:#e8efe7;--warn:#a8501f;--warn-s:#f7ebe3;--gold:#8a6d1f;
@@ -30,7 +30,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .who{font-weight:600;color:var(--accent)}
 .bar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:12px 0}
 select#sort{font:inherit;font-size:14px;padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);max-width:100%}
-.nota{margin-left:8px;font:600 12.5px/1 -apple-system,sans-serif;padding:4px 8px;border-radius:999px;background:var(--accent-s);color:var(--accent);font-variant-numeric:tabular-nums}
+.nota{margin-left:8px;font:600 12.5px/1 -apple-system,sans-serif;padding:4px 0;
+ width:38px;text-align:center;border-radius:999px;background:var(--accent-s);
+ color:var(--accent);font-variant-numeric:tabular-nums;flex:0 0 auto}
 .nota.thin{background:transparent;border:1px solid var(--line);color:var(--soft)}
 .find{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:8px;
  margin:0 0 2px;
@@ -93,7 +95,8 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 @media(prefers-reduced-motion:reduce){.prog .pbar i{transition:none}}
 #people button{border-color:var(--gold)}
 #people button.on{background:var(--gold);border-color:var(--gold);color:#fff}
-.fav{padding:2px 9px;font-size:15px;line-height:1.2;border-color:var(--line);
+.fav{padding:2px 0;width:34px;text-align:center;flex:0 0 auto;
+ font-size:15px;line-height:1.4;border-color:var(--line);
  color:var(--soft);background:transparent}
 .fav.on{background:var(--gold);border-color:var(--gold);color:#fff}
 .favo{font-size:11px;color:var(--gold)}
@@ -117,12 +120,14 @@ input[type=search]::-webkit-search-cancel-button{display:none}
  padding:15px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:10px}
 .card.flag{border-left:4px solid var(--warn)}
 .card.gone{opacity:.62}
+.dead.held{background:var(--gold)}
 .card.gone .price{text-decoration:line-through;text-decoration-thickness:2px}
 .dead{background:var(--warn);color:var(--paper);font-size:12.5px;font-weight:600;
  border-radius:8px;padding:5px 10px;align-self:flex-start}
-.shot{display:block;position:relative;margin:-15px -16px 0;height:clamp(96px,26vw,150px);
+.shot{display:block;position:relative;margin:-15px -16px 0;height:clamp(150px,42vw,220px);
  background:var(--accent-s);overflow:hidden;border-radius:14px 14px 0 0}
-.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot img{width:100%;height:100%;object-fit:cover;object-position:center 42%;
+ display:block}
 .shot .cnt{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.5);
  color:#fff;font-size:11px;padding:2px 8px;border-radius:999px;
  backdrop-filter:blur(3px)}
@@ -201,7 +206,11 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .visit .clr{padding:5px 11px;font-size:13px}
 #rota{margin:10px 0 0}
 .bday{font-size:12.5px;color:var(--accent);background:var(--accent-s);
- border-radius:8px;padding:4px 9px;align-self:flex-start}
+ border-radius:8px;padding:5px 9px;display:flex;align-items:center;gap:8px;
+ flex-wrap:wrap}
+.cpday{padding:3px 10px;font-size:11.5px;border-color:var(--accent);
+ color:var(--accent);background:transparent}
+.swapd{font-size:11.5px;color:var(--soft)}
 .bday.later{color:var(--soft);background:transparent;border:1px solid var(--line)}
 .planhead{background:var(--accent-s);border:1px solid var(--accent);
  border-radius:13px;padding:12px 14px;margin:10px 0;font-size:14.5px;color:var(--accent)}
@@ -209,6 +218,14 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .day.later{opacity:.6}
 .day.todo{border-color:var(--warn)}
 .day.todo .dh{background:var(--warn);color:var(--paper)}
+.pline{display:flex;align-items:baseline;gap:10px;padding:10px 15px 6px;
+ border-top:1px solid var(--line);font-size:14px;background:var(--accent-s)}
+.pline b{font-variant-numeric:tabular-nums;font-size:16px;color:var(--accent)}
+.pline .stars{color:var(--gold)}
+.pline .leg2{margin-left:auto;color:var(--soft);font-size:12.5px}
+.pline.star3{background:linear-gradient(90deg,rgba(184,134,11,.18),var(--accent-s) 70%)}
+#planbox .card{border:0;border-radius:0;box-shadow:none;margin:0}
+#planbox .shot{border-radius:0}
 .pstop{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:9px 14px;
  border-top:1px solid var(--line);font-size:14px}
 .pstop b{font-variant-numeric:tabular-nums}
@@ -220,6 +237,11 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .pstop a{margin-left:auto;text-decoration:none;color:var(--accent);font-size:13px;
  border:1px solid var(--line);border-radius:8px;padding:3px 9px}
 .pstop a+a{margin-left:0}
+.pstop .st1,.pstop .st2,.pstop .st3{color:var(--gold);font-size:12.5px}
+.pstop.star3{background:linear-gradient(90deg,rgba(184,134,11,.14),transparent 60%)}
+.pstop.star3 b{color:var(--gold)}
+.pstop.nostar{opacity:.72}
+.tiero{font-size:12px;color:var(--gold)}
 .pstop.ok{background:var(--accent-s)}
 .pstop.no{opacity:.5;text-decoration:line-through}
 .day{background:var(--card);border:1px solid var(--line);border-radius:13px;
@@ -250,6 +272,18 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:var(--soft);font-size:13px}
 @media(max-width:520px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:21px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.skip{padding:5px 12px;font-size:12.5px;border-color:var(--line);color:var(--soft)}
+.skip.on{border-color:var(--warn);color:var(--warn);font-weight:600}
+.pdrop{padding:9px 14px;border-top:1px solid var(--line);font-size:12.5px;
+ color:var(--soft);font-style:italic}
+.pnight{padding:9px 14px;border-top:1px solid var(--line);font-size:13px;
+ color:var(--soft);background:var(--accent-s)}
+.cpday{padding:3px 10px;font-size:11.5px;border-color:var(--accent);
+ color:var(--accent);background:transparent}
+.swapd{font-size:11.5px;color:var(--soft)}
+.same{font-size:12px;color:var(--accent);background:var(--accent-s);
+ border-radius:8px;padding:4px 9px;align-self:flex-start;cursor:pointer}
 </style></head><body>
 
 <div class="gate" id="gate"><div class="box">
@@ -274,6 +308,8 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="gone">🚫 Снятые</button>
   <button data-f="plan">🧭 Круг</button>
   <button data-f="thisweek">📆 Эта неделя</button>
+  <button data-f="skipped">🙅 Вне круга</button>
+  <button data-f="starred">★ Со звёздами</button>
   <button data-f="mine">С заметками</button>
   <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
   <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
@@ -340,7 +376,19 @@ function mergeNotes(fresh){
   [...map.values()].forEach(function(n){(out[n.house_id]=out[n.house_id]||[]).push(n);});
   return {notes:out,pending:pending};
 }
-let FAVS={}, REMIND={};
+let FAVS={}, REMIND={}, SKIP={};
+function isSkipped(id){ return !!SKIP[id]; }
+function skipBy(id){ const x=SKIP[id]; return x&&x.by; }
+function skipWhy(id){ const x=SKIP[id]; return x&&x.why; }
+function toggleSkip(id,why){
+  if(SKIP[id]) delete SKIP[id];
+  else SKIP[id]={by:me, at:stamp(), why:why||'не подходит'};
+  soil('k',id);
+}
+// out of the circle for a reason of its own: refused, or sold
+function outOfLoop(id){
+  return isSkipped(id) || stVal(id)==='recusa';
+}
 function stVal(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.v:x; }
 function stBy(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.by:null; }
 function stAt(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.at:null; }
@@ -393,6 +441,7 @@ function cacheSave(){
   localStorage.setItem('casa_visits',JSON.stringify(VISITS));
   localStorage.setItem('casa_favs',JSON.stringify(FAVS));
   localStorage.setItem('casa_remind',JSON.stringify(REMIND));
+  localStorage.setItem('casa_skip',JSON.stringify(SKIP));
 }
 function cacheLoad(){
   try{
@@ -400,6 +449,7 @@ function cacheLoad(){
     VISITS=JSON.parse(localStorage.getItem('casa_visits')||'{}');
     FAVS=JSON.parse(localStorage.getItem('casa_favs')||'{}');
     REMIND=JSON.parse(localStorage.getItem('casa_remind')||'{}');
+    SKIP=JSON.parse(localStorage.getItem('casa_skip')||'{}');
     return JSON.parse(localStorage.getItem('casa_notes')||'[]');
   }catch(e){ STATUS={}; return []; }
 }
@@ -415,6 +465,7 @@ async function pull(){
     VISITS=mergeMap(d.visits,VISITS,'v');
     FAVS=mergeMap(d.favs,FAVS,'f');
     REMIND=mergeMap(d.remind,REMIND,'r');
+    SKIP=mergeMap(d.skip,SKIP,'k');
     return d.notes||[];
   }catch(e){ SYNCED=false; return cacheLoad(); }
 }
@@ -449,14 +500,15 @@ async function push(mine){
                 status:dropDeleted(cur.status,STATUS,'s'),
                 visits:dropDeleted(cur.visits,VISITS,'v'),
                 favs:dropDeleted(cur.favs,FAVS,'f'),
-                remind:dropDeleted(cur.remind,REMIND,'r'),v:1};
+                remind:dropDeleted(cur.remind,REMIND,'r'),
+                skip:dropDeleted(cur.skip,SKIP,'k'),v:1};
     const w=await fetch(API,{method:'PUT',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(body)});
     if(!w.ok) throw 0;
     SYNCED=true;
     NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
-    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{};
+    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{}; SKIP=body.skip||{};
     cacheSave();
     DIRTY.clear(); saveDirty();
     return true;
@@ -474,7 +526,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-1823-fa77ec7';
+const BUILD='20260810-1910-461850f';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -600,7 +652,9 @@ function keep(h){
    (NOTES[h.id]||[]).some(function(n){return (n.text||'').trim();})))return false;
  if(filt==='planned'&&!vTime(h.id))return false;
  if(filt==='plan')return false;          // the plan draws itself
- if(filt==='thisweek'&&!(DAYOF[h.id]&&DAYOF[h.id].week))return false;
+ if(filt==='thisweek'&&(!(DAYOF[h.id]&&DAYOF[h.id].week)||outOfLoop(h.id)))return false;
+ if(filt==='skipped'&&!isSkipped(h.id))return false;
+ if(filt==='starred'&&!bestTier(h.id))return false;
  if(filt==='gone'&&!isSold(h))return false;
  if(filt==='live'&&isSold(h))return false;
  if(filt==='wa'&&!(h.agent_phone&&telList(h.agent_phone).some(isMobile)))return false;
@@ -629,6 +683,8 @@ function noteBlock(h){
  const mine=list.find(n=>n.author===me);
  const others=list.filter(n=>n.author!==me);
  return '<div class="notes">'+
+  (tierOwners(h.id).length>1
+    ? '<div class="tiero">'+tierOwners(h.id).join(' · ')+'</div>' : '')+
   others.map(n=>'<div class="note other"><b>'+n.author+'</b><span class="t">'+
     (n.updated_at||'').slice(5,16).replace('T',' ').replace(' ',' в ')+'</span><br>'+esc(n.text)+'</div>').join('')+
   '<div class="tiers"><span style="font-size:12px;color:var(--soft)">уровень</span>'+
@@ -644,6 +700,8 @@ function noteBlock(h){
    (vTime(h.id)?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+
    (vBy(h.id)?'<span class="vby">'+vBy(h.id)+'</span>':'')+
    (vTime(h.id)?'<button class="cal" data-cal="'+h.id+'">в календарь</button>':'')+
+   '<button class="skip'+(isSkipped(h.id)?' on':'')+'" data-skip="'+h.id+'">'+
+     (isSkipped(h.id)?'вернуть в круг':'убрать из круга')+'</button>'+
    (vTime(h.id)?'<button class="conf'+(vOk(h.id)?'':' off')+'" data-conf="'+h.id+'" '+
      'title="подтверждён или ещё нет">'+(vOk(h.id)?'✓ точно':'? не точно')+'</button>':'')+
    '</div>'+
@@ -737,6 +795,30 @@ function mapThumb(h){
 function isSold(h){
   return h.listing_status==='gone' || stWhy(h.id)==='vendido';
 }
+function isReserved(h){ return stWhy(h.id)==='reservado'; }
+
+// agents list more than one house, and a single message can cover them all
+function agentKey(h){
+  if(!h.agent_phone) return null;
+  return telList(h.agent_phone).map(digits9).sort().join('|');
+}
+let BYAGENT=null;
+function agentGroups(){
+  if(BYAGENT) return BYAGENT;
+  BYAGENT={};
+  HOUSES.forEach(function(h){
+    const k=agentKey(h);
+    if(!k) return;
+    (BYAGENT[k]=BYAGENT[k]||[]).push(h);
+  });
+  return BYAGENT;
+}
+function sameAgent(h){
+  const k=agentKey(h);
+  if(!k) return [];
+  return (agentGroups()[k]||[]).filter(function(x){ return x.id!==h.id; });
+}
+
 function card(h){
  const flags=(h.desc_blockers||'').split(';').map(s=>s.trim()).filter(Boolean);
  const goods=(h.desc_goods||'').split(';').map(s=>s.trim()).filter(Boolean);
@@ -761,16 +843,20 @@ function card(h){
         (h.photo_count?'<span class="cnt">'+h.photo_count+' фото</span>':'')+
       '</a>'
     : mapThumb(h))+
-  (isSold(h)
-    ? '<div class="dead">'+
-      (stWhy(h.id)==='vendido'
+  ((isSold(h)||isReserved(h))
+    ? '<div class="dead'+(isReserved(h)?' held':'')+'">'+
+      (stWhy(h.id)==='reservado'
+        ? 'зарезервирован — сказал '+(stBy(h.id)||'кто-то')+
+          (stAt(h.id)?' '+stAt(h.id).slice(5,16).replace(' ',' в '):'')+
+          ' · бронь может сорваться, держим на виду'
+      : stWhy(h.id)==='vendido'
         ? 'продан — сказал '+(stBy(h.id)||'кто-то')+
           (stAt(h.id)?' '+stAt(h.id).slice(5,16).replace(' ',' в '):'')
         : 'объявление снято с сайта'+
           (h.listing_checked?' · проверено '+h.listing_checked.slice(5,10):''))+
       '</div>'
     : '')+
-  (DAYOF[h.id]
+  (DAYOF[h.id]&&!outOfLoop(h.id)
     ? '<div class="bday'+(DAYOF[h.id].week?'':' later')+'">'+
       (DAYOF[h.id].week
         ? 'звать на <b>'+(DAYOF[h.id].when||('день '+DAYOF[h.id].label))+'</b>, около '+
@@ -806,10 +892,21 @@ function card(h){
       ? '<div class="onlyfix">только стационарный — WhatsApp не дойдёт, звонить</div>'
       : '')+
     '</div>':'')+
+  (sameAgent(h).length
+    ? '<div class="same" data-agent="'+h.id+'">у этого агента ещё '+
+      sameAgent(h).length+' '+(sameAgent(h).length===1?'дом':'домов')+
+      ' — '+sameAgent(h).slice(0,3).map(function(x){return x.concelho||'?';}).join(', ')+
+      (sameAgent(h).length>3?'…':'')+' · показать</div>'
+    : '')+
   '<div class="acts">'+
    (h.agent_phone?'<a class="call" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
 
    '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление</a>'+
+   ((h.lat||h.town_lat)
+     ? '<a href="https://www.google.com/maps/search/?api=1&query='+
+       (h.lat||h.town_lat)+','+(h.lon||h.town_lon)+'" target="_blank" '+
+       'rel="noopener" title="где это">📍 Карта</a>'
+     : '')+
    '<button class="lnk" data-link="'+h.id+'" title="скопировать ссылку">🔗</button></div>'+
   noteBlock(h)+'</article>';
 }
@@ -933,6 +1030,10 @@ function loadLeaflet(cb){
   document.head.appendChild(js);
 }
 function pinColour(h){
+  var t=bestTier(h.id);
+  if(t===3) return '#b8860b';          // both of us
+  if(t===2) return '#c9a227';
+  if(t===1) return '#d9c26a';
   if(stVal(h.id)==='top') return '#c25a2b';
   if(isFav(h.id)) return '#c9a227';
   if(vTime(h.id)) return '#7b3fb5';
@@ -957,9 +1058,14 @@ function renderMapa(list){
     LAYER=L.layerGroup(list.filter(function(h){return h.lat;}).map(function(h){
       pts.push([h.lat,h.lon]);
       var booked=!!vTime(h.id);
-      var m=L.circleMarker([h.lat,h.lon],{radius:booked?4:8,weight:booked?1:2,
-        color:'#fff',fillColor:pinColour(h),fillOpacity:booked?.35:.95});
+      var t=bestTier(h.id);
+      var r = booked ? 4 : (t===3?13 : t===2?11 : t===1?9 : 6);
+      var m=L.circleMarker([h.lat,h.lon],{radius:r,weight:booked?1:(t?3:2),
+        color:t?'#fff':'#ffffffcc',fillColor:pinColour(h),
+        fillOpacity:booked?.35:(t?1:.6)});
       var det=[];
+      if(bestTier(h.id)) det.push('★'.repeat(bestTier(h.id))+' '+
+        tierOwners(h.id).join(', '));
       if(h.bedrooms) det.push('T'+h.bedrooms);
       if(h.land_area_m2) det.push('земля '+new Intl.NumberFormat('pt-PT').format(h.land_area_m2)+' м²');
       if(h.elevation_m) det.push(Math.round(h.elevation_m)+' м высота');
@@ -1018,6 +1124,15 @@ function renderMapa(list){
 }
 
 
+// three stars means both of them liked it, so the best star wins
+function bestTier(id){
+  return (NOTES[id]||[]).reduce(function(a,n){
+    return Math.max(a, n.tier || 0); }, 0);
+}
+function tierOwners(id){
+  return (NOTES[id]||[]).filter(function(n){ return n.tier; })
+    .map(function(n){ return n.author+' '+'★'.repeat(n.tier); });
+}
 function myTier(h){
   var n=(NOTES[h.id]||[]).filter(function(x){return x.author===me;})[0];
   return n&&n.tier?n.tier:0;
@@ -1059,7 +1174,8 @@ const ST_SHORT={escrito:'написал',ligado:'позвонил',semresp:'не
   semtel:'нет номера',espera:'жду',resposta:'ответили',marcado:'договорились',
   visto:'посмотрели',top:'фаворит',recusa:'отказ'};
 // why a no is a no - the part worth remembering
-const WHY={credito:'не под кредит',vendido:'уже продан',caro:'дорого',
+const WHY={credito:'не под кредит',vendido:'уже продан',
+  reservado:'зарезервирован',caro:'дорого',
   docs:'проблемы с документами',naoserve:'не подходит',outro:'другое'};
 function stWhy(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.why:null; }
 function setWhy(id,w){
@@ -1230,11 +1346,26 @@ async function loadPlan(){
   return PLAN;
 }
 function planStop(st,weekly){
+  const h=HOUSES.filter(function(x){return String(x.id)===String(st.id);})[0];
+  if(h){
+    const t=bestTier(st.id);
+    return '<div class="pline'+(t?' star'+t:'')+'">'+
+      '<b>'+st.at+'</b>'+
+      (t?'<span class="stars">'+'★'.repeat(t)+'</span>':'')+
+      (st.drive_min?'<span class="leg2">'+st.drive_min+' мин от прошлого</span>'
+                   :'<span class="leg2">первый за день</span>')+
+      '</div>'+card(h);
+  }
+  return planStopLine(st,weekly);
+}
+function planStopLine(st,weekly){
   const v=stVal(st.id), lab=v?(ST_SHORT[v]||v):'';
   const cls = v==='marcado'?'ok' : v==='recusa'?'no' : v?'mid':'todo';
   const mob = st.phone && telList(st.phone).some(isMobile);
-  return '<div class="pstop '+cls+'">'+
+  const t = bestTier(st.id);
+  return '<div class="pstop '+cls+(t?' star'+t:' nostar')+'">'+
     '<b>'+st.at+'</b>'+
+    (t?'<span class="st'+t+'">'+'★'.repeat(t)+'</span>':'')+
     '<span class="pl">'+(st.concelho||'?')+'</span>'+
     '<span class="pr">'+eur(st.price_eur)+'</span>'+
     '<span class="nota'+(st.score<40?' thin':'')+'">'+st.score+'</span>'+
@@ -1256,27 +1387,44 @@ async function renderPlan(){
     return; }
   const week=new Set(pl.week||[]);
   const todo=[];
-  let html='<div class="planhead">Круг из Лиссабона · <b>'+pl.houses+'</b> домов · '+
-    '<b>'+pl.total_drive_h+' ч</b> за рулём'+(pl.by_road?' по дорогам':' по прямой')+
-    '<div class="m">В неделю берём дни '+(pl.week||[]).join(', ')+
-    ' — <b>'+pl.week_houses+'</b> домов, <b>'+pl.week_drive_h+' ч</b> дороги. '+
-    'Ночуем по пути, поэтому первый дом дня без переезда.</div></div>';
+  let freedTotal=0, droppedTotal=0, html='';
   (pl.days||[]).forEach(function(d){
     const inWeek=week.has(d.label);
+    const live=d.stops.filter(function(st){ return !outOfLoop(st.id); });
+    const starred=live.filter(function(st){ return bestTier(st.id); }).length;
+    const dropped=d.stops.filter(function(st){ return outOfLoop(st.id); });
+    const freed=dropped.reduce(function(a,st){ return a+40+st.drive_min; },0);
+    freedTotal+=freed; droppedTotal+=dropped.length;
     html+='<div class="day'+(inWeek?'':' later')+'"><div class="dh">'+
       (d.when?d.when.charAt(0).toUpperCase()+d.when.slice(1):'День '+d.label)+
-      ' · '+d.stops.length+' домов · '+Math.floor(d.drive_min/60)+' ч '+
+      ' · '+live.length+' домов'+
+      (starred?' · <b>'+starred+' со звёздами</b>':'')+
+      (dropped.length?' <s>'+d.stops.length+'</s>':'')+' · '+
+      Math.floor(d.drive_min/60)+' ч '+
       (d.drive_min%60)+' мин за рулём'+
       (inWeek?'':' · <i>отложить, '+d.per_house+' мин на дом</i>')+
       '<a class="mapsbtn" target="_blank" rel="noopener" href="'+
         'https://www.google.com/maps/dir/'+
-        d.stops.map(function(x){return x.lat+','+x.lon;}).join('/')+'">в Maps</a></div>';
-    d.stops.forEach(function(st){
+        live.map(function(x){return x.lat+','+x.lon;}).join('/')+'">в Maps</a></div>';
+    live.forEach(function(st){
       html+=planStop(st,inWeek);
       if(inWeek&&!stVal(st.id)) todo.push(st);
     });
+    if(dropped.length) html+='<div class="pdrop">вне круга: '+
+      dropped.map(function(st){ return (st.concelho||'?')+
+        (skipWhy(st.id)?' ('+skipWhy(st.id)+')':' (отказ)'); }).join(', ')+
+      ' · освободилось '+Math.floor(freed/60)+' ч '+(freed%60)+' мин</div>';
     html+='</div>';
   });
+  const head='<div class="planhead">Круг из Лиссабона · <b>'+pl.houses+'</b> домов · '+
+    '<b>'+pl.total_drive_h+' ч</b> за рулём'+(pl.by_road?' по дорогам':' по прямой')+
+    '<div class="m">В неделю берём дни '+(pl.week||[]).join(', ')+
+    ' — <b>'+pl.week_houses+'</b> домов, <b>'+pl.week_drive_h+' ч</b> дороги. '+
+    'Ночуем по пути, поэтому первый дом дня без переезда.'+
+    (droppedTotal?'<br>Вне круга <b>'+droppedTotal+'</b> домов — освободилось <b>'+
+      Math.floor(freedTotal/60)+' ч '+(freedTotal%60)+' мин</b>.':'')+
+    '</div></div>';
+  html=head+html;
   if(todo.length){
     html='<div class="day todo"><div class="dh">Написать сегодня — '+todo.length+
       ' домов, без них круг не соберётся</div>'+
@@ -1389,6 +1537,31 @@ document.addEventListener('click',async e=>{
    setVisitOk(id,!now);
    const okc=await push(); render(); mark();
    toast(okc?(now?'Помечено: ещё не точно':'Подтверждено'):'Сохранено в телефоне',!okc);
+   return; }
+ const ag=e.target.closest('[data-agent]');
+ if(ag){
+   const h=HOUSES.filter(function(x){return String(x.id)===String(ag.dataset.agent);})[0];
+   if(h){ const k=agentKey(h);
+     qbox.value=''; q=''; filt='agent:'+k;
+     document.querySelectorAll('[data-f]').forEach(function(x){x.classList.remove('on');});
+     unfreeze(); render();
+     toast('Все дома этого агента');
+   }
+   return;
+ }
+ const cd=e.target.closest('[data-cpday]');
+ if(cd){
+   const d=DAYOF[cd.dataset.cpday];
+   if(d) copyText(d.when+', '+d.at).then(function(){
+     toast('Скопировано: '+d.when+', '+d.at);
+   },function(){ toast('Не получилось скопировать',true); });
+   return;
+ }
+ const sk=e.target.closest('[data-skip]');
+ if(sk){ const id=sk.dataset.skip, was=isSkipped(id);
+   toggleSkip(id);
+   const oks=await push(); renderCard(id); renderPlan(); mark();
+   toast(oks?(was?'Вернул в круг':'Убрал из круга'):'Сохранено в телефоне',!oks);
    return; }
  const cal=e.target.closest('[data-cal]');
  if(cal){
