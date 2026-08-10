@@ -1051,7 +1051,7 @@ function roadKey(a,b){ return a.lat+','+a.lon+';'+b.lat+','+b.lon; }
 async function roadBetween(a,b){
   if(!a.lat||!b.lat) return null;
   const k=roadKey(a,b);
-  if(ROADS[k]!==undefined) return ROADS[k];
+  if(ROADS[k]!==undefined) return ROADS[k];   // asked before - no redraw needed
   ROADS[k]=null;                                 // do not ask twice while in flight
   try{
     const u='https://router.project-osrm.org/route/v1/driving/'+
@@ -1067,12 +1067,14 @@ async function roadBetween(a,b){
   return ROADS[k];
 }
 async function fillRoads(items){
-  let got=false;
+  let fetched=false;                            // only a NEW road is worth a redraw
   for(let i=1;i<items.length;i++){
+    const k=roadKey(items[i-1].h,items[i].h);
+    const knew = ROADS[k]!==undefined;
     const r=await roadBetween(items[i-1].h,items[i].h);
-    if(r) got=true;
+    if(r && !knew) fetched=true;
   }
-  return got;
+  return fetched;
 }
 function gapWords(min){
   const h=Math.floor(min/60), m=Math.round(min%60);
