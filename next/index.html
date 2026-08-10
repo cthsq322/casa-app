@@ -634,6 +634,26 @@ function mark(){
   el.textContent=HOUSES.length+' домов · '+c+' с заметками · '+
     (SYNCED?'синхронизировано':(retryTimer?'не отправлено…':'офлайн'));
 }
+function slim(doc){
+  // defaults go unsaid - the reader assumes them anyway
+  Object.values(doc.status||{}).forEach(function(v){
+    if(v&&typeof v==='object'){
+      if(v.why==null) delete v.why;
+      if(v.n==null||v.n===1) delete v.n;
+    }
+  });
+  Object.values(doc.visits||{}).forEach(function(v){
+    if(v&&typeof v==='object'&&v.ok===true) delete v.ok;
+    if(v&&typeof v==='object'&&v.before==null) delete v.before;
+  });
+  [doc.skip,doc.pins,doc.tels].forEach(function(m){
+    Object.values(m||{}).forEach(function(v){
+      if(v&&typeof v==='object') delete v.at;
+    });
+  });
+  (doc.notes||[]).forEach(function(n){ if(n.tier==null) delete n.tier; });
+  return doc;
+}
 async function push(mine){
   cacheSave();
   try{
@@ -650,7 +670,7 @@ async function push(mine){
       const id=d.slice(2);
       if(!(NOTES[id]||[]).some(function(n){return n.author===me;})) map.delete(id+'|'+me);
     });
-    const body={notes:[...map.values()],
+    const body=slim({notes:[...map.values()],
                 status:dropDeleted(cur.status,STATUS,'s'),
                 visits:dropDeleted(cur.visits,VISITS,'v'),
                 favs:dropDeleted(cur.favs,FAVS,'f'),
@@ -658,7 +678,7 @@ async function push(mine){
                 skip:dropDeleted(cur.skip,SKIP,'k'),
                 pins:dropDeleted(cur.pins,PINS,'p'),
                 tels:dropDeleted(cur.tels,TELS,'t'),
-                slots:dropDeleted(cur.slots,SLOTS,'z'),v:1};
+                slots:dropDeleted(cur.slots,SLOTS,'z'),v:1});
     const w=await fetch(API,{method:'PUT',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(body)});
@@ -683,7 +703,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-0020-d91b0ce';
+const BUILD='20260811-0027-530c658';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
