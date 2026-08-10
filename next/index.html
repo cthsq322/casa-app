@@ -288,6 +288,9 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
 @media(max-width:520px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:21px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
+.msgall{margin-left:8px;padding:3px 10px;font-size:11.5px;border-color:var(--accent);
+ color:var(--accent);background:transparent;font-weight:600}
+.msgall.done{background:var(--accent);color:var(--paper)}
 .msg{padding:5px 12px;font-size:12.5px;border-color:var(--accent);
  color:var(--accent);font-weight:600}
 .msg.done{background:var(--accent);color:var(--paper)}
@@ -586,7 +589,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2006-635bd6e';
+const BUILD='20260810-2050-d97f55b';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -898,6 +901,30 @@ function sameAgent(h){
 
 
 // The link goes first, then this - so no greeting, straight to the point.
+// several houses, one agent, one message
+function msgForGroup(h){
+  const all=[h].concat(sameAgent(h));
+  const lines=all.map(function(x){
+    const d=DAYOF[x.id];
+    return '• '+(x.concelho||'?')+' — '+eur(x.price_eur)+'
+'+x.url+
+      (d&&d.when?'
+  '+ptDay(d):'');
+  });
+  return [
+    'Estamos a ver casas nesta zona e já temos a rota da semana montada.',
+    'Vi que tem estas '+(all.length>1?all.length+' casas':'casa')+' — interessam-nos todas:',
+    lines.join('
+
+'),
+    'Conseguimos passar nos dias indicados? Se alguma hora não servir, diga qual serve '+
+    'nesse mesmo dia — a rota está feita e é mais fácil trocar a hora do que o dia.',
+    'Antes de avançarmos: as casas passam no crédito e estão prontas para a avaliação '+
+    'do banco? Temos aprovação do banco e vamos à avaliação, por isso fechamos depressa.'
+  ].join('
+
+');
+}
 function msgFor(h){
   const d=DAYOF[h.id];
   const when = d && d.when ? d.when+' por volta das '+d.at : null;
@@ -1019,7 +1046,9 @@ function card(h){
     ? '<div class="same" data-agent="'+h.id+'">у этого агента ещё '+
       sameAgent(h).length+' '+(sameAgent(h).length===1?'дом':'домов')+
       ' — '+sameAgent(h).slice(0,3).map(function(x){return x.concelho||'?';}).join(', ')+
-      (sameAgent(h).length>3?'…':'')+' · показать</div>'
+      (sameAgent(h).length>3?'…':'')+' · показать'+
+      '<button class="msgall" data-msgall="'+h.id+'">✍ одно письмо на все</button>'+
+      '</div>'
     : '')+
   '<div class="acts">'+
    (h.agent_phone?'<a class="call" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
@@ -1679,6 +1708,16 @@ document.addEventListener('click',async e=>{
      unfreeze(); render();
      toast('Все дома этого агента');
    }
+   return;
+ }
+ const ma=e.target.closest('[data-msgall]');
+ if(ma){
+   const h=HOUSES.filter(function(x){return String(x.id)===String(ma.dataset.msgall);})[0];
+   if(h) copyText(msgForGroup(h)).then(function(){
+     ma.classList.add('done');
+     setTimeout(function(){ ma.classList.remove('done'); },1800);
+     toast('Письмо на '+(1+sameAgent(h).length)+' домов скопировано');
+   },function(){ toast('Не получилось скопировать',true); });
    return;
  }
  const mg=e.target.closest('[data-msg]');

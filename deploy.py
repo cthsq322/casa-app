@@ -15,7 +15,9 @@ import pathlib
 import re
 import subprocess
 
-HERE = pathlib.Path(__file__).parent
+import os
+HERE = pathlib.Path(os.environ.get("CASA_BUILD_DIR",
+                                   pathlib.Path(__file__).parent))
 INDEX = HERE / "index.html"
 VERSION = HERE / "version.txt"
 

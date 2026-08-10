@@ -12,6 +12,7 @@ needs to be while a change is being tried.
 Nothing reaches the real address except through `live`, and `live` refuses to
 run unless the tests have passed against /next/ first.
 """
+import os
 import pathlib
 import shutil
 import subprocess
@@ -38,7 +39,9 @@ def stage():
         if src.exists():
             shutil.copy2(src, NEXT / f)
     # stamp the copy, never the file the live site is built from
-    subprocess.run([sys.executable, str(HERE / "deploy.py")], cwd=NEXT, check=True)
+    env = dict(os.environ, CASA_BUILD_DIR=str(NEXT))
+    subprocess.run([sys.executable, str(HERE / "deploy.py")],
+                   cwd=HERE, env=env, check=True)
     # the copy under /next/ must not tell phones on the real site to reload
     idx = NEXT / "index.html"
     idx.write_text(idx.read_text(encoding="utf-8")
