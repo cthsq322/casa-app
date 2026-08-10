@@ -653,7 +653,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2254-e057dbf';
+const BUILD='20260810-2302-7e1cdbf';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1246,7 +1246,9 @@ function kmBetween(a,b){
 }
 function renderRota(){
   var box=document.getElementById('rota');
-  var ids=Object.keys(VISITS).filter(function(k){return vTime(k);});
+  var ids=Object.keys(VISITS).filter(function(k){
+    return vTime(k) && !outOfLoop(k);
+  });
   if(filt!=='rota'||!ids.length){ box.innerHTML=''; return; }
   var items=ids.map(function(id){
       let hh=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
@@ -1338,7 +1340,9 @@ function renderMapa(list){
     if(LAYER) MAP.removeLayer(LAYER);
     if(ROUTE) MAP.removeLayer(ROUTE);
     var pts=[];
-    LAYER=L.layerGroup(list.filter(function(h){return h.lat;}).map(function(h){
+    LAYER=L.layerGroup(list.filter(function(h){
+      return h.lat && !outOfLoop(h.id);          // выкинутые с карты уходят
+    }).map(function(h){
       pts.push([h.lat,h.lon]);
       var booked=!!vTime(h.id);
       var t=bestTier(h.id);
@@ -1744,6 +1748,7 @@ async function renderDay(){
   const key=dayKey(dayOff);
   const stops=Object.keys(VISITS).map(function(id){
     const t=vTime(id); if(!t||t.slice(0,10)!==key) return null;
+    if(outOfLoop(id)) return null;               // выкинутый дом дня не держит
     let h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
     if(!h) return null;
     const pp=pinPos(h); if(pp) h=Object.assign({},h,{lat:pp[0],lon:pp[1]});
