@@ -98,6 +98,12 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 .shot .cnt{position:absolute;right:9px;bottom:9px;background:rgba(0,0,0,.55);
  color:#fff;font-size:11.5px;padding:3px 9px;border-radius:999px;
  backdrop-filter:blur(3px)}
+.shot.tile{background:#e8e4dc}
+.shot.tile img{image-rendering:auto;filter:saturate(.85)}
+.shot .pin.rough{background:transparent;border:3px dashed var(--warn);width:26px;height:26px;margin:-13px 0 0 -13px;box-shadow:none}
+.shot .pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;
+ border-radius:50%;background:var(--warn);border:2px solid #fff;
+ box-shadow:0 1px 4px rgba(0,0,0,.45)}
 .shot.none,.shot.broken{display:flex;align-items:center;justify-content:center;
  aspect-ratio:auto;padding:14px;font-size:12.5px;color:var(--soft);
  background:var(--accent-s);text-align:center}
@@ -562,6 +568,30 @@ function copyText(text){
     document.body.removeChild(a);
   });
 }
+// slippy-map maths: which tile holds this point, and where inside it
+function tileFor(lat,lon,z){
+  const n=Math.pow(2,z);
+  const x=(lon+180)/360*n;
+  const r=lat*Math.PI/180;
+  const y=(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n;
+  return {x:Math.floor(x), y:Math.floor(y), z:z,
+          dx:(x-Math.floor(x))*100, dy:(y-Math.floor(y))*100};
+}
+function mapThumb(h){
+  // the house if we have it, otherwise the town - and the label says which
+  const exact=!!h.lat;
+  const la=exact?h.lat:h.town_lat, lo=exact?h.lon:h.town_lon;
+  if(!la) return '<div class="shot none">нет фото и нет координат</div>';
+  const t=tileFor(la,lo,exact?14:12);
+  return '<a class="shot tile" href="https://www.google.com/maps/search/?api=1&query='+
+    la+','+lo+'" target="_blank" rel="noopener">'+
+    '<img src="https://tile.openstreetmap.org/'+t.z+'/'+t.x+'/'+t.y+'.png" '+
+      'alt="" loading="lazy" decoding="async">'+
+    '<span class="pin'+(exact?'':' rough')+'" style="left:'+t.dx.toFixed(1)+
+      '%;top:'+t.dy.toFixed(1)+'%"></span>'+
+    '<span class="cnt">'+(exact?'фото нет — вот место':'фото нет — примерно этот город')+
+    '</span></a>';
+}
 function card(h){
  const flags=(h.desc_blockers||'').split(';').map(s=>s.trim()).filter(Boolean);
  const goods=(h.desc_goods||'').split(';').map(s=>s.trim()).filter(Boolean);
@@ -584,7 +614,7 @@ function card(h){
         'onerror="this.closest(\'.shot\').classList.add(\'broken\')">'+
         (h.photo_count?'<span class="cnt">'+h.photo_count+' фото</span>':'')+
       '</a>'
-    : '<div class="shot none">нет фото — открой объявление</div>')+
+    : mapThumb(h))+
   '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
   '<div class="stats">'+
    '<div class="stat"><div class="v">'+m2(h.land_area_m2)+'</div><div class="k">земля м²</div></div>'+
