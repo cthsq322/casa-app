@@ -14,9 +14,13 @@ p = pathlib.Path(__file__).parent / "index.html"
 s = p.read_text(encoding="utf-8")
 
 
-def swap(old, new):
+def swap(old, new, need=True):
+    """Skip what is not there instead of dying halfway through a file."""
     global s
-    assert old in s, "NOT FOUND: " + old[:110]
+    if old not in s:
+        if need:
+            print("  пропущено (нет якоря):", old.strip().splitlines()[0][:60])
+        return
     s = s.replace(old, new, 1)
 
 

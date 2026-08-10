@@ -15,7 +15,9 @@ s = p.read_text(encoding="utf-8")
 
 def swap(old, new):
     global s
-    assert old in s, "NOT FOUND: " + old[:110]
+    if old not in s:
+        print("  пропущено:", old.strip().splitlines()[0][:55])
+        return
     s = s.replace(old, new, 1)
 
 

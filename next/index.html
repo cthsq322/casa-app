@@ -30,7 +30,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .who{font-weight:600;color:var(--accent)}
 .bar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:12px 0}
 select#sort{font:inherit;font-size:14px;padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);max-width:100%}
-.nota{margin-left:8px;font:600 12.5px/1 -apple-system,sans-serif;padding:4px 8px;border-radius:999px;background:var(--accent-s);color:var(--accent);font-variant-numeric:tabular-nums}
+.nota{margin-left:8px;font:600 12.5px/1 -apple-system,sans-serif;padding:4px 0;
+ width:38px;text-align:center;border-radius:999px;background:var(--accent-s);
+ color:var(--accent);font-variant-numeric:tabular-nums;flex:0 0 auto}
 .nota.thin{background:transparent;border:1px solid var(--line);color:var(--soft)}
 .find{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:8px;
  margin:0 0 2px;
@@ -93,7 +95,8 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 @media(prefers-reduced-motion:reduce){.prog .pbar i{transition:none}}
 #people button{border-color:var(--gold)}
 #people button.on{background:var(--gold);border-color:var(--gold);color:#fff}
-.fav{padding:2px 9px;font-size:15px;line-height:1.2;border-color:var(--line);
+.fav{padding:2px 0;width:34px;text-align:center;flex:0 0 auto;
+ font-size:15px;line-height:1.4;border-color:var(--line);
  color:var(--soft);background:transparent}
 .fav.on{background:var(--gold);border-color:var(--gold);color:#fff}
 .favo{font-size:11px;color:var(--gold)}
@@ -120,9 +123,10 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 .card.gone .price{text-decoration:line-through;text-decoration-thickness:2px}
 .dead{background:var(--warn);color:var(--paper);font-size:12.5px;font-weight:600;
  border-radius:8px;padding:5px 10px;align-self:flex-start}
-.shot{display:block;position:relative;margin:-15px -16px 0;height:clamp(96px,26vw,150px);
+.shot{display:block;position:relative;margin:-15px -16px 0;height:clamp(150px,42vw,220px);
  background:var(--accent-s);overflow:hidden;border-radius:14px 14px 0 0}
-.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot img{width:100%;height:100%;object-fit:cover;object-position:center 42%;
+ display:block}
 .shot .cnt{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.5);
  color:#fff;font-size:11px;padding:2px 8px;border-radius:999px;
  backdrop-filter:blur(3px)}
@@ -201,20 +205,26 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .visit .clr{padding:5px 11px;font-size:13px}
 #rota{margin:10px 0 0}
 .bday{font-size:12.5px;color:var(--accent);background:var(--accent-s);
- border-radius:8px;padding:4px 9px;align-self:flex-start}
+ border-radius:8px;padding:5px 9px;display:flex;align-items:center;gap:8px;
+ flex-wrap:wrap}
+.cpday{padding:3px 10px;font-size:11.5px;border-color:var(--accent);
+ color:var(--accent);background:transparent}
+.swapd{font-size:11.5px;color:var(--soft)}
 .bday.later{color:var(--soft);background:transparent;border:1px solid var(--line)}
 .planhead{background:var(--accent-s);border:1px solid var(--accent);
  border-radius:13px;padding:12px 14px;margin:10px 0;font-size:14.5px;color:var(--accent)}
 .planhead .m{color:var(--soft);font-size:13px;margin-top:5px;font-weight:400}
 .day.later{opacity:.6}
-.skip{padding:5px 12px;font-size:12.5px;border-color:var(--line);color:var(--soft)}
-.skip.on{border-color:var(--warn);color:var(--warn);font-weight:600}
-.pdrop{padding:9px 14px;border-top:1px solid var(--line);font-size:12.5px;
- color:var(--soft);font-style:italic}
-.pnight{padding:9px 14px;border-top:1px solid var(--line);font-size:13px;
- color:var(--soft);background:var(--accent-s)}
 .day.todo{border-color:var(--warn)}
 .day.todo .dh{background:var(--warn);color:var(--paper)}
+.pline{display:flex;align-items:baseline;gap:10px;padding:10px 15px 6px;
+ border-top:1px solid var(--line);font-size:14px;background:var(--accent-s)}
+.pline b{font-variant-numeric:tabular-nums;font-size:16px;color:var(--accent)}
+.pline .stars{color:var(--gold)}
+.pline .leg2{margin-left:auto;color:var(--soft);font-size:12.5px}
+.pline.star3{background:linear-gradient(90deg,rgba(184,134,11,.18),var(--accent-s) 70%)}
+#planbox .card{border:0;border-radius:0;box-shadow:none;margin:0}
+#planbox .shot{border-radius:0}
 .pstop{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:9px 14px;
  border-top:1px solid var(--line);font-size:14px}
 .pstop b{font-variant-numeric:tabular-nums}
@@ -261,6 +271,18 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:var(--soft);font-size:13px}
 @media(max-width:520px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:21px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.skip{padding:5px 12px;font-size:12.5px;border-color:var(--line);color:var(--soft)}
+.skip.on{border-color:var(--warn);color:var(--warn);font-weight:600}
+.pdrop{padding:9px 14px;border-top:1px solid var(--line);font-size:12.5px;
+ color:var(--soft);font-style:italic}
+.pnight{padding:9px 14px;border-top:1px solid var(--line);font-size:13px;
+ color:var(--soft);background:var(--accent-s)}
+.cpday{padding:3px 10px;font-size:11.5px;border-color:var(--accent);
+ color:var(--accent);background:transparent}
+.swapd{font-size:11.5px;color:var(--soft)}
+.same{font-size:12px;color:var(--accent);background:var(--accent-s);
+ border-radius:8px;padding:4px 9px;align-self:flex-start;cursor:pointer}
 </style></head><body>
 
 <div class="gate" id="gate"><div class="box">
@@ -503,7 +525,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-1901-a70be27';
+const BUILD='20260810-1910-461850f';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -772,6 +794,29 @@ function mapThumb(h){
 function isSold(h){
   return h.listing_status==='gone' || stWhy(h.id)==='vendido';
 }
+
+// agents list more than one house, and a single message can cover them all
+function agentKey(h){
+  if(!h.agent_phone) return null;
+  return telList(h.agent_phone).map(digits9).sort().join('|');
+}
+let BYAGENT=null;
+function agentGroups(){
+  if(BYAGENT) return BYAGENT;
+  BYAGENT={};
+  HOUSES.forEach(function(h){
+    const k=agentKey(h);
+    if(!k) return;
+    (BYAGENT[k]=BYAGENT[k]||[]).push(h);
+  });
+  return BYAGENT;
+}
+function sameAgent(h){
+  const k=agentKey(h);
+  if(!k) return [];
+  return (agentGroups()[k]||[]).filter(function(x){ return x.id!==h.id; });
+}
+
 function card(h){
  const flags=(h.desc_blockers||'').split(';').map(s=>s.trim()).filter(Boolean);
  const goods=(h.desc_goods||'').split(';').map(s=>s.trim()).filter(Boolean);
@@ -809,9 +854,7 @@ function card(h){
     ? '<div class="bday'+(DAYOF[h.id].week?'':' later')+'">'+
       (DAYOF[h.id].week
         ? 'звать на <b>'+(DAYOF[h.id].when||('день '+DAYOF[h.id].label))+'</b>, около '+
-          DAYOF[h.id].at+
-          (DAYOF[h.id].swap&&DAYOF[h.id].swap.length
-            ? ' · можно сдвинуть на '+DAYOF[h.id].swap.join(' или ') : '')
+          DAYOF[h.id].at
         : 'в круге на день '+DAYOF[h.id].label+' — эта часть отложена')+
       '</div>'
     : '')+
@@ -843,10 +886,21 @@ function card(h){
       ? '<div class="onlyfix">только стационарный — WhatsApp не дойдёт, звонить</div>'
       : '')+
     '</div>':'')+
+  (sameAgent(h).length
+    ? '<div class="same" data-agent="'+h.id+'">у этого агента ещё '+
+      sameAgent(h).length+' '+(sameAgent(h).length===1?'дом':'домов')+
+      ' — '+sameAgent(h).slice(0,3).map(function(x){return x.concelho||'?';}).join(', ')+
+      (sameAgent(h).length>3?'…':'')+' · показать</div>'
+    : '')+
   '<div class="acts">'+
    (h.agent_phone?'<a class="call" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
 
    '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление</a>'+
+   ((h.lat||h.town_lat)
+     ? '<a href="https://www.google.com/maps/search/?api=1&query='+
+       (h.lat||h.town_lat)+','+(h.lon||h.town_lon)+'" target="_blank" '+
+       'rel="noopener" title="где это">📍 Карта</a>'
+     : '')+
    '<button class="lnk" data-link="'+h.id+'" title="скопировать ссылку">🔗</button></div>'+
   noteBlock(h)+'</article>';
 }
@@ -1275,11 +1329,7 @@ async function loadPlan(){
       PLAN=await r.json();
       (PLAN.days||[]).forEach(function(d){
         d.stops.forEach(function(st){
-          const near=(d.swap_with||[]).map(function(lb){
-            const nd=(PLAN.days||[]).filter(function(x){return x.label===lb;})[0];
-            return nd&&nd.when?nd.when:null;
-          }).filter(Boolean);
-          DAYOF[st.id]={label:d.label, when:d.when, at:st.at, swap:near,
+          DAYOF[st.id]={label:d.label, when:d.when, at:st.at,
                         week:(PLAN.week||[]).indexOf(d.label)>=0};
         });
       });
@@ -1289,6 +1339,19 @@ async function loadPlan(){
   return PLAN;
 }
 function planStop(st,weekly){
+  const h=HOUSES.filter(function(x){return String(x.id)===String(st.id);})[0];
+  if(h){
+    const t=bestTier(st.id);
+    return '<div class="pline'+(t?' star'+t:'')+'">'+
+      '<b>'+st.at+'</b>'+
+      (t?'<span class="stars">'+'★'.repeat(t)+'</span>':'')+
+      (st.drive_min?'<span class="leg2">'+st.drive_min+' мин от прошлого</span>'
+                   :'<span class="leg2">первый за день</span>')+
+      '</div>'+card(h);
+  }
+  return planStopLine(st,weekly);
+}
+function planStopLine(st,weekly){
   const v=stVal(st.id), lab=v?(ST_SHORT[v]||v):'';
   const cls = v==='marcado'?'ok' : v==='recusa'?'no' : v?'mid':'todo';
   const mob = st.phone && telList(st.phone).some(isMobile);
@@ -1332,7 +1395,6 @@ async function renderPlan(){
       (dropped.length?' <s>'+d.stops.length+'</s>':'')+' · '+
       Math.floor(d.drive_min/60)+' ч '+
       (d.drive_min%60)+' мин за рулём'+
-      (d.night_in?' · <i>приехали накануне вечером, '+d.night_in+' мин</i>':'')+
       (inWeek?'':' · <i>отложить, '+d.per_house+' мин на дом</i>')+
       '<a class="mapsbtn" target="_blank" rel="noopener" href="'+
         'https://www.google.com/maps/dir/'+
@@ -1345,8 +1407,6 @@ async function renderPlan(){
       dropped.map(function(st){ return (st.concelho||'?')+
         (skipWhy(st.id)?' ('+skipWhy(st.id)+')':' (отказ)'); }).join(', ')+
       ' · освободилось '+Math.floor(freed/60)+' ч '+(freed%60)+' мин</div>';
-    if(d.night_out) html+='<div class="pnight">вечером переезд '+
-      Math.floor(d.night_out/60)+' ч '+(d.night_out%60)+' мин — ночуем в новой зоне</div>';
     html+='</div>';
   });
   const head='<div class="planhead">Круг из Лиссабона · <b>'+pl.houses+'</b> домов · '+
@@ -1471,6 +1531,25 @@ document.addEventListener('click',async e=>{
    const okc=await push(); render(); mark();
    toast(okc?(now?'Помечено: ещё не точно':'Подтверждено'):'Сохранено в телефоне',!okc);
    return; }
+ const ag=e.target.closest('[data-agent]');
+ if(ag){
+   const h=HOUSES.filter(function(x){return String(x.id)===String(ag.dataset.agent);})[0];
+   if(h){ const k=agentKey(h);
+     qbox.value=''; q=''; filt='agent:'+k;
+     document.querySelectorAll('[data-f]').forEach(function(x){x.classList.remove('on');});
+     unfreeze(); render();
+     toast('Все дома этого агента');
+   }
+   return;
+ }
+ const cd=e.target.closest('[data-cpday]');
+ if(cd){
+   const d=DAYOF[cd.dataset.cpday];
+   if(d) copyText(d.when+', '+d.at).then(function(){
+     toast('Скопировано: '+d.when+', '+d.at);
+   },function(){ toast('Не получилось скопировать',true); });
+   return;
+ }
  const sk=e.target.closest('[data-skip]');
  if(sk){ const id=sk.dataset.skip, was=isSkipped(id);
    toggleSkip(id);
