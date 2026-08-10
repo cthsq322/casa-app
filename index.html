@@ -446,7 +446,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-1740-167ba97';
+const BUILD='20260810-1747-b8fe2ea';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -570,8 +570,8 @@ function keep(h){
  if(filt==='fresh'&&(stVal(h.id)||vTime(h.id)||
    (NOTES[h.id]||[]).some(function(n){return (n.text||'').trim();})))return false;
  if(filt==='planned'&&!vTime(h.id))return false;
- if(filt==='gone'&&h.listing_status!=='gone')return false;
- if(filt==='live'&&h.listing_status==='gone')return false;
+ if(filt==='gone'&&!isSold(h))return false;
+ if(filt==='live'&&isSold(h))return false;
  if(filt==='wa'&&!(h.agent_phone&&telList(h.agent_phone).some(isMobile)))return false;
  if(filt==='flag'&&!h.desc_blockers)return false;
  if(filt==='rota'&&!vTime(h.id))return false;
@@ -702,6 +702,10 @@ function mapThumb(h){
     '<span class="cnt">'+(exact?'фото нет — вот место':'фото нет — примерно этот город')+
     '</span></a>';
 }
+// gone by two roads: the ad stopped opening, or someone told us it is sold
+function isSold(h){
+  return h.listing_status==='gone' || stWhy(h.id)==='vendido';
+}
 function card(h){
  const flags=(h.desc_blockers||'').split(';').map(s=>s.trim()).filter(Boolean);
  const goods=(h.desc_goods||'').split(';').map(s=>s.trim()).filter(Boolean);
@@ -709,7 +713,7 @@ function card(h){
  const rel=h.elevation_relative_m;
  const relT=rel==null?'—':(rel>0?'+'+Math.round(rel):Math.round(rel));
  return '<article class="card'+(flags.length?' flag':'')+
-   (h.listing_status==='gone'?' gone':'')+'">'+
+   (isSold(h)?' gone':'')+'">'+
   '<div class="top"><span class="price">'+eur(h.price_eur)+'</span>'+
    (h.auto_score!=null?'<span class="nota'+(h.score_parts<5?' thin':'')+
      '" title="известно '+h.score_parts+' из 7 критериев">'+h.auto_score+'</span>':'')+
@@ -726,9 +730,14 @@ function card(h){
         (h.photo_count?'<span class="cnt">'+h.photo_count+' фото</span>':'')+
       '</a>'
     : mapThumb(h))+
-  (h.listing_status==='gone'
-    ? '<div class="dead">объявление снято с сайта'+
-      (h.listing_checked?' · проверено '+h.listing_checked.slice(5,10):'')+'</div>'
+  (isSold(h)
+    ? '<div class="dead">'+
+      (stWhy(h.id)==='vendido'
+        ? 'продан — сказал '+(stBy(h.id)||'кто-то')+
+          (stAt(h.id)?' '+stAt(h.id).slice(5,16).replace(' ',' в '):'')
+        : 'объявление снято с сайта'+
+          (h.listing_checked?' · проверено '+h.listing_checked.slice(5,10):''))+
+      '</div>'
     : '')+
   '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
   '<div class="stats">'+
