@@ -359,7 +359,10 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
  color:var(--accent);background:transparent}
 .swapd{font-size:11.5px;color:var(--soft)}
 .same{font-size:12px;color:var(--accent);background:var(--accent-s);
- border-radius:8px;padding:4px 9px;align-self:flex-start;cursor:pointer}
+ border-radius:8px;padding:6px 10px;cursor:pointer;display:flex;
+ align-items:center;gap:8px;flex-wrap:nowrap;overflow:hidden}
+.same .samet{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.same .msgall{margin-left:auto;flex:0 0 auto;white-space:nowrap}
 </style></head><body>
 
 <div class="gate" id="gate"><div class="box">
@@ -661,7 +664,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2318-e39a9f6';
+const BUILD='20260810-2327-facb7c1';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1174,11 +1177,11 @@ function card(h){
       : '')+
     '</div>':'')+
   (sameAgent(h).length
-    ? '<div class="same" data-agent="'+h.id+'">у этого агента ещё '+
-      sameAgent(h).length+' '+(sameAgent(h).length===1?'дом':'домов')+
-      ' — '+sameAgent(h).slice(0,3).map(function(x){return x.concelho||'?';}).join(', ')+
-      (sameAgent(h).length>3?'…':'')+' · показать'+
-      '<button class="msgall" data-msgall="'+h.id+'">✍ одно письмо на все</button>'+
+    ? '<div class="same" data-agent="'+h.id+'">'+
+      '<span class="samet">у агента +'+sameAgent(h).length+': '+
+      sameAgent(h).slice(0,2).map(function(x){return x.concelho||'?';}).join(', ')+
+      (sameAgent(h).length>2?'…':'')+'</span>'+
+      '<button class="msgall" data-msgall="'+h.id+'">✍ письмо на все</button>'+
       '</div>'
     : '')+
   '<div class="acts">'+
@@ -1461,11 +1464,11 @@ function sortList(list){
 
 
 const ST_REACH=['escrito','ligado','semresp','semtel'];
-const ST_BACK=['espera','resposta','marcado','visto','top','recusa'];
+const ST_BACK=['espera','resposta','marcado','recusa'];
 const ST_LABELS={escrito:'✍ написал',ligado:'☎ позвонил',
   semresp:'📵 не дозвонился',semtel:'🚫 нет номера',
   espera:'⏳ жду',resposta:'↩ ответили',marcado:'📅 договорились',
-  visto:'👁 посмотрели',top:'★ фаворит',recusa:'✕ отказ'};
+  recusa:'✕ отказ'};
 const ST_SHORT={escrito:'написал',ligado:'позвонил',semresp:'не дозвонился',
   semtel:'нет номера',espera:'жду',resposta:'ответили',marcado:'договорились',
   visto:'посмотрели',top:'фаворит',recusa:'отказ'};
