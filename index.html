@@ -109,7 +109,70 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
 
 <script>
 let HOUSES=[],NOTES={},STATUS={},filt='all',q='',me=localStorage.getItem('casa_user');
-try{STATUS=JSON.parse(localStorage.getItem('casa_status')||'{}')}catch(e){STATUS={}}
+
+const BLOB='019feb59-15e5-7ad0-81ea-0b75e08ca35a';
+const API='https://jsonblob.com/api/jsonBlob/'+BLOB;
+let SYNCED=false;
+
+function cacheSave(){
+  localStorage.setItem('casa_notes',JSON.stringify(Object.values(NOTES).flat()));
+  localStorage.setItem('casa_status',JSON.stringify(STATUS));
+}
+function cacheLoad(){
+  try{
+    STATUS=JSON.parse(localStorage.getItem('casa_status')||'{}');
+    return JSON.parse(localStorage.getItem('casa_notes')||'[]');
+  }catch(e){ STATUS={}; return []; }
+}
+function key(n){ return n.house_id+'|'+n.author; }
+
+async function pull(){
+  try{
+    const r=await fetch(API+'?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    SYNCED=true;
+    STATUS=d.status||{};
+    return d.notes||[];
+  }catch(e){ SYNCED=false; return cacheLoad(); }
+}
+
+// merge my change into whatever is on the server, so we never clobber
+// the other person's note
+async function push(mine){
+  cacheSave();
+  try{
+    const r=await fetch(API+'?t='+Date.now(),{cache:'no-store'});
+    const cur = r.ok ? await r.json() : {notes:[],status:{}};
+    const map=new Map((cur.notes||[]).map(n=>[key(n),n]));
+    Object.values(NOTES).flat().forEach(n=>{
+      const old=map.get(key(n));
+      if(!old || n.author===me || (n.updated_at||'')>(old.updated_at||'')) map.set(key(n),n);
+    });
+    const body={notes:[...map.values()],status:Object.assign({},cur.status||{},STATUS),v:1};
+    const w=await fetch(API,{method:'PUT',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(body)});
+    if(!w.ok) throw 0;
+    SYNCED=true;
+    NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
+    STATUS=body.status;
+    cacheSave();
+    return true;
+  }catch(e){ SYNCED=false; return false; }
+}
+
+// pick up the other person's edits while the page is open
+setInterval(async()=>{
+  if(document.hidden) return;
+  const fresh=await pull();
+  if(!SYNCED) return;
+  const before=JSON.stringify(Object.values(NOTES).flat().map(key).sort());
+  const map={}; fresh.forEach(n=>{(map[n.house_id]=map[n.house_id]||[]).push(n)});
+  const after=JSON.stringify(fresh.map(key).sort());
+  if(before!==after){ NOTES=map; cacheSave(); render(); }
+}, 20000);
+
 
 const eur=n=>n?new Intl.NumberFormat('pt-PT').format(n)+' €':'—';
 const m2=n=>n?new Intl.NumberFormat('pt-PT').format(Math.round(n)):'—';
@@ -125,10 +188,11 @@ function setUser(u){me=u;localStorage.setItem('casa_user',u);
 
 async function load(){
  HOUSES=await (await fetch('data.json?v='+Date.now())).json();
- const all=JSON.parse(localStorage.getItem('casa_notes')||'[]');
+ const all=await pull();
  NOTES={};all.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
  const s={houses:HOUSES.length,commented:Object.keys(NOTES).length};
- document.getElementById('sub').textContent=s.houses+' imóveis · '+s.commented+' com notas';
+ document.getElementById('sub').textContent=s.houses+' imóveis · '+s.commented+
+   ' com notas'+(SYNCED?' · sincronizado':' · offline');
  document.getElementById('foot').innerHTML=
   '«выше округи» — насколько дом выше среднего рельефа в радиусе 15 км. '+
   '«до соседа» — до ближайшей постройки по карте. Notas partilhadas entre Serhii e Violeta.';
@@ -199,10 +263,7 @@ function render(){
  document.getElementById('grid').innerHTML=list.map(card).join('');
 }
 
-function persist(){
- localStorage.setItem('casa_notes',JSON.stringify(Object.values(NOTES).flat()));
- localStorage.setItem('casa_status',JSON.stringify(STATUS));
-}
+const persist=cacheSave;
 async function saveNote(id,text,tier){
  const prev=(NOTES[id]||[]).find(n=>n.author===me)||{};
  const rest=(NOTES[id]||[]).filter(n=>n.author!==me);
@@ -210,7 +271,9 @@ async function saveNote(id,text,tier){
    text: text!=='' ? text : (prev.text||''),
    tier: tier!=null ? tier : (prev.tier??null),
    updated_at:new Date().toISOString().slice(0,16).replace('T',' ')});
- NOTES[id]=rest; persist(); toast('Guardado ✓');
+ NOTES[id]=rest; render();
+ const okd=await push();
+ toast(okd?'Guardado ✓':'Guardado no telemóvel (sem rede)',!okd);
 }
 
 document.addEventListener('click',async e=>{
@@ -226,7 +289,7 @@ document.addEventListener('click',async e=>{
    await saveNote(id,ta?ta.value:'',+t.dataset.tier);render();return;}
  const s=e.target.closest('[data-st]');
  if(s){const id=+s.dataset.h;
-   STATUS[id]=s.dataset.st; persist();
+   STATUS[id]=s.dataset.st; await push();
    const h=HOUSES.find(x=>x.id===id); if(h)h.status=s.dataset.st;
    toast('Estado: '+s.dataset.st); render(); return;}
 });
