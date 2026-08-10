@@ -78,6 +78,12 @@ body.searching .count{padding:8px 0 4px;font-weight:600;color:var(--accent)}
 .soon.on{display:block;margin:10px 0 0;background:var(--warn-s);
  border:1px solid var(--warn);border-radius:12px;padding:10px 13px;font-size:14px}
 .soon .s1{padding:2px 0}
+.soon.folded .s1{display:none}
+.soonx{float:right;margin:-4px -4px 0 8px;padding:3px 10px;font-size:11.5px;
+ background:transparent;border-color:var(--warn);color:var(--warn)}
+.incard{margin:0 0 4px}
+.incard .card{border-radius:0;border-left:0;border-right:0;box-shadow:none;margin:0}
+.incard .shot{border-radius:0}
 .soon b{color:var(--warn)}
 .soon a{color:var(--accent);text-decoration:none;margin-left:8px;font-weight:600}
 .cal{padding:5px 12px;font-size:12.5px;border-color:var(--accent);color:var(--accent)}
@@ -628,7 +634,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2152-103b7bb';
+const BUILD='20260810-2157-492a4e8';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1223,6 +1229,7 @@ function renderRota(){
       var gap=prev?(new Date(it.t)-new Date(list[i-1].t))/60000:null;
       var spare=(drive!=null&&gap!=null)?gap-drive-45:null;   // 45 min to look round
       var tight=(spare!=null&&spare<0);
+      var full=HOUSES.filter(function(x){return String(x.id)===String(it.h.id);})[0];
       html+='<div class="stop'+(tight?' tight':'')+'">'+
         '<b>'+fmtTime(it.t)+'</b>'+
         '<span class="pl">'+(it.h.concelho||'?')+'</span>'+
@@ -1235,6 +1242,7 @@ function renderRota(){
                                 : ' &middot; не хватает '+gapWords(-spare)):'')+
            '</div>':'')+
         '</div>';
+      if(full) html+='<div class="incard">'+card(full)+'</div>';
     });
     html+='</div>';
   });
@@ -1475,8 +1483,10 @@ function renderSoon(){
   }).filter(Boolean).concat(rem).concat(due)
    .sort(function(a,b){ return (b.due?1:0)-(a.due?1:0) || a.when-b.when; });
   if(!items.length){ box.innerHTML=''; box.className='soon'; return; }
-  box.className='soon on';
-  box.innerHTML=items.map(function(it){
+  box.className='soon on'+(localStorage.getItem('casa_soon_off')==='1'?' folded':'');
+  box.innerHTML='<button class="soonx" id="soonx">'+
+    (localStorage.getItem('casa_soon_off')==='1'?'показать':'свернуть')+'</button>'+
+    items.map(function(it){
     const d=it.when;
     const midnight=new Date(now); midnight.setHours(0,0,0,0);
     const days=Math.floor((new Date(d).setHours(0,0,0,0)-midnight)/86400000);
@@ -1737,6 +1747,8 @@ async function renderDay(){
             '">карта</a>'+
           '<a target="_blank" rel="noopener" href="'+it.h.url+'">объявление</a>'+
         '</div></div>';
+      const fullh=HOUSES.filter(function(x){return String(x.id)===String(it.h.id);})[0];
+      if(fullh) html+='<div class="incard">'+card(fullh)+'</div>';
     });
     html+='<div class="daysum">за рулём между домами <b>'+
       Math.floor(total/60)+' ч '+(total%60)+' мин</b></div>';
@@ -1750,15 +1762,15 @@ async function renderDay(){
   });
   if(waiting.length){
     html+='<div class="dwait"><div class="dwh">ждём ответа — '+waiting.length+'</div>'+
-      waiting.slice(0,12).map(function(h){
+      waiting.slice(0,8).map(function(h){
         return '<div class="dw">'+(h.concelho||'?')+' · '+eur(h.price_eur)+
           ' · нота '+(h.auto_score!=null?h.auto_score:'?')+
           '<span class="who3">'+(ST_SHORT[stVal(h.id)]||'')+
           (stBy(h.id)?' · '+stBy(h.id):'')+'</span>'+
           (h.agent_phone?'<a href="tel:'+telHref(h.agent_phone)+'">☎</a>':'')+
-          '</div>';
+          '</div>'+'<div class="incard">'+card(h)+'</div>';
       }).join('')+
-      (waiting.length>12?'<div class="dw">…и ещё '+(waiting.length-12)+'</div>':'')+
+      (waiting.length>8?'<div class="dw">…и ещё '+(waiting.length-8)+'</div>':'')+
       '</div>';
   }
   box.innerHTML=html;
@@ -1871,6 +1883,11 @@ document.addEventListener('click',async e=>{
    const okc=await push(); render(); mark();
    toast(okc?(now?'Помечено: ещё не точно':'Подтверждено'):'Сохранено в телефоне',!okc);
    return; }
+ if(e.target.id==='soonx'){
+   const off=localStorage.getItem('casa_soon_off')==='1';
+   localStorage.setItem('casa_soon_off', off?'0':'1');
+   renderSoon(); return;
+ }
  const dn=e.target.closest('[data-day]');
  if(dn){ dayOff+=parseInt(dn.dataset.day,10); renderDay(); return; }
  const ag=e.target.closest('[data-agent]');
