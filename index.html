@@ -225,6 +225,9 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .checked{font-size:11px;color:var(--soft)}
 .pinnote{font-size:11.5px;color:var(--warn);margin-top:-3px}
 .pinnote.ok{color:var(--accent)}
+.pinnote.wait2{color:var(--warn);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.askaddr{padding:3px 10px;font-size:11.5px;border-color:var(--warn);color:var(--warn);
+ background:transparent}
 #rota{margin:10px 0 0}
 .bday{font-size:12.5px;color:var(--accent);background:var(--accent-s);
  border-radius:8px;padding:5px 9px;display:flex;align-items:center;gap:8px;
@@ -644,7 +647,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2216-ee69333';
+const BUILD='20260810-2233-19c8b06';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -864,6 +867,10 @@ function noteBlock(h){
      ? '<a class="pinopen" target="_blank" rel="noopener" href="'+
        esc(pinOf(h.id).url)+'">открыть</a>'
      : '')+'</div>'+
+  (vTime(h.id)&&!pinOf(h.id)
+    ? '<div class="pinnote wait2">адреса ещё нет — пришлют позже '+
+      '<button class="askaddr" data-askaddr="'+h.id+'">попросить адрес</button></div>'
+    : '')+
   (pinOf(h.id)
     ? '<div class="pinnote'+(pinOf(h.id).lat?' ok':'')+'">'+
       (pinOf(h.id).lat
@@ -1770,7 +1777,8 @@ async function renderDay(){
         (t?'<span class="stars">'+'★'.repeat(t)+'</span>':'')+
         (it.ok?'':'<span class="warn2">не подтверждён'+
           (it.before?' · ответить до '+it.before.slice(11,16):'')+'</span>')+
-        (pinOf(it.h.id)?'<span class="haspin">точка есть</span>':'')+
+        (pinOf(it.h.id)?'<span class="haspin">точка есть</span>'
+                :'<span class="warn2">адрес пришлют</span>')+
         '<div class="dacts">'+
           (it.h.agent_phone?'<a href="tel:'+telHref(it.h.agent_phone)+'">позвонить</a>':'')+
           '<a target="_blank" rel="noopener" href="'+
@@ -1947,6 +1955,13 @@ document.addEventListener('click',async e=>{
    if(h){ mg.classList.add('done');
      setTimeout(function(){ mg.classList.remove('done'); },1800);
      sendText(msgFor(h), 'Текст'); }
+   return;
+ }
+ const aa=e.target.closest('[data-askaddr]');
+ if(aa){
+   sendText('Pode enviar-me a morada exata ou a localização no Google Maps, '+
+     'por favor? É só para o GPS — a visita fica combinada como falámos.',
+     'Просьба про адрес');
    return;
  }
  const cd=e.target.closest('[data-cpday]');
