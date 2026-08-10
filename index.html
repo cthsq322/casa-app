@@ -29,6 +29,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .who{font-weight:600;color:var(--accent)}
 .bar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:12px 0;
  position:sticky;top:0;background:var(--paper);z-index:5;border-bottom:1px solid var(--line)}
+select#sort{font:inherit;font-size:14px;padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);max-width:100%}
+.nota{margin-left:8px;font:600 12.5px/1 -apple-system,sans-serif;padding:4px 8px;border-radius:999px;background:var(--accent-s);color:var(--accent);font-variant-numeric:tabular-nums}
+.nota.thin{background:transparent;border:1px solid var(--line);color:var(--soft)}
 input[type=search]{font:inherit;padding:7px 12px;border:1px solid var(--line);
  border-radius:999px;background:var(--card);color:var(--ink);flex:1;min-width:160px}
 .count{color:var(--soft);font-size:14px;padding:12px 0 6px}
@@ -130,7 +133,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="alone">Sem vizinhos</button>
   <button data-f="mine">Com notas</button>
   <button data-f="flag">⚠ Alerta</button><button data-f="rota">🗺 Rota</button><button data-f="mapa">📍 Mapa</button>
-  <input id="q" type="search" placeholder="concelho, agência…">
+  <select id="sort" title="ordenar"><option value="score">Nota &darr;</option><option value="tier">N&iacute;vel &starf; &darr;</option><option value="land">Terreno &darr;</option><option value="price">Pre&ccedil;o &uarr;</option><option value="price_d">Pre&ccedil;o &darr;</option><option value="ppm">&euro;/m&sup2; &uarr;</option><option value="area">&Aacute;rea da casa &darr;</option><option value="rooms">Quartos &darr;</option><option value="wc">Casas de banho &darr;</option><option value="alt">Altitude &darr;</option><option value="alone">Longe de vizinhos &darr;</option></select><input id="q" type="search" placeholder="concelho, agência…">
 </div>
 <div class="links">
   <a href="frases.html">✍ O que escrever</a>
@@ -143,7 +146,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
 <div id="toast"></div>
 
 <script>
-let HOUSES=[],NOTES={},STATUS={},VISITS={},filt='all',q='',me=localStorage.getItem('casa_user');
+let HOUSES=[],NOTES={},STATUS={},VISITS={},sortBy=localStorage.getItem('casa_sort')||'score',filt='all',q='',me=localStorage.getItem('casa_user');
 
 const BLOB='019feb59-15e5-7ad0-81ea-0b75e08ca35a';
 const API='https://jsonblob.com/api/jsonBlob/'+BLOB;
@@ -279,7 +282,10 @@ function card(h){
  const rel=h.elevation_relative_m;
  const relT=rel==null?'—':(rel>0?'+'+Math.round(rel):Math.round(rel));
  return '<article class="card'+(flags.length?' flag':'')+'">'+
-  '<div class="top"><span class="price">'+eur(h.price_eur)+'</span><span class="ref">#'+h.id+'</span></div>'+
+  '<div class="top"><span class="price">'+eur(h.price_eur)+'</span>'+
+   (h.auto_score!=null?'<span class="nota'+(h.score_parts<5?' thin':'')+
+     '" title="'+h.score_parts+' de 7 critérios conhecidos">'+h.auto_score+'</span>':'')+
+   '<span class="ref">#'+h.id+'</span></div>'+
   '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
   '<div class="stats">'+
    '<div class="stat"><div class="v">'+m2(h.land_area_m2)+'</div><div class="k">terreno m²</div></div>'+
@@ -410,8 +416,39 @@ function renderMapa(list){
   });
 }
 
+
+function myTier(h){
+  var n=(NOTES[h.id]||[]).filter(function(x){return x.author===me;})[0];
+  return n&&n.tier?n.tier:0;
+}
+var SORTS={
+  score : [function(h){return h.auto_score;},        -1],
+  tier  : [function(h){return myTier(h)||null;},     -1],
+  land  : [function(h){return h.land_area_m2;},      -1],
+  price : [function(h){return h.price_eur;},          1],
+  price_d:[function(h){return h.price_eur;},         -1],
+  ppm   : [function(h){return h.price_per_m2;},       1],
+  area  : [function(h){return h.area_m2;},           -1],
+  rooms : [function(h){return h.bedrooms;},          -1],
+  wc    : [function(h){return h.bathrooms;},         -1],
+  alt   : [function(h){return h.elevation_m;},       -1],
+  alone : [function(h){return h.nearest_building_m;},-1]
+};
+function sortList(list){
+  var s=SORTS[sortBy]||SORTS.score, get=s[0], dir=s[1];
+  return list.slice().sort(function(a,b){
+    var x=get(a), y=get(b);
+    // anything we do not know goes to the bottom, whichever way we are sorting
+    if(x==null&&y==null) return (b.auto_score||0)-(a.auto_score||0);
+    if(x==null) return 1;
+    if(y==null) return -1;
+    if(x===y) return (b.auto_score||0)-(a.auto_score||0);
+    return (x-y)*dir;
+  });
+}
+
 function render(){
- const list=HOUSES.filter(keep);
+ const list=sortList(HOUSES.filter(keep));
  document.getElementById('count').textContent=list.length+' de '+HOUSES.length+' imóveis';
  document.getElementById('grid').innerHTML=(filt==='mapa'?'':list.map(card).join(''));
  renderRota(); renderMapa(list);
@@ -459,6 +496,10 @@ document.addEventListener('change',async e=>{
  const ta=e.target.closest('[data-note]');
  if(ta)saveNote(+ta.dataset.note,ta.value,null);
 });
+document.getElementById('sort').addEventListener('change',function(e){
+ sortBy=e.target.value; localStorage.setItem('casa_sort',sortBy); render();
+});
+document.getElementById('sort').value=localStorage.getItem('casa_sort')||'score';
 document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render();});
 
 if(me){setUser(me);load();}

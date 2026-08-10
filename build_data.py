@@ -19,6 +19,7 @@ COLS = [
     "nearest_building_m", "dist_lisbon_km",
     "agent_phone", "whatsapp", "agency_name",
     "desc_blockers", "desc_goods", "desc_rooms",
+    "auto_score", "score_parts", "price_per_m2",
 ]
 
 
