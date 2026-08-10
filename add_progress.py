@@ -50,11 +50,11 @@ swap("#people button{border-color:var(--gold)}",
 .prog .row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .prog b{color:var(--ink);font-variant-numeric:tabular-nums;font-size:15px}
 .prog .rest{margin-left:auto}
-.prog .bar{height:6px;border-radius:999px;background:var(--line);margin-top:6px;
+.prog .pbar{height:6px;border-radius:999px;background:var(--line);margin-top:6px;
  overflow:hidden}
-.prog .bar i{display:block;height:100%;background:var(--accent);border-radius:999px;
+.prog .pbar i{display:block;height:100%;background:var(--accent);border-radius:999px;
  transition:width .3s}
-@media(prefers-reduced-motion:reduce){.prog .bar i{transition:none}}
+@media(prefers-reduced-motion:reduce){.prog .pbar i{transition:none}}
 #people button{border-color:var(--gold)}""")
 
 swap("function renderPeople(){",
@@ -69,7 +69,7 @@ swap("function renderPeople(){",
     (marked?' · договорились <b>'+marked+'</b>':'')+
     (seen?' · посмотрели <b>'+seen+'</b>':'')+
     '<span class="rest">осталось <b>'+(HOUSES.length-done)+'</b></span></div>'+
-    '<div class="bar"><i style="width:'+pct+'%"></i></div>';
+    '<div class="pbar"><i style="width:'+pct+'%"></i></div>';
 }
 function renderPeople(){""")
 
