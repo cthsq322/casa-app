@@ -58,6 +58,12 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 .stbar button .n{font-variant-numeric:tabular-nums;font-weight:600;background:var(--accent-s);color:var(--accent);border-radius:999px;padding:1px 7px;font-size:12px}
 .stbar button.on .n{background:rgba(255,255,255,.25);color:inherit}
 .stbar button.zero{opacity:.45}
+.upd{display:none}
+.upd.on{display:flex;align-items:center;gap:10px;margin:10px 0 0;
+ background:var(--accent);color:var(--paper);border-radius:12px;
+ padding:10px 13px;font-size:14px;font-weight:600}
+.upd button{margin-left:auto;background:var(--paper);
+ border-color:var(--paper);color:var(--accent);font-weight:600}
 .soon{display:none}
 .soon.on{display:block;margin:10px 0 0;background:var(--warn-s);
  border:1px solid var(--warn);border-radius:12px;padding:10px 13px;font-size:14px}
@@ -237,6 +243,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
   <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
 <div class="findwrap"><div class="find"><span class="mag">🔍</span><input id="q" type="search" placeholder="Найти дом: город, адрес, № или цена"><button id="qx" title="очистить">✕</button></div></div>
+<div class="upd" id="upd"></div>
 <div class="soon" id="soon"></div>
 <div class="mine" id="mine"></div>
 <div class="prog" id="prog"></div>
@@ -429,6 +436,27 @@ function scheduleRetry(){
   retryTimer=setTimeout(async()=>{ retryTimer=null; await push(); mark(); }, 15000);
 }
 
+
+// The page cannot update itself in the background, but it can notice.
+const BUILD='20260810-1655-a080f93';
+let updateSeen=false;
+async function checkBuild(){
+  if(updateSeen) return;
+  try{
+    const r=await fetch('version.txt?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok) return;
+    const live=(await r.text()).trim();
+    if(!live||live===BUILD) return;
+    updateSeen=true;
+    const busy=document.activeElement&&
+      (document.activeElement.tagName==='TEXTAREA'||document.activeElement.tagName==='INPUT');
+    if(!busy&&!DIRTY.size){ location.reload(); return; }   // nothing to lose
+    const bar=document.getElementById('upd');
+    if(bar){ bar.className='upd on';
+      bar.innerHTML='Вышла новая версия сайта <button id="updgo">обновить</button>'; }
+  }catch(e){}
+}
+
 async function tick(){
   if(!document.hidden){
     const fresh=await pull();
@@ -446,6 +474,7 @@ async function tick(){
       pollWait=Math.min(pollWait*2, POLL_MAX);  // throttled or offline - ease off
     }
     mark();
+    checkBuild();
   }
   pollTimer=setTimeout(tick, pollWait);
 }
@@ -559,7 +588,7 @@ function noteBlock(h){
  const others=list.filter(n=>n.author!==me);
  return '<div class="notes">'+
   others.map(n=>'<div class="note other"><b>'+n.author+'</b><span class="t">'+
-    (n.updated_at||'').slice(5,16).replace('T',' ')+'</span><br>'+esc(n.text)+'</div>').join('')+
+    (n.updated_at||'').slice(5,16).replace('T',' ').replace(' ',' в ')+'</span><br>'+esc(n.text)+'</div>').join('')+
   '<div class="tiers"><span style="font-size:12px;color:var(--soft)">уровень</span>'+
    [1,2,3].map(t=>'<button data-tier="'+t+'" data-h="'+h.id+'"'+
      (mine&&mine.tier===t?' class="on"':'')+'>'+'★'.repeat(t)+'</button>').join('')+'</div>'+
@@ -588,7 +617,7 @@ function noteBlock(h){
   (stBy(h.id)?'<div class="stby">'+(ST_SHORT[stVal(h.id)]||stVal(h.id))+
      (stTry(h.id)>1?' ×'+stTry(h.id):'')+
      (stWhy(h.id)?' · '+(WHY[stWhy(h.id)]||stWhy(h.id)):'')+
-     ' · <b>'+stBy(h.id)+'</b>'+(stAt(h.id)?' · '+stAt(h.id).slice(5,10):'')+'</div>':'')+
+     ' · <b>'+stBy(h.id)+'</b>'+(stAt(h.id)?' · '+stAt(h.id).slice(5,16).replace(' ',' в '):'')+'</div>':'')+
   '<div class="stg"><span class="gl">что сделал</span><div class="st">'+
     ST_REACH.map(s=>'<button data-st="'+s+'" data-h="'+h.id+'"'+
       ((stVal(h.id)||h.status)===s?' class="on"':'')+'>'+ST_SHORT[s]+
@@ -1084,6 +1113,7 @@ async function saveNote(id,text,tier,quiet){
 }
 
 document.addEventListener('click',async e=>{
+ if(e.target.id==='updgo'){ location.reload(); return; }
  const cf=e.target.closest('[data-conf]');
  if(cf){ const id=cf.dataset.conf, now=vOk(id);
    setVisitOk(id,!now);
