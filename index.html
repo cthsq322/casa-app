@@ -41,6 +41,12 @@ input[type=search]{font:inherit;padding:7px 12px;border:1px solid var(--line);
 .pp b{font-size:15px}
 .pp a{color:var(--accent);text-decoration:none;display:inline-block;margin-top:5px}
 .pp .m{color:#666;font-size:12.5px}
+.stbar{display:flex;gap:7px;overflow-x:auto;padding:9px 0 3px;scrollbar-width:none}
+.stbar::-webkit-scrollbar{display:none}
+.stbar button{flex:0 0 auto;padding:6px 13px;font-size:13.5px;display:flex;align-items:center;gap:7px}
+.stbar button .n{font-variant-numeric:tabular-nums;font-weight:600;background:var(--accent-s);color:var(--accent);border-radius:999px;padding:1px 7px;font-size:12px}
+.stbar button.on .n{background:rgba(255,255,255,.25);color:inherit}
+.stbar button.zero{opacity:.45}
 .links{display:flex;gap:8px;padding:2px 0 4px;overflow-x:auto;scrollbar-width:none}
 .links::-webkit-scrollbar{display:none}
 .links a{flex:0 0 auto;text-decoration:none;font-size:13.5px;white-space:nowrap;
@@ -105,7 +111,8 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .gate .box{text-align:center;padding:30px}
 .gate h2{font:600 24px/1.2 Georgia,serif;margin:0 0 6px}
 .gate p{color:var(--soft);margin:0 0 22px}
-.gate button{font-size:18px;padding:13px 34px;margin:0 6px}
+.gate .box{max-width:320px}
+.gate button{font-size:18px;padding:13px 30px;margin:5px 5px;min-width:150px}
 #toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);padding:9px 17px;
  border-radius:9px;color:#fff;background:var(--accent);opacity:0;transition:opacity .3s;
  pointer-events:none;z-index:60;font-size:14px}
@@ -118,6 +125,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <h2>Casa</h2><p>Quem és?</p>
   <button data-u="Serhii">Serhii</button>
   <button data-u="Violeta">Violeta</button>
+  <button data-u="Milena">Milena</button>
 </div></div>
 
 <div class="wrap">
@@ -135,6 +143,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="flag">⚠ Alerta</button><button data-f="rota">🗺 Rota</button><button data-f="mapa">📍 Mapa</button>
   <select id="sort" title="ordenar"><option value="score">Nota &darr;</option><option value="tier">N&iacute;vel &starf; &darr;</option><option value="land">Terreno &darr;</option><option value="price">Pre&ccedil;o &uarr;</option><option value="price_d">Pre&ccedil;o &darr;</option><option value="ppm">&euro;/m&sup2; &uarr;</option><option value="area">&Aacute;rea da casa &darr;</option><option value="rooms">Quartos &darr;</option><option value="wc">Casas de banho &darr;</option><option value="alt">Altitude &darr;</option><option value="alone">Longe de vizinhos &darr;</option></select><input id="q" type="search" placeholder="concelho, agência…">
 </div>
+<div class="stbar" id="stbar"></div>
 <div class="links">
   <a href="frases.html">✍ O que escrever</a>
   <a href="lista.html">🔗 Links por site</a>
@@ -302,7 +311,7 @@ async function load(){
  if(DIRTY.size){ push().then(mark); }
  document.getElementById('foot').innerHTML=
   '«выше округи» — насколько дом выше среднего рельефа в радиусе 15 км. '+
-  '«до соседа» — до ближайшей постройки по карте. Notas partilhadas entre Serhii e Violeta.';
+  '«до соседа» — до ближайшей постройки по карте. Notas partilhadas entre Serhii, Violeta e Milena.';
  render();
 }
 
@@ -314,6 +323,7 @@ function keep(h){
  if(filt==='flag'&&!h.desc_blockers)return false;
  if(filt==='rota'&&!VISITS[h.id])return false;
  if(filt==='mapa'&&!h.lat)return false;
+ if(filt.indexOf('st:')===0&&STATUS[h.id]!==filt.slice(3))return false;
  if(q){const hay=[h.concelho,h.freguesia,h.district,h.agency_name].filter(Boolean).join(' ').toLowerCase();
   if(!hay.includes(q))return false;}
  return true;
@@ -334,8 +344,8 @@ function noteBlock(h){
   '<div class="visit"><span class="vl">visita</span>'+
    '<input type="datetime-local" data-visit="'+h.id+'" value="'+(VISITS[h.id]||'')+'">'+
    (VISITS[h.id]?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+'</div>'+
-  '<div class="st">'+['escrito','resposta','visita','top','arquivo']
-    .map(s=>'<button data-st="'+s+'" data-h="'+h.id+'"'+((STATUS[h.id]||h.status)===s?' class="on"':'')+'>'+s+'</button>').join('')+
+  '<div class="st">'+['escrito','ligado','espera','resposta','marcado','visto','top','arquivo']
+    .map(s=>'<button data-st="'+s+'" data-h="'+h.id+'"'+((STATUS[h.id]||h.status)===s?' class="on"':'')+'>'+ST_SHORT[s]+'</button>').join('')+
   '</div></div>';
 }
 
@@ -511,11 +521,40 @@ function sortList(list){
   });
 }
 
+
+const ST_LABELS={escrito:'✍ escrevi',ligado:'☎ liguei',
+  espera:'⏳ à espera',resposta:'↩ responderam',marcado:'📅 marcado',
+  visto:'👁 já vimos',top:'★ favorita',arquivo:'✕ fora'};
+const ST_SHORT={escrito:'escrevi',ligado:'liguei',espera:'à espera',
+  resposta:'responderam',marcado:'marcado',visto:'já vimos',
+  top:'favorita',arquivo:'fora'};
+function migrateStatus(){
+  let moved=false;
+  Object.keys(STATUS).forEach(function(id){
+    if(STATUS[id]==='visita'){ STATUS[id]='marcado'; moved=true; }
+  });
+  if(moved){ cacheSave(); }
+}
+function renderStBar(){
+  migrateStatus();
+  const box=document.getElementById('stbar');
+  if(!box) return;
+  const n={}; Object.keys(ST_LABELS).forEach(function(k){n[k]=0;});
+  Object.keys(STATUS).forEach(function(id){
+    if(n[STATUS[id]]!=null) n[STATUS[id]]++;
+  });
+  box.innerHTML=Object.keys(ST_LABELS).map(function(k){
+    return '<button data-f="st:'+k+'"'+
+      (filt==='st:'+k?' class="on"':(n[k]?'':' class="zero"'))+'>'+
+      ST_LABELS[k]+'<span class="n">'+n[k]+'</span></button>';
+  }).join('');
+}
+
 function render(){
  const list=sortList(HOUSES.filter(keep));
  document.getElementById('count').textContent=list.length+' de '+HOUSES.length+' imóveis';
  document.getElementById('grid').innerHTML=(filt==='mapa'?'':list.map(card).join(''));
- renderRota(); renderMapa(list);
+ renderRota(); renderMapa(list); renderStBar();
 }
 
 const persist=cacheSave;
@@ -535,8 +574,11 @@ document.addEventListener('click',async e=>{
  const cl=e.target.closest('[data-clr]');
  if(cl){ delete VISITS[cl.dataset.clr]; soil('v',cl.dataset.clr); await push(); render(); toast('Visita removida'); return; }
  const u=e.target.closest('[data-u]'); if(u){setUser(u.dataset.u);load();return;}
- const f=e.target.closest('[data-f]'); if(f){filt=f.dataset.f;
-   document.querySelectorAll('[data-f]').forEach(x=>x.classList.toggle('on',x===f));render();return;}
+ const f=e.target.closest('[data-f]');
+ if(f){ filt=(filt===f.dataset.f&&filt.indexOf('st:')===0)?'all':f.dataset.f;
+   document.querySelectorAll('[data-f]').forEach(x=>
+     x.classList.toggle('on',x.dataset.f===filt));
+   render(); return;}
  if(e.target.id==='theme'){const c=document.documentElement.dataset.theme||
    (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
    document.documentElement.dataset.theme=c==='dark'?'light':'dark';return;}
@@ -554,7 +596,7 @@ document.addEventListener('click',async e=>{
 document.addEventListener('change',async e=>{
  const vi=e.target.closest('[data-visit]');
  if(vi){ const id=vi.dataset.visit;
-   if(vi.value){ VISITS[id]=vi.value; STATUS[id]='visita'; } else { delete VISITS[id]; }
+   if(vi.value){ VISITS[id]=vi.value; STATUS[id]='marcado'; } else { delete VISITS[id]; }
    soil('v',id); soil('s',id);
    const okd=await push(); render(); mark();
    toast(okd?'Visita marcada':'Guardado no telemóvel',!okd); return; }
