@@ -20,6 +20,7 @@ COLS = [
     "agent_phone", "whatsapp", "agency_name",
     "desc_blockers", "desc_goods", "desc_rooms",
     "auto_score", "score_parts", "price_per_m2",
+    "first_photo_url", "photo_count",
 ]
 
 

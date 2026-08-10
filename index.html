@@ -92,6 +92,20 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
  padding:15px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:10px}
 .card.flag{border-left:4px solid var(--warn)}
+.shot{display:block;position:relative;margin:-15px -16px 0;aspect-ratio:16/10;
+ background:var(--accent-s);overflow:hidden;border-radius:14px 14px 0 0}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot .cnt{position:absolute;right:9px;bottom:9px;background:rgba(0,0,0,.55);
+ color:#fff;font-size:11.5px;padding:3px 9px;border-radius:999px;
+ backdrop-filter:blur(3px)}
+.shot.none,.shot.broken{display:flex;align-items:center;justify-content:center;
+ aspect-ratio:auto;padding:14px;font-size:12.5px;color:var(--soft);
+ background:var(--accent-s);text-align:center}
+.shot.broken img,.shot.broken .cnt{display:none}
+.shot.broken:before{content:'фото не открылось — смотри объявление'}
+.lnk{flex:0 0 auto;padding:8px 13px;border-radius:9px;border:1px solid var(--line);
+ background:transparent;font-size:15px;line-height:1.2}
+.lnk.done{border-color:var(--accent);color:var(--accent)}
 .top{display:flex;align-items:baseline;gap:9px}
 .price{font:600 22px/1 Georgia,serif}
 .ref{margin-left:auto;font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums}
@@ -129,6 +143,11 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .tiers{display:flex;gap:5px;align-items:center}
 .tiers button{padding:4px 11px;font-size:14px}
 .tiers button.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.stg{display:flex;flex-direction:column;gap:4px}
+.stg .gl{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--soft)}
+.stg.why .gl{color:var(--warn)}
+.stg.why .st button.on{background:var(--warn);border-color:var(--warn);color:#fff}
 .st{display:flex;flex-wrap:wrap;gap:5px}
 .st button{padding:4px 10px;font-size:12.5px}
 .visit{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
@@ -183,6 +202,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="all" class="on">Все</button>
   <button data-f="work">🖐 Моя работа</button>
   <button data-f="fresh">Не тронутые</button>
+  <button data-f="planned">📅 С датой</button>
   <button data-f="mine">С заметками</button>
   <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
   <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
@@ -254,7 +274,11 @@ function stAt(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.at:null; 
 function vTime(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.t:x; }
 function vBy(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.by:null; }
 function stamp(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
-function setStatus(id,v){ STATUS[id]={v:v,by:me,at:stamp()}; soil('s',id); }
+function setStatus(id,v){
+  const keep = v==='recusa' ? stWhy(id) : null;
+  STATUS[id]={v:v,by:me,at:stamp(),why:keep};
+  soil('s',id);
+}
 function setVisit(id,t){ VISITS[id]={t:t,by:me}; soil('v',id); }
 
 function favList(who){ return FAVS[who||me]||[]; }
@@ -451,6 +475,7 @@ function keep(h){
  if(filt==='mine'&&!(NOTES[h.id]||[]).length)return false;
  if(filt==='work'&&!touchedBy(h.id,me))return false;
  if(filt==='fresh'&&(stVal(h.id)||(NOTES[h.id]||[]).length||vTime(h.id)))return false;
+ if(filt==='planned'&&!vTime(h.id))return false;
  if(filt==='flag'&&!h.desc_blockers)return false;
  if(filt==='rota'&&!vTime(h.id))return false;
  if(filt==='mapa'&&!h.lat)return false;
@@ -491,10 +516,23 @@ function noteBlock(h){
    (vTime(h.id)?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+
    (vBy(h.id)?'<span class="vby">'+vBy(h.id)+'</span>':'')+'</div>'+
   (stBy(h.id)?'<div class="stby">'+(ST_SHORT[stVal(h.id)]||stVal(h.id))+
+     (stWhy(h.id)?' · '+(WHY[stWhy(h.id)]||stWhy(h.id)):'')+
      ' · <b>'+stBy(h.id)+'</b>'+(stAt(h.id)?' · '+stAt(h.id).slice(5,10):'')+'</div>':'')+
-  '<div class="st">'+['escrito','ligado','espera','resposta','marcado','visto','top','arquivo']
-    .map(s=>'<button data-st="'+s+'" data-h="'+h.id+'"'+((stVal(h.id)||h.status)===s?' class="on"':'')+'>'+ST_SHORT[s]+'</button>').join('')+
-  '</div></div>';
+  '<div class="stg"><span class="gl">что сделал</span><div class="st">'+
+    ST_REACH.map(s=>'<button data-st="'+s+'" data-h="'+h.id+'"'+
+      ((stVal(h.id)||h.status)===s?' class="on"':'')+'>'+ST_SHORT[s]+'</button>').join('')+
+  '</div></div>'+
+  '<div class="stg"><span class="gl">что в ответ</span><div class="st">'+
+    ST_BACK.map(s=>'<button data-st="'+s+'" data-h="'+h.id+'"'+
+      ((stVal(h.id)||h.status)===s?' class="on"':'')+'>'+ST_SHORT[s]+'</button>').join('')+
+  '</div></div>'+
+  (stVal(h.id)==='recusa'
+    ? '<div class="stg why"><span class="gl">почему отказ</span><div class="st">'+
+      Object.keys(WHY).map(w=>'<button data-why="'+w+'" data-h="'+h.id+'"'+
+        (stWhy(h.id)===w?' class="on"':'')+'>'+WHY[w]+'</button>').join('')+
+      '</div></div>'
+    : '')+
+  '</div>';
 }
 
 function telHref(raw){
@@ -532,6 +570,13 @@ function card(h){
      '<span class="favo">'+favOwners(h.id).filter(function(u){return u!==me;})
        .join(', ')+'</span>':'')+
    '<span class="ref">#'+h.id+'</span></div>'+
+  (h.first_photo_url
+    ? '<a class="shot" href="'+h.url+'" target="_blank" rel="noopener">'+
+        '<img src="'+h.first_photo_url+'" alt="" loading="lazy" decoding="async" '+
+        'onerror="this.closest(\'.shot\').classList.add(\'broken\')">'+
+        (h.photo_count?'<span class="cnt">'+h.photo_count+' фото</span>':'')+
+      '</a>'
+    : '<div class="shot none">нет фото — открой объявление</div>')+
   '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
   '<div class="stats">'+
    '<div class="stat"><div class="v">'+m2(h.land_area_m2)+'</div><div class="k">земля м²</div></div>'+
@@ -556,7 +601,8 @@ function card(h){
   '<div class="acts">'+
    (h.agent_phone?'<a class="call" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
    (h.whatsapp?'<a href="'+h.whatsapp+'" target="_blank" rel="noopener">WhatsApp</a>':'')+
-   '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление</a></div>'+
+   '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление</a>'+
+   '<button class="lnk" data-link="'+h.id+'" title="скопировать ссылку">🔗</button></div>'+
   noteBlock(h)+'</article>';
 }
 
@@ -709,16 +755,30 @@ function sortList(list){
 }
 
 
+const ST_REACH=['escrito','ligado','semresp','semtel'];
+const ST_BACK=['espera','resposta','marcado','visto','top','recusa'];
 const ST_LABELS={escrito:'✍ написал',ligado:'☎ позвонил',
+  semresp:'📵 не дозвонился',semtel:'🚫 нет номера',
   espera:'⏳ жду',resposta:'↩ ответили',marcado:'📅 договорились',
-  visto:'👁 посмотрели',top:'★ фаворит',arquivo:'✕ отпал'};
-const ST_SHORT={escrito:'написал',ligado:'позвонил',espera:'жду',
-  resposta:'ответили',marcado:'договорились',visto:'посмотрели',
-  top:'фаворит',arquivo:'отпал'};
+  visto:'👁 посмотрели',top:'★ фаворит',recusa:'✕ отказ'};
+const ST_SHORT={escrito:'написал',ligado:'позвонил',semresp:'не дозвонился',
+  semtel:'нет номера',espera:'жду',resposta:'ответили',marcado:'договорились',
+  visto:'посмотрели',top:'фаворит',recusa:'отказ'};
+// why a no is a no - the part worth remembering
+const WHY={credito:'не под кредит',vendido:'уже продан',caro:'дорого',
+  docs:'проблемы с документами',naoserve:'не подходит',outro:'другое'};
+function stWhy(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.why:null; }
+function setWhy(id,w){
+  const x=STATUS[id];
+  STATUS[id]={v:(x&&x.v)||'recusa',by:me,at:stamp(),why:w};
+  soil('s',id);
+}
 function migrateStatus(){
   let moved=false;
   Object.keys(STATUS).forEach(function(id){
-    if(stVal(id)==='visita'){ STATUS[id]={v:'marcado',by:stBy(id),at:stAt(id)}; moved=true; }
+    const v=stVal(id);
+    const to = v==='visita' ? 'marcado' : (v==='arquivo' ? 'recusa' : null);
+    if(to){ STATUS[id]={v:to,by:stBy(id),at:stAt(id),why:stWhy(id)}; moved=true; }
   });
   if(moved){ cacheSave(); }
 }
@@ -834,6 +894,20 @@ async function saveNote(id,text,tier,quiet){
 }
 
 document.addEventListener('click',async e=>{
+ const lk=e.target.closest('[data-link]');
+ if(lk){
+   const h=HOUSES.find(function(x){return String(x.id)===String(lk.dataset.link);});
+   if(h) copyText(h.url).then(function(){
+     lk.classList.add('done');
+     setTimeout(function(){ lk.classList.remove('done'); },1600);
+     toast('Ссылка скопирована');
+   },function(){ toast('Не получилось скопировать',true); });
+   return;
+ }
+ const wy=e.target.closest('[data-why]');
+ if(wy){ setWhy(wy.dataset.h,wy.dataset.why); render();
+   const okw=await push(); mark();
+   toast(okw?'Причина: '+WHY[wy.dataset.why]:'Сохранено в телефоне',!okw); return; }
  const tl=e.target.closest('[data-tel]');
  if(tl){
    const num=prettyTel(tl.dataset.tel).replace(/\s/g,'');

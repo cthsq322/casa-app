@@ -1,0 +1,20 @@
+# Photo links from imovirtual go through OLX's image CDN, which signs the path
+# with its own HS256 token. gitleaks reads that as a leaked JWT. It is not one:
+# the payload carries a file name and a watermark spec, nothing of ours, and the
+# same string is handed to anyone who opens the listing.
+#
+# Narrow on purpose - only tokens inside an apollo.olxcdn.com URL are excused,
+# so a real JWT anywhere else still stops the commit.
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "jwt"
+description = "JWT"
+regex = '''\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}'''
+
+  [rules.allowlist]
+  description = "signed image paths on the OLX CDN"
+  regexTarget = "line"
+  regexes = ['''apollo\.olxcdn\.com/v1/files/''']
