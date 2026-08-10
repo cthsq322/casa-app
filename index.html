@@ -27,14 +27,16 @@ button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(-
 button.on{background:var(--accent);border-color:var(--accent);color:var(--paper)}
 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .who{font-weight:600;color:var(--accent)}
-.bar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:12px 0;
- position:sticky;top:0;background:var(--paper);z-index:5;border-bottom:1px solid var(--line)}
+.bar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:12px 0}
 select#sort{font:inherit;font-size:14px;padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);max-width:100%}
 .nota{margin-left:8px;font:600 12.5px/1 -apple-system,sans-serif;padding:4px 8px;border-radius:999px;background:var(--accent-s);color:var(--accent);font-variant-numeric:tabular-nums}
 .nota.thin{background:transparent;border:1px solid var(--line);color:var(--soft)}
-.find{display:flex;align-items:center;gap:8px;margin:11px 0 2px;
+.find{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:8px;
+ margin:0 0 2px;
  background:var(--card);border:1px solid var(--line);border-radius:999px;
  padding:3px 6px 3px 14px;box-shadow:var(--sh)}
+.findwrap{position:sticky;top:0;z-index:6;background:var(--paper);
+ padding:8px 0 4px;margin:0 0 4px}
 .find .mag{font-size:15px;opacity:.65}
 input[type=search]{font:inherit;font-size:16px;padding:9px 2px;border:0;outline:0;
  background:transparent;color:var(--ink);flex:1;min-width:60px;
@@ -56,6 +58,13 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 .stbar button .n{font-variant-numeric:tabular-nums;font-weight:600;background:var(--accent-s);color:var(--accent);border-radius:999px;padding:1px 7px;font-size:12px}
 .stbar button.on .n{background:rgba(255,255,255,.25);color:inherit}
 .stbar button.zero{opacity:.45}
+.soon{display:none}
+.soon.on{display:block;margin:10px 0 0;background:var(--warn-s);
+ border:1px solid var(--warn);border-radius:12px;padding:10px 13px;font-size:14px}
+.soon .s1{padding:2px 0}
+.soon b{color:var(--warn)}
+.soon a{color:var(--accent);text-decoration:none;margin-left:8px;font-weight:600}
+.cal{padding:5px 12px;font-size:12.5px;border-color:var(--accent);color:var(--accent)}
 .mine{margin:11px 0 0;font-size:13.5px;color:var(--soft)}
 .mine b{color:var(--ink);font-variant-numeric:tabular-nums}
 .mine .empty{font-style:italic}
@@ -223,7 +232,8 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="mine">С заметками</button>
   <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
   <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
-<div class="find"><span class="mag">🔍</span><input id="q" type="search" placeholder="Найти дом: город, адрес, № или цена"><button id="qx" title="очистить">✕</button></div>
+<div class="findwrap"><div class="find"><span class="mag">🔍</span><input id="q" type="search" placeholder="Найти дом: город, адрес, № или цена"><button id="qx" title="очистить">✕</button></div></div>
+<div class="soon" id="soon"></div>
 <div class="mine" id="mine"></div>
 <div class="prog" id="prog"></div>
 <div class="stbar" id="people"></div>
@@ -284,12 +294,15 @@ function mergeNotes(fresh){
   [...map.values()].forEach(function(n){(out[n.house_id]=out[n.house_id]||[]).push(n);});
   return {notes:out,pending:pending};
 }
-let FAVS={};
+let FAVS={}, REMIND={};
 function stVal(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.v:x; }
 function stBy(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.by:null; }
 function stAt(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.at:null; }
 function vTime(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.t:x; }
 function vBy(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.by:null; }
+function rDate(id){ const x=REMIND[id]; return x&&typeof x==='object'?x.d:x; }
+function rBy(id){ const x=REMIND[id]; return x&&typeof x==='object'?x.by:null; }
+function setRemind(id,d){ REMIND[id]={d:d,by:me}; soil('r',id); }
 function stamp(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
 const COUNTED=['escrito','ligado','semresp'];   // things you do more than once
 function stTry(id){ const x=STATUS[id]; return (x&&typeof x==='object'&&x.n)||0; }
@@ -319,12 +332,14 @@ function cacheSave(){
   localStorage.setItem('casa_status',JSON.stringify(STATUS));
   localStorage.setItem('casa_visits',JSON.stringify(VISITS));
   localStorage.setItem('casa_favs',JSON.stringify(FAVS));
+  localStorage.setItem('casa_remind',JSON.stringify(REMIND));
 }
 function cacheLoad(){
   try{
     STATUS=JSON.parse(localStorage.getItem('casa_status')||'{}');
     VISITS=JSON.parse(localStorage.getItem('casa_visits')||'{}');
     FAVS=JSON.parse(localStorage.getItem('casa_favs')||'{}');
+    REMIND=JSON.parse(localStorage.getItem('casa_remind')||'{}');
     return JSON.parse(localStorage.getItem('casa_notes')||'[]');
   }catch(e){ STATUS={}; return []; }
 }
@@ -339,6 +354,7 @@ async function pull(){
     STATUS=mergeMap(d.status,STATUS,'s');
     VISITS=mergeMap(d.visits,VISITS,'v');
     FAVS=mergeMap(d.favs,FAVS,'f');
+    REMIND=mergeMap(d.remind,REMIND,'r');
     return d.notes||[];
   }catch(e){ SYNCED=false; return cacheLoad(); }
 }
@@ -371,14 +387,15 @@ async function push(mine){
     const body={notes:[...map.values()],
                 status:dropDeleted(cur.status,STATUS,'s'),
                 visits:dropDeleted(cur.visits,VISITS,'v'),
-                favs:dropDeleted(cur.favs,FAVS,'f'),v:1};
+                favs:dropDeleted(cur.favs,FAVS,'f'),
+                remind:dropDeleted(cur.remind,REMIND,'r'),v:1};
     const w=await fetch(API,{method:'PUT',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(body)});
     if(!w.ok) throw 0;
     SYNCED=true;
     NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
-    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{};
+    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{};
     cacheSave();
     DIRTY.clear(); saveDirty();
     return true;
@@ -536,7 +553,13 @@ function noteBlock(h){
   '<div class="visit"><span class="vl">визит</span>'+
    '<input type="datetime-local" data-visit="'+h.id+'" value="'+(vTime(h.id)||'')+'">'+
    (vTime(h.id)?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+
-   (vBy(h.id)?'<span class="vby">'+vBy(h.id)+'</span>':'')+'</div>'+
+   (vBy(h.id)?'<span class="vby">'+vBy(h.id)+'</span>':'')+
+   (vTime(h.id)?'<button class="cal" data-cal="'+h.id+'">в календарь</button>':'')+
+   '</div>'+
+  '<div class="visit"><span class="vl">напомнить</span>'+
+   '<input type="date" data-remind="'+h.id+'" value="'+(rDate(h.id)||'')+'">'+
+   (rDate(h.id)?'<button class="clr" data-rclr="'+h.id+'">x</button>':'')+
+   (rBy(h.id)?'<span class="vby">'+rBy(h.id)+'</span>':'')+'</div>'+
   (stBy(h.id)?'<div class="stby">'+(ST_SHORT[stVal(h.id)]||stVal(h.id))+
      (stTry(h.id)>1?' ×'+stTry(h.id):'')+
      (stWhy(h.id)?' · '+(WHY[stWhy(h.id)]||stWhy(h.id)):'')+
@@ -849,6 +872,62 @@ function migrateStatus(){
   });
   if(moved){ cacheSave(); }
 }
+function pad2(n){ return (n<10?'0':'')+n; }
+function icsFor(h,t){
+  // 90 minutes is a viewing plus the walk round the land
+  const start=new Date(t), end=new Date(start.getTime()+90*60000);
+  const z=d=>d.getUTCFullYear()+pad2(d.getUTCMonth()+1)+pad2(d.getUTCDate())+'T'+
+    pad2(d.getUTCHours())+pad2(d.getUTCMinutes())+'00Z';
+  const esc=x=>String(x||'').replace(/[\\;,]/g,m=>'\\'+m).replace(/\n/g,'\\n');
+  const where=[h.concelho,h.freguesia].filter(Boolean).join(', ');
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//casa//RU','CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT','UID:casa-'+h.id+'@cthsq322.github.io','DTSTAMP:'+z(new Date()),
+    'DTSTART:'+z(start),'DTEND:'+z(end),
+    'SUMMARY:'+esc('Осмотр дома — '+where+' — '+eur(h.price_eur)),
+    'LOCATION:'+esc(h.lat?h.lat+','+h.lon:where),
+    'DESCRIPTION:'+esc((h.agent_phone||'')+'  '+h.url),
+    'BEGIN:VALARM','TRIGGER:-P1D','ACTION:DISPLAY',
+    'DESCRIPTION:'+esc('Завтра осмотр — '+where),'END:VALARM',
+    'BEGIN:VALARM','TRIGGER:-PT2H','ACTION:DISPLAY',
+    'DESCRIPTION:'+esc('Через 2 часа осмотр — '+where),'END:VALARM',
+    'END:VEVENT','END:VCALENDAR'].join('\r\n');
+}
+function renderSoon(){
+  const box=document.getElementById('soon');
+  if(!box||!HOUSES.length) return;
+  const now=new Date();
+  const rem=Object.keys(REMIND).map(function(id){
+    const dt=rDate(id); if(!dt) return null;
+    const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    if(!h) return null;
+    const when=new Date(dt+'T09:00');
+    const hours=(when-now)/3600000;
+    return (hours>-24 && hours<48) ? {h:h,when:when,hours:hours,note:true} : null;
+  }).filter(Boolean);
+  const items=Object.keys(VISITS).map(function(id){
+    const t=vTime(id); if(!t) return null;
+    const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    if(!h) return null;
+    const when=new Date(t);
+    const hours=(when-now)/3600000;
+    return (hours>-3 && hours<48) ? {h:h,t:t,when:when,hours:hours} : null;
+  }).filter(Boolean).concat(rem).sort(function(a,b){ return a.when-b.when; });
+  if(!items.length){ box.innerHTML=''; box.className='soon'; return; }
+  box.className='soon on';
+  box.innerHTML=items.map(function(it){
+    const d=it.when, today=d.toDateString()===now.toDateString();
+    const word = it.note
+      ? (today?'сегодня напомнить':(it.hours<0?'просрочено напоминание':'завтра напомнить'))
+      : it.hours<0 ? 'идёт сейчас'
+      : today ? 'сегодня в '+pad2(d.getHours())+':'+pad2(d.getMinutes())
+      : 'завтра в '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+    return '<div class="s1"><b>'+word+'</b> · '+(it.h.concelho||'?')+
+      (it.by?' · '+it.by:'')+
+      (it.h.agent_phone?' <a href="tel:'+telHref(it.h.agent_phone)+'">позвонить</a>':'')+
+      (it.h.lat?' <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+
+        it.h.lat+','+it.h.lon+'">маршрут</a>':'')+'</div>';
+  }).join('');
+}
 function renderMine(){
   const box=document.getElementById('mine');
   if(!box||!HOUSES.length) return;
@@ -907,6 +986,7 @@ function renderStBar(){
   renderPeople();
   renderProgress();
   renderMine();
+  renderSoon();
   const box=document.getElementById('stbar');
   if(!box) return;
   const n={}; Object.keys(ST_LABELS).forEach(function(k){n[k]=0;});
@@ -961,6 +1041,21 @@ async function saveNote(id,text,tier,quiet){
 }
 
 document.addEventListener('click',async e=>{
+ const cal=e.target.closest('[data-cal]');
+ if(cal){
+   const h=HOUSES.find(function(x){return String(x.id)===String(cal.dataset.cal);});
+   const t=vTime(cal.dataset.cal);
+   if(h&&t){
+     const blob=new Blob([icsFor(h,t)],{type:'text/calendar;charset=utf-8'});
+     const a=document.createElement('a');
+     a.href=URL.createObjectURL(blob);
+     a.download='osmotr-'+h.id+'.ics';
+     document.body.appendChild(a); a.click(); document.body.removeChild(a);
+     setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
+     toast('Добавь в календарь — напомнит за день');
+   }
+   return;
+ }
  const lk=e.target.closest('[data-link]');
  if(lk){
    const h=HOUSES.find(function(x){return String(x.id)===String(lk.dataset.link);});
@@ -988,6 +1083,9 @@ document.addEventListener('click',async e=>{
  const fv=e.target.closest('[data-fav]');
  if(fv){ toggleFav(fv.dataset.fav); render(); await push(); mark();
    toast(isFav(fv.dataset.fav)?'В избранном':'Убрано из избранного'); return; }
+ const rc=e.target.closest('[data-rclr]');
+ if(rc){ delete REMIND[rc.dataset.rclr]; soil('r',rc.dataset.rclr);
+   await push(); render(); mark(); toast('Напоминание убрано'); return; }
  const cl=e.target.closest('[data-clr]');
  if(cl){ const id=cl.dataset.clr;
    delete VISITS[id]; soil('v',id);
@@ -1015,6 +1113,12 @@ document.addEventListener('click',async e=>{
 });
 
 document.addEventListener('change',async e=>{
+ const rm=e.target.closest('[data-remind]');
+ if(rm){ const id=rm.dataset.remind;
+   if(rm.value) setRemind(id,rm.value); else { delete REMIND[id]; soil('r',id); }
+   const okr=await push(); render(); mark();
+   toast(okr?(rm.value?'Напомню в этот день':'Напоминание убрано'):'Сохранено в телефоне',!okr);
+   return; }
  const vi=e.target.closest('[data-visit]');
  if(vi){ const id=vi.dataset.visit;
    if(vi.value){ setVisit(id,vi.value); setStatus(id,'marcado'); }
