@@ -653,7 +653,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2246-067d422';
+const BUILD='20260810-2254-e057dbf';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1937,8 +1937,16 @@ document.addEventListener('click',async e=>{
  }
  const dn=e.target.closest('[data-day]');
  if(dn){ dayOff+=parseInt(dn.dataset.day,10); renderDay(); return; }
+ const ma=e.target.closest('[data-msgall]');
+ if(ma){
+   const h=HOUSES.filter(function(x){return String(x.id)===String(ma.dataset.msgall);})[0];
+   if(h){ ma.classList.add('done');
+     setTimeout(function(){ ma.classList.remove('done'); },1800);
+     sendText(msgForGroup(h), 'Письмо на '+(1+sameAgent(h).length)+' домов'); }
+   return;
+ }
  const ag=e.target.closest('[data-agent]');
- if(ag){
+ if(ag && !e.target.closest('[data-msgall]')){
    const h=HOUSES.filter(function(x){return String(x.id)===String(ag.dataset.agent);})[0];
    if(h){ const k=agentKey(h);
      qbox.value=''; q=''; filt='agent:'+k;
@@ -1946,14 +1954,6 @@ document.addEventListener('click',async e=>{
      unfreeze(); render();
      toast('Все дома этого агента');
    }
-   return;
- }
- const ma=e.target.closest('[data-msgall]');
- if(ma){
-   const h=HOUSES.filter(function(x){return String(x.id)===String(ma.dataset.msgall);})[0];
-   if(h){ ma.classList.add('done');
-     setTimeout(function(){ ma.classList.remove('done'); },1800);
-     sendText(msgForGroup(h), 'Письмо на '+(1+sameAgent(h).length)+' домов'); }
    return;
  }
  const mg=e.target.closest('[data-msg]');
