@@ -32,8 +32,17 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 select#sort{font:inherit;font-size:14px;padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);max-width:100%}
 .nota{margin-left:8px;font:600 12.5px/1 -apple-system,sans-serif;padding:4px 8px;border-radius:999px;background:var(--accent-s);color:var(--accent);font-variant-numeric:tabular-nums}
 .nota.thin{background:transparent;border:1px solid var(--line);color:var(--soft)}
-input[type=search]{font:inherit;padding:7px 12px;border:1px solid var(--line);
- border-radius:999px;background:var(--card);color:var(--ink);flex:1;min-width:160px}
+.find{display:flex;align-items:center;gap:8px;margin:11px 0 2px;
+ background:var(--card);border:1px solid var(--line);border-radius:999px;
+ padding:3px 6px 3px 14px;box-shadow:var(--sh)}
+.find .mag{font-size:15px;opacity:.65}
+input[type=search]{font:inherit;font-size:16px;padding:9px 2px;border:0;outline:0;
+ background:transparent;color:var(--ink);flex:1;min-width:60px;
+ -webkit-appearance:none}
+input[type=search]::-webkit-search-cancel-button{display:none}
+#qx{border:0;background:transparent;color:var(--soft);font-size:15px;padding:7px 11px;
+ visibility:hidden}
+#qx.on{visibility:visible}
 .count{color:var(--soft);font-size:14px;padding:12px 0 6px}
 #mapbox{display:none;height:68vh;min-height:340px;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:10px 0 4px;background:var(--card)}
 #mapbox.on{display:block}
@@ -47,6 +56,15 @@ input[type=search]{font:inherit;padding:7px 12px;border:1px solid var(--line);
 .stbar button .n{font-variant-numeric:tabular-nums;font-weight:600;background:var(--accent-s);color:var(--accent);border-radius:999px;padding:1px 7px;font-size:12px}
 .stbar button.on .n{background:rgba(255,255,255,.25);color:inherit}
 .stbar button.zero{opacity:.45}
+.prog{margin:12px 0 2px;font-size:13.5px;color:var(--soft)}
+.prog .row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.prog b{color:var(--ink);font-variant-numeric:tabular-nums;font-size:15px}
+.prog .rest{margin-left:auto}
+.prog .bar{height:6px;border-radius:999px;background:var(--line);margin-top:6px;
+ overflow:hidden}
+.prog .bar i{display:block;height:100%;background:var(--accent);border-radius:999px;
+ transition:width .3s}
+@media(prefers-reduced-motion:reduce){.prog .bar i{transition:none}}
 #people button{border-color:var(--gold)}
 #people button.on{background:var(--gold);border-color:var(--gold);color:#fff}
 .fav{padding:2px 9px;font-size:15px;line-height:1.2;border-color:var(--line);
@@ -86,6 +104,14 @@ input[type=search]{font:inherit;padding:7px 12px;border:1px solid var(--line);
 .tag.bad{background:var(--warn-s);color:var(--warn);font-weight:600}
 .tag.rooms{background:transparent;border:1px solid var(--line);color:var(--soft)}
 .exc{font-size:13px;color:var(--soft)}
+.tels{display:flex;flex-wrap:wrap;gap:6px}
+.tel{display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:14.5px;
+ font-variant-numeric:tabular-nums;border-radius:9px;border:1px dashed var(--line);
+ background:transparent;color:var(--ink)}
+.tel .cp{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--soft)}
+.tel.done{border-style:solid;border-color:var(--accent);color:var(--accent)}
+.tel.done .cp{color:var(--accent)}
+.tel.done .cp:after{content:' ✓'}
 .acts{display:flex;gap:7px}
 .acts a{flex:1;text-align:center;text-decoration:none;font-size:14px;padding:8px;
  border-radius:9px;border:1px solid var(--line);color:var(--ink)}
@@ -156,8 +182,9 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="alone">Без соседей</button>
   <button data-f="mine">С заметками</button>
   <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
-  <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select><input id="q" type="search" placeholder="город, адрес, №, цена…">
-</div>
+  <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
+<div class="find"><span class="mag">🔍</span><input id="q" type="search" placeholder="Найти дом: город, адрес, № или цена"><button id="qx" title="очистить">✕</button></div>
+<div class="prog" id="prog"></div>
 <div class="stbar" id="people"></div>
 <div class="stbar" id="stbar"></div>
 <div class="links">
@@ -458,6 +485,25 @@ function noteBlock(h){
   '</div></div>';
 }
 
+function telHref(raw){
+  const first=String(raw).split(';')[0].trim().replace(/[^\d+]/g,'');
+  return first.startsWith('+')?first:'+351'+first;
+}
+function prettyTel(raw){
+  const d=String(raw).replace(/[^\d]/g,'');
+  const nine=d.length>9?d.slice(-9):d;                 // drop the country code
+  return '+351 '+nine.replace(/(\d{3})(\d{3})(\d{3})/,'$1 $2 $3');
+}
+function copyText(text){
+  if(navigator.clipboard&&window.isSecureContext) return navigator.clipboard.writeText(text);
+  return new Promise(function(res,rej){
+    const a=document.createElement('textarea');
+    a.value=text; a.style.position='fixed'; a.style.opacity='0';
+    document.body.appendChild(a); a.select();
+    try{ document.execCommand('copy'); res(); }catch(e){ rej(e); }
+    document.body.removeChild(a);
+  });
+}
 function card(h){
  const flags=(h.desc_blockers||'').split(';').map(s=>s.trim()).filter(Boolean);
  const goods=(h.desc_goods||'').split(';').map(s=>s.trim()).filter(Boolean);
@@ -489,8 +535,14 @@ function card(h){
   (goods.length?'<div class="tags">'+goods.slice(0,6).map(g=>'<span class="tag">'+g+'</span>').join('')+'</div>':'')+
   (rooms.length?'<div class="tags">'+rooms.slice(0,5).map(r=>'<span class="tag rooms">'+r+'</span>').join('')+'</div>':'')+
   (h.excerpt?'<p class="exc">'+esc(h.excerpt)+'</p>':'')+
+  (h.agent_phone?'<div class="tels">'+
+    String(h.agent_phone).split(';').map(function(t){ return t.trim(); })
+      .filter(Boolean).slice(0,3).map(function(t){
+        return '<button class="tel" data-tel="'+t+'">'+prettyTel(t)+
+               '<span class="cp">копировать</span></button>';
+      }).join('')+'</div>':'')+
   '<div class="acts">'+
-   (h.agent_phone?'<a class="pri" href="tel:+351'+h.agent_phone+'">Позвонить</a>':'')+
+   (h.agent_phone?'<a class="pri" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
    (h.whatsapp?'<a href="'+h.whatsapp+'" target="_blank" rel="noopener">WhatsApp</a>':'')+
    '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление</a></div>'+
   noteBlock(h)+'</article>';
@@ -658,6 +710,19 @@ function migrateStatus(){
   });
   if(moved){ cacheSave(); }
 }
+function renderProgress(){
+  const box=document.getElementById('prog');
+  if(!box||!HOUSES.length) return;
+  const done=HOUSES.filter(function(h){ return stVal(h.id); }).length;
+  const marked=HOUSES.filter(function(h){ return stVal(h.id)==='marcado'; }).length;
+  const seen=HOUSES.filter(function(h){ return stVal(h.id)==='visto'; }).length;
+  const pct=Math.round(done/HOUSES.length*100);
+  box.innerHTML='<div class="row">отработано <b>'+done+'</b> из <b>'+HOUSES.length+'</b>'+
+    (marked?' · договорились <b>'+marked+'</b>':'')+
+    (seen?' · посмотрели <b>'+seen+'</b>':'')+
+    '<span class="rest">осталось <b>'+(HOUSES.length-done)+'</b></span></div>'+
+    '<div class="bar"><i style="width:'+pct+'%"></i></div>';
+}
 function renderPeople(){
   const box=document.getElementById('people');
   if(!box) return;
@@ -681,6 +746,7 @@ function renderPeople(){
 function renderStBar(){
   migrateStatus();
   renderPeople();
+  renderProgress();
   const box=document.getElementById('stbar');
   if(!box) return;
   const n={}; Object.keys(ST_LABELS).forEach(function(k){n[k]=0;});
@@ -735,6 +801,16 @@ async function saveNote(id,text,tier,quiet){
 }
 
 document.addEventListener('click',async e=>{
+ const tl=e.target.closest('[data-tel]');
+ if(tl){
+   const num=prettyTel(tl.dataset.tel).replace(/\s/g,'');
+   copyText(num).then(function(){
+     tl.classList.add('done');
+     setTimeout(function(){ tl.classList.remove('done'); },1600);
+     toast('Номер скопирован: '+num);
+   },function(){ toast('Не получилось скопировать',true); });
+   return;
+ }
  const fv=e.target.closest('[data-fav]');
  if(fv){ toggleFav(fv.dataset.fav); render(); await push(); mark();
    toast(isFav(fv.dataset.fav)?'В избранном':'Убрано из избранного'); return; }
@@ -789,7 +865,15 @@ document.addEventListener('input',function(e){
     saveNote(id,ta.value.trim(),null,true);      // quiet: no re-render mid-typing
   },1200);
 });
-document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render();});
+const qbox=document.getElementById('q'), qclr=document.getElementById('qx');
+qbox.addEventListener('input',function(e){
+  q=e.target.value.trim().toLowerCase();
+  qclr.classList.toggle('on',!!q);
+  render();
+});
+qclr.addEventListener('click',function(){
+  qbox.value=''; q=''; qclr.classList.remove('on'); qbox.focus(); render();
+});
 
 if(me){setUser(me);load();}
 </script>
