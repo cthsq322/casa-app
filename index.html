@@ -273,6 +273,9 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
 @media(max-width:520px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:21px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
+.msg{padding:5px 12px;font-size:12.5px;border-color:var(--accent);
+ color:var(--accent);font-weight:600}
+.msg.done{background:var(--accent);color:var(--paper)}
 .skip{padding:5px 12px;font-size:12.5px;border-color:var(--line);color:var(--soft)}
 .skip.on{border-color:var(--warn);color:var(--warn);font-weight:600}
 .pdrop{padding:9px 14px;border-top:1px solid var(--line);font-size:12.5px;
@@ -526,7 +529,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-1910-461850f';
+const BUILD='20260810-1923-f20a856';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -700,6 +703,7 @@ function noteBlock(h){
    (vTime(h.id)?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+
    (vBy(h.id)?'<span class="vby">'+vBy(h.id)+'</span>':'')+
    (vTime(h.id)?'<button class="cal" data-cal="'+h.id+'">в календарь</button>':'')+
+   '<button class="msg" data-msg="'+h.id+'">✍ текст агенту</button>'+
    '<button class="skip'+(isSkipped(h.id)?' on':'')+'" data-skip="'+h.id+'">'+
      (isSkipped(h.id)?'вернуть в круг':'убрать из круга')+'</button>'+
    (vTime(h.id)?'<button class="conf'+(vOk(h.id)?'':' off')+'" data-conf="'+h.id+'" '+
@@ -819,6 +823,36 @@ function sameAgent(h){
   return (agentGroups()[k]||[]).filter(function(x){ return x.id!==h.id; });
 }
 
+
+// The link goes first, then this - so no greeting, straight to the point.
+function msgFor(h){
+  const d=DAYOF[h.id];
+  const when = d && d.when ? d.when+' por volta das '+d.at : null;
+  const pt = [
+    'Estamos a ver casas nesta zona e já temos a rota da semana montada.',
+    when
+      ? 'Esta casa fica-nos a jeito ' + ptDay(d) + ' — conseguimos passar por lá?'
+      : 'Gostávamos de ver esta casa esta semana — que dias tem disponíveis?',
+    when
+      ? 'Se essa hora não servir, diga qual serve nesse mesmo dia: a rota está feita e é mais fácil trocar a hora do que o dia.'
+      : '',
+    'Antes de avançarmos, duas coisas: a casa passa no crédito e está pronta para a avaliação do banco?',
+    'Temos aprovação do banco e vamos à avaliação, por isso conseguimos fechar depressa.'
+  ].filter(Boolean).join('\n\n');
+  return pt;
+}
+function ptDay(d){
+  // "суббота 15.08" -> "no sábado, dia 15/08, por volta das 09:00"
+  const RU2PT={'понедельник':'segunda-feira','вторник':'terça-feira',
+    'среда':'quarta-feira','четверг':'quinta-feira','пятница':'sexta-feira',
+    'суббота':'sábado','воскресenье':'domingo','воскресенье':'domingo'};
+  const parts=(d.when||'').split(' ');
+  const dia=RU2PT[parts[0]]||parts[0];
+  const data=(parts[1]||'').replace('.','/');
+  const art = (dia==='sábado'||dia==='domingo') ? 'no ' : 'na ';
+  return art+dia+(data?', dia '+data:'')+', por volta das '+d.at;
+}
+
 function card(h){
  const flags=(h.desc_blockers||'').split(';').map(s=>s.trim()).filter(Boolean);
  const goods=(h.desc_goods||'').split(';').map(s=>s.trim()).filter(Boolean);
@@ -860,7 +894,8 @@ function card(h){
     ? '<div class="bday'+(DAYOF[h.id].week?'':' later')+'">'+
       (DAYOF[h.id].week
         ? 'звать на <b>'+(DAYOF[h.id].when||('день '+DAYOF[h.id].label))+'</b>, около '+
-          DAYOF[h.id].at
+          DAYOF[h.id].at+
+          '<button class="cpday" data-cpday="'+h.id+'">копировать дату</button>'
         : 'в круге на день '+DAYOF[h.id].label+' — эта часть отложена')+
       '</div>'
     : '')+
@@ -1549,11 +1584,21 @@ document.addEventListener('click',async e=>{
    }
    return;
  }
+ const mg=e.target.closest('[data-msg]');
+ if(mg){
+   const h=HOUSES.filter(function(x){return String(x.id)===String(mg.dataset.msg);})[0];
+   if(h) copyText(msgFor(h)).then(function(){
+     mg.classList.add('done');
+     setTimeout(function(){ mg.classList.remove('done'); },1800);
+     toast(DAYOF[h.id]?'Текст с датой скопирован':'Текст скопирован (дата не задана)');
+   },function(){ toast('Не получилось скопировать',true); });
+   return;
+ }
  const cd=e.target.closest('[data-cpday]');
  if(cd){
    const d=DAYOF[cd.dataset.cpday];
-   if(d) copyText(d.when+', '+d.at).then(function(){
-     toast('Скопировано: '+d.when+', '+d.at);
+   if(d) copyText(ptDay(d)).then(function(){
+     toast('Скопировано: '+ptDay(d));
    },function(){ toast('Не получилось скопировать',true); });
    return;
  }
