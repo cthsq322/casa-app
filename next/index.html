@@ -653,7 +653,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2302-7e1cdbf';
+const BUILD='20260810-2305-fbf339b';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1027,7 +1027,8 @@ function msgForGroup(h){
   const NL=String.fromCharCode(10);
   const lines=all.map(function(x){
     const d=DOF(x.id);
-    return '• '+(x.concelho||'?')+' — '+eur(x.price_eur)+NL+x.url+
+    return '• '+(x.concelho||'?')+' — '+
+      (x.price_eur?eur(x.price_eur):'preço sob consulta')+NL+x.url+
       (d&&d.when?NL+'  '+ptDay(d):'');
   });
   return [
