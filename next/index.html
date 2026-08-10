@@ -373,7 +373,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="mine">С заметками</button>
   <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
   <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
-<div class="findwrap"><div class="find"><span class="mag">🔍</span><input id="q" type="search" placeholder="Найти дом: город, адрес, № или цена"><button id="qx" title="очистить">✕</button></div></div>
+<div class="findwrap"><div class="find"><span class="mag">🔍</span><input id="q" type="search" placeholder="Найти: город, телефон, № или цена"><button id="qx" title="очистить">✕</button></div></div>
 <div class="upd" id="upd"></div>
 <div class="soon" id="soon"></div>
 <div class="mine" id="mine"></div>
@@ -628,7 +628,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2135-0dd8f89';
+const BUILD='20260810-2152-103b7bb';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -771,6 +771,11 @@ function keep(h){
  if(q){
   const num=q.replace(/[^\d]/g,'');
   if(num.length>=3){
+    // a phone: any run of digits from any number we hold for this house
+    const tail = num.length>9 ? num.slice(-9) : num;
+    const tels = (h.agent_phone? telList(h.agent_phone):[]).concat(
+      myTel(h.id)?[myTel(h.id)]:[]).map(digits9);
+    if(tels.some(function(t){ return t.indexOf(tail)>=0; })) return true;
     const hit=String(h.id)===num||String(Math.round(h.price_eur||0)).startsWith(num)||
       (h.url||'').includes(num);
     if(hit) return true;
@@ -982,6 +987,7 @@ function msgForGroup(h){
       'serve nesse mesmo dia — a rota está feita e é mais fácil '+
       'trocar a hora do que o dia.',
     'Nestes dias queremos ver o máximo possível para fechar uma lista curta; o que nos agradar tem segunda visita à sexta ou ao fim de semana.',
+    'Se tiver mais casas nesta zona — mesmo as que ainda não estão no site — mande os links. O que nos interessar vemos no mesmo dia, logo a seguir à sua.',
     'Antes de avançarmos: as casas passam no crédito e estão prontas '+
       'para a avaliação do banco? Temos aprovação do banco e vamos '+
       'à avaliação, por isso fechamos depressa.'
@@ -1000,6 +1006,7 @@ function msgFor(h){
       ? 'Se essa hora não servir, diga qual serve nesse mesmo dia — é mais fácil trocar a hora do que o dia.'
       : '',
     'Nestes dias queremos ver o máximo possível para fechar uma lista curta. Se a casa nos agradar, voltamos numa segunda visita à sexta-feira ou ao fim de semana, com calma e com família.',
+    'Se tiver mais casas nesta zona — mesmo as que ainda não estão no site — mande os links. O que nos interessar vemos no mesmo dia, logo a seguir à sua.',
     'Antes de avançarmos, duas coisas: a casa passa no crédito e está pronta para a avaliação do banco? Temos aprovação do banco e vamos à avaliação, por isso conseguimos fechar depressa.'
   ];
   return parts.filter(Boolean).join(NL+NL);
