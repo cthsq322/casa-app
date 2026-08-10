@@ -589,7 +589,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2006-635bd6e';
+const BUILD='20260810-2057-6fda464';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -904,26 +904,24 @@ function sameAgent(h){
 // several houses, one agent, one message
 function msgForGroup(h){
   const all=[h].concat(sameAgent(h));
+  const NL=String.fromCharCode(10);
   const lines=all.map(function(x){
     const d=DAYOF[x.id];
-    return '• '+(x.concelho||'?')+' — '+eur(x.price_eur)+'
-'+x.url+
-      (d&&d.when?'
-  '+ptDay(d):'');
+    return '• '+(x.concelho||'?')+' — '+eur(x.price_eur)+NL+x.url+
+      (d&&d.when?NL+'  '+ptDay(d):'');
   });
   return [
     'Estamos a ver casas nesta zona e já temos a rota da semana montada.',
-    'Vi que tem estas '+(all.length>1?all.length+' casas':'casa')+' — interessam-nos todas:',
-    lines.join('
-
-'),
-    'Conseguimos passar nos dias indicados? Se alguma hora não servir, diga qual serve '+
-    'nesse mesmo dia — a rota está feita e é mais fácil trocar a hora do que o dia.',
-    'Antes de avançarmos: as casas passam no crédito e estão prontas para a avaliação '+
-    'do banco? Temos aprovação do banco e vamos à avaliação, por isso fechamos depressa.'
-  ].join('
-
-');
+    'Vi que tem estas '+(all.length>1?all.length+' casas':'casa')+
+      ' — interessam-nos todas:',
+    lines.join(NL+NL),
+    'Conseguimos passar nos dias indicados? Se alguma hora não servir, diga qual '+
+      'serve nesse mesmo dia — a rota está feita e é mais fácil '+
+      'trocar a hora do que o dia.',
+    'Antes de avançarmos: as casas passam no crédito e estão prontas '+
+      'para a avaliação do banco? Temos aprovação do banco e vamos '+
+      'à avaliação, por isso fechamos depressa.'
+  ].join(NL+NL);
 }
 function msgFor(h){
   const d=DAYOF[h.id];

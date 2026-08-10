@@ -32,7 +32,26 @@ def run(*args):
     return subprocess.run(args, cwd=HERE, capture_output=True, text=True)
 
 
+def syntax_ok(path):
+    """A broken string literal takes the whole page down - check before shipping."""
+    import re, tempfile
+    html = pathlib.Path(path).read_text(encoding="utf-8")
+    blocks = re.findall(r"<script>(.*?)</script>", html, re.S)
+    for i, js in enumerate(blocks):
+        tmp = pathlib.Path(tempfile.gettempdir()) / f"casa_check_{i}.js"
+        tmp.write_text(js, encoding="utf-8")
+        r = subprocess.run(["node", "--check", str(tmp)], capture_output=True, text=True)
+        tmp.unlink(missing_ok=True)
+        if r.returncode:
+            print("СИНТАКСИС СЛОМАН:")
+            print(r.stderr[:600])
+            return False
+    return True
+
+
 def stage():
+    if not syntax_ok(HERE / "index.html"):
+        raise SystemExit("не собираю: скрипт не парсится")
     NEXT.mkdir(exist_ok=True)
     for f in FILES:
         src = HERE / f
@@ -54,6 +73,8 @@ def stage():
 
 
 def live():
+    if not syntax_ok(NEXT / "index.html"):
+        raise SystemExit("не переношу: скрипт в next/ не парсится")
     if not STAMP.exists():
         print("СТОП: тесты против /next/ ещё не отмечены как зелёные.")
         print("Прогони их и создай файл .tested, иначе на рабочий адрес ничего не пойдёт.")
