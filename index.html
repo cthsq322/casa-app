@@ -447,8 +447,14 @@ function mergeNotes(fresh){
 }
 let FAVS={}, REMIND={}, SKIP={}, PINS={}, TELS={}, SLOTS={};
 // a slot set by hand beats whatever the circle computed today
+const RUDAYS=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 function slotFor(id){
   const m=SLOTS[id];
+  if(typeof m==='string'&&m.length>=16){           // "2026-08-11 09:15"
+    const d=new Date(m.slice(0,10)+'T00:00');
+    return {when:RUDAYS[d.getDay()]+' '+m.slice(8,10)+'.'+m.slice(5,7),
+            at:m.slice(11,16), week:true, swap:[], manual:true};
+  }
   if(m&&m.when) return {when:m.when, at:m.at, week:true, swap:[], manual:true};
   return DAYOF[id];
 }
@@ -647,7 +653,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2233-19c8b06';
+const BUILD='20260810-2241-7e00005';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -928,12 +934,13 @@ function prettyTel(raw){
 }
 // the phone's own share sheet: no clipboard permission, and WhatsApp is one tap
 async function sendText(text, label){
+  // the clipboard call has to happen inside the tap, before anything async
+  try{ await copyText(text); toast((label||'Текст')+' скопирован — вставляй в WhatsApp'); return; }
+  catch(e){}
   if(navigator.share){
-    try{ await navigator.share({text:text}); toast('Отправляю…'); return; }
+    try{ await navigator.share({text:text}); return; }
     catch(e){ if(e && e.name==='AbortError') return; }
   }
-  try{ await copyText(text); toast((label||'Текст')+' скопирован'); return; }
-  catch(e){}
   showText(text);
 }
 // last resort - put it on screen, already selected
