@@ -438,7 +438,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-1655-a080f93';
+const BUILD='20260810-1701-f7b2011';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -956,7 +956,7 @@ function renderSoon(){
     if(!h) return null;
     const when=new Date(dt+'T09:00');
     const hours=(when-now)/3600000;
-    return (hours>-24 && hours<48) ? {h:h,when:when,hours:hours,note:true} : null;
+    return (hours>-24 && hours<96) ? {h:h,when:when,hours:hours,note:true} : null;
   }).filter(Boolean);
   const due=Object.keys(VISITS).map(function(id){
     if(vOk(id)||!vTime(id)) return null;
@@ -972,16 +972,22 @@ function renderSoon(){
     if(!h) return null;
     const when=new Date(t);
     const hours=(when-now)/3600000;
-    return (hours>-3 && hours<48) ? {h:h,t:t,when:when,hours:hours} : null;
+    return (hours>-3 && hours<96) ? {h:h,t:t,when:when,hours:hours} : null;
   }).filter(Boolean).concat(rem).concat(due)
    .sort(function(a,b){ return (b.due?1:0)-(a.due?1:0) || a.when-b.when; });
   if(!items.length){ box.innerHTML=''; box.className='soon'; return; }
   box.className='soon on';
   box.innerHTML=items.map(function(it){
-    const d=it.when, today=d.toDateString()===now.toDateString();
+    const d=it.when;
+    const midnight=new Date(now); midnight.setHours(0,0,0,0);
+    const days=Math.floor((new Date(d).setHours(0,0,0,0)-midnight)/86400000);
+    const today=days===0;
+    const dayWord = days===0?'сегодня' : days===1?'завтра' :
+      days===2?'послезавтра' : pad2(d.getDate())+'.'+pad2(d.getMonth()+1);
     if(it.due){
       const v=new Date(it.visit);
-      return '<div class="s1 due"><b>'+(it.hours<0?'просрочено — ':'ответить до ')+
+      return '<div class="s1 due"><b>'+(it.hours<0?'просрочено — ':'ответить '+
+        (days===0?'сегодня до ':days===1?'завтра до ':dayWord+' до '))+
         pad2(d.getHours())+':'+pad2(d.getMinutes())+'</b> · '+(it.h.concelho||'?')+
         ' · осмотр '+pad2(v.getDate())+'.'+pad2(v.getMonth()+1)+' в '+
         pad2(v.getHours())+':'+pad2(v.getMinutes())+
@@ -989,10 +995,9 @@ function renderSoon(){
         '</div>';
     }
     const word = it.note
-      ? (today?'сегодня напомнить':(it.hours<0?'просрочено напоминание':'завтра напомнить'))
+      ? (it.hours<0&&!today ? 'просрочено напоминание' : dayWord+' напомнить')
       : it.hours<0 ? 'идёт сейчас'
-      : today ? 'сегодня в '+pad2(d.getHours())+':'+pad2(d.getMinutes())
-      : 'завтра в '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+      : dayWord+' в '+pad2(d.getHours())+':'+pad2(d.getMinutes());
     return '<div class="s1"><b>'+word+'</b> · '+(it.h.concelho||'?')+
       (it.by?' · '+it.by:'')+
       (it.h.agent_phone?' <a href="tel:'+telHref(it.h.agent_phone)+'">позвонить</a>':'')+
