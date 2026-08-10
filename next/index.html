@@ -653,7 +653,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2241-7e00005';
+const BUILD='20260810-2246-067d422';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1113,7 +1113,7 @@ function card(h){
       '</div>'
     : '')+
   (slotFor(h.id)&&!outOfLoop(h.id)
-    ? '<div class="bday'+(DAYOF[h.id].week?'':' later')+'">'+
+    ? '<div class="bday'+(slotFor(h.id).week?'':' later')+'">'+
       (slotFor(h.id).week
         ? 'звать на <b>'+(slotFor(h.id).when||('день '+slotFor(h.id).label))+'</b>, около '+
           slotFor(h.id).at+(slotFor(h.id).manual?' · назначено вручную':'')+
