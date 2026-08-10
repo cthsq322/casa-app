@@ -49,6 +49,10 @@ input[type=search]::-webkit-search-cancel-button{display:none}
  visibility:hidden}
 #qx.on{visibility:visible}
 .count{color:var(--soft);font-size:14px;padding:12px 0 6px}
+body.searching #soon,body.searching .mine,body.searching .prog,
+body.searching #people,body.searching #stbar,body.searching .links,
+body.searching .bar{display:none}
+body.searching .count{padding:8px 0 4px;font-weight:600;color:var(--accent)}
 #mapbox{display:none;height:68vh;min-height:340px;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:10px 0 4px;background:var(--card)}
 #mapbox.on{display:block}
 .stoppin span{display:flex;align-items:center;justify-content:center;
@@ -204,6 +208,17 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .visit input{font:inherit;font-size:13.5px;padding:6px 8px;border-radius:8px;
  border:1px solid var(--line);background:var(--paper);color:var(--ink);flex:1;min-width:150px}
 .visit .clr{padding:5px 11px;font-size:13px}
+.pinrow input{font-size:13px}
+.pinopen{font-size:12.5px;text-decoration:none;color:var(--accent);
+ border:1px solid var(--line);border-radius:8px;padding:6px 11px}
+.tel.mine{border-color:var(--gold);background:rgba(201,162,39,.12);color:var(--ink)}
+.tel.mine .cp{color:var(--gold)}
+.addtel input{font:inherit;font-size:13.5px;padding:6px 9px;border-radius:8px;
+ border:1px dashed var(--line);background:transparent;color:var(--ink);flex:1;
+ min-width:120px}
+.checked{font-size:11px;color:var(--soft)}
+.pinnote{font-size:11.5px;color:var(--warn);margin-top:-3px}
+.pinnote.ok{color:var(--accent)}
 #rota{margin:10px 0 0}
 .bday{font-size:12.5px;color:var(--accent);background:var(--accent-s);
  border-radius:8px;padding:5px 9px;display:flex;align-items:center;gap:8px;
@@ -379,7 +394,41 @@ function mergeNotes(fresh){
   [...map.values()].forEach(function(n){(out[n.house_id]=out[n.house_id]||[]).push(n);});
   return {notes:out,pending:pending};
 }
-let FAVS={}, REMIND={}, SKIP={};
+let FAVS={}, REMIND={}, SKIP={}, PINS={}, TELS={};
+function myTel(id){ return (TELS[id]||{}).tel||''; }
+function setTel(id,raw){
+  const d=String(raw||'').replace(/[^0-9+]/g,'');
+  if(!d){ delete TELS[id]; } else TELS[id]={tel:d, by:me, at:stamp()};
+  soil('t',id);
+}
+function pinOf(id){ return PINS[id]||null; }
+function pinPos(h){
+  const p=PINS[h.id];
+  if(p&&p.lat) return [p.lat,p.lon];
+  if(h.lat) return [h.lat,h.lon];
+  if(h.town_lat) return [h.town_lat,h.town_lon];
+  return null;
+}
+// a long Maps link carries the point; a short one only redirects
+function coordsFrom(text){
+  const t=String(text||'');
+  let m=t.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)
+     || t.match(/[?&](?:q|ll|daddr|destination)=(-?\d+\.\d+),(-?\d+\.\d+)/)
+     || t.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)
+     || t.match(/^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/);
+  if(!m) return null;
+  const la=parseFloat(m[1]), lo=parseFloat(m[2]);
+  // it has to be in mainland Portugal, or it is not a house of ours
+  if(la<36.9||la>42.2||lo<-9.7||lo>-6.0) return null;
+  return [la,lo];
+}
+function setPin(id,text){
+  const c=coordsFrom(text);
+  if(!text.trim()){ delete PINS[id]; }
+  else PINS[id]={url:text.trim(), lat:c?c[0]:null, lon:c?c[1]:null,
+                 by:me, at:stamp()};
+  soil('p',id);
+}
 function isSkipped(id){ return !!SKIP[id]; }
 function skipBy(id){ const x=SKIP[id]; return x&&x.by; }
 function skipWhy(id){ const x=SKIP[id]; return x&&x.why; }
@@ -445,6 +494,8 @@ function cacheSave(){
   localStorage.setItem('casa_favs',JSON.stringify(FAVS));
   localStorage.setItem('casa_remind',JSON.stringify(REMIND));
   localStorage.setItem('casa_skip',JSON.stringify(SKIP));
+  localStorage.setItem('casa_pins',JSON.stringify(PINS));
+  localStorage.setItem('casa_tels',JSON.stringify(TELS));
 }
 function cacheLoad(){
   try{
@@ -453,6 +504,8 @@ function cacheLoad(){
     FAVS=JSON.parse(localStorage.getItem('casa_favs')||'{}');
     REMIND=JSON.parse(localStorage.getItem('casa_remind')||'{}');
     SKIP=JSON.parse(localStorage.getItem('casa_skip')||'{}');
+    PINS=JSON.parse(localStorage.getItem('casa_pins')||'{}');
+    TELS=JSON.parse(localStorage.getItem('casa_tels')||'{}');
     return JSON.parse(localStorage.getItem('casa_notes')||'[]');
   }catch(e){ STATUS={}; return []; }
 }
@@ -469,6 +522,8 @@ async function pull(){
     FAVS=mergeMap(d.favs,FAVS,'f');
     REMIND=mergeMap(d.remind,REMIND,'r');
     SKIP=mergeMap(d.skip,SKIP,'k');
+    PINS=mergeMap(d.pins,PINS,'p');
+    TELS=mergeMap(d.tels,TELS,'t');
     return d.notes||[];
   }catch(e){ SYNCED=false; return cacheLoad(); }
 }
@@ -504,14 +559,16 @@ async function push(mine){
                 visits:dropDeleted(cur.visits,VISITS,'v'),
                 favs:dropDeleted(cur.favs,FAVS,'f'),
                 remind:dropDeleted(cur.remind,REMIND,'r'),
-                skip:dropDeleted(cur.skip,SKIP,'k'),v:1};
+                skip:dropDeleted(cur.skip,SKIP,'k'),
+                pins:dropDeleted(cur.pins,PINS,'p'),
+                tels:dropDeleted(cur.tels,TELS,'t'),v:1};
     const w=await fetch(API,{method:'PUT',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(body)});
     if(!w.ok) throw 0;
     SYNCED=true;
     NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
-    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{}; SKIP=body.skip||{};
+    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{}; SKIP=body.skip||{}; PINS=body.pins||{}; TELS=body.tels||{};
     cacheSave();
     DIRTY.clear(); saveDirty();
     return true;
@@ -529,7 +586,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-1923-f20a856';
+const BUILD='20260810-2006-635bd6e';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -714,6 +771,22 @@ function noteBlock(h){
        '<input type="datetime-local" data-before="'+h.id+'" value="'+
          (vBefore(h.id)||defaultBefore())+'"></div>'
      : '')+
+  '<div class="visit pinrow"><span class="vl">место</span>'+
+   '<input type="text" inputmode="url" data-pin="'+h.id+'" '+
+     'placeholder="вставь ссылку с карты от агента" value="'+
+     esc((pinOf(h.id)||{}).url||'')+'">'+
+   (pinOf(h.id)
+     ? '<a class="pinopen" target="_blank" rel="noopener" href="'+
+       esc(pinOf(h.id).url)+'">открыть</a>'
+     : '')+'</div>'+
+  (pinOf(h.id)
+    ? '<div class="pinnote'+(pinOf(h.id).lat?' ok':'')+'">'+
+      (pinOf(h.id).lat
+        ? 'точка от агента · ' + pinOf(h.id).lat.toFixed(5)+', '+pinOf(h.id).lon.toFixed(5)+
+          ' · ' + (pinOf(h.id).by||'')
+        : 'короткая ссылка — откроется правильно, координаты подставлю при сборке')+
+      '</div>'
+    : '')+
   '<div class="visit"><span class="vl">напомнить</span>'+
    '<input type="date" data-remind="'+h.id+'" value="'+(rDate(h.id)||'')+'">'+
    (rDate(h.id)?'<button class="clr" data-rclr="'+h.id+'">x</button>':'')+
@@ -899,6 +972,9 @@ function card(h){
         : 'в круге на день '+DAYOF[h.id].label+' — эта часть отложена')+
       '</div>'
     : '')+
+  (h.listing_checked&&!isSold(h)&&!isReserved(h)
+    ? '<div class="checked">объявление было живо '+
+      h.listing_checked.slice(5,10)+'</div>' : '')+
   '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
   '<div class="stats">'+
    '<div class="stat"><div class="v">'+m2(h.land_area_m2)+'</div><div class="k">земля м²</div></div>'+
@@ -914,6 +990,18 @@ function card(h){
   (goods.length?'<div class="tags">'+goods.slice(0,6).map(g=>'<span class="tag">'+g+'</span>').join('')+'</div>':'')+
   (rooms.length?'<div class="tags">'+rooms.slice(0,5).map(r=>'<span class="tag rooms">'+r+'</span>').join('')+'</div>':'')+
 
+  '<div class="tels">'+
+   (myTel(h.id)
+     ? '<div class="telrow"><button class="tel mine" data-tel="'+myTel(h.id)+'">'+
+       prettyTel(myTel(h.id))+'<span class="cp">нашли сами</span></button>'+
+       (isMobile(myTel(h.id))
+         ? '<a class="wa" href="'+waLink(myTel(h.id))+'" target="_blank" '+
+           'rel="noopener">WhatsApp</a>' : '')+'</div>'
+     : '')+
+   '<div class="telrow addtel"><span class="vl">свой номер</span>'+
+     '<input type="tel" inputmode="tel" data-mytel="'+h.id+'" '+
+     'placeholder="+351…" value="'+esc(myTel(h.id))+'"></div>'+
+   '</div>'+
   (h.agent_phone?'<div class="tels">'+
     telList(h.agent_phone).slice(0,3).map(function(t){
       const m=isMobile(t);
@@ -937,9 +1025,12 @@ function card(h){
    (h.agent_phone?'<a class="call" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
 
    '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление</a>'+
-   ((h.lat||h.town_lat)
+   (pinOf(h.id)&&!pinOf(h.id).lat
+     ? '<a href="'+esc(pinOf(h.id).url)+'" target="_blank" rel="noopener" '+
+       'title="точка от агента">📍 Карта</a>'
+     : pinPos(h)
      ? '<a href="https://www.google.com/maps/search/?api=1&query='+
-       (h.lat||h.town_lat)+','+(h.lon||h.town_lon)+'" target="_blank" '+
+       pinPos(h)[0]+','+pinPos(h)[1]+'" target="_blank" '+
        'rel="noopener" title="где это">📍 Карта</a>'
      : '')+
    '<button class="lnk" data-link="'+h.id+'" title="скопировать ссылку">🔗</button></div>'+
@@ -1005,7 +1096,9 @@ function renderRota(){
   var ids=Object.keys(VISITS).filter(function(k){return vTime(k);});
   if(filt!=='rota'||!ids.length){ box.innerHTML=''; return; }
   var items=ids.map(function(id){
-      return {h:HOUSES.filter(function(x){return String(x.id)===String(id);})[0], t:vTime(id), by:vBy(id)};
+      let hh=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+      if(hh){ const pp=pinPos(hh); if(pp) hh=Object.assign({},hh,{lat:pp[0],lon:pp[1]}); }
+      return {h:hh, t:vTime(id), by:vBy(id)};
     }).filter(function(x){return x.h;})
       .sort(function(a,b){return a.t.localeCompare(b.t);});
   var days={};
@@ -1506,6 +1599,8 @@ function renderCard(id){
   renderStBar(); renderProgress(); renderMine(); renderSoon(); mark();
 }
 function render(){
+ // searching means looking for one house - everything else steps aside
+ document.body.classList.toggle('searching', !!q);
  const keepY=frozen?window.scrollY:null;
  let list=sortList(HOUSES.filter(keep));
  if(frozen){
@@ -1686,6 +1781,20 @@ document.addEventListener('change',async e=>{
  if(bf){ setVisitOk(bf.dataset.before,false,bf.value);
    const okb=await push(); render(); mark();
    toast(okb?'Напомню ответить':'Сохранено в телефоне',!okb); return; }
+ const mt=e.target.closest('[data-mytel]');
+ if(mt){ const id=mt.dataset.mytel;
+   setTel(id,mt.value);
+   const okt=await push(); renderCard(id); mark();
+   toast(okt?(myTel(id)?'Номер сохранён':'Номер убран'):'Сохранено в телефоне',!okt);
+   return; }
+ const pn=e.target.closest('[data-pin]');
+ if(pn){ const id=pn.dataset.pin;
+   setPin(id,pn.value);
+   const okp=await push(); renderCard(id); mark();
+   const c=pinOf(id);
+   toast(okp?(c?(c.lat?'Точка сохранена':'Ссылка сохранена'):'Точка убрана')
+           :'Сохранено в телефоне',!okp);
+   return; }
  const rm=e.target.closest('[data-remind]');
  if(rm){ const id=rm.dataset.remind;
    if(rm.value) setRemind(id,rm.value); else { delete REMIND[id]; soil('r',id); }
