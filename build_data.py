@@ -22,6 +22,7 @@ COLS = [
     "auto_score", "score_parts", "price_per_m2",
     "first_photo_url", "photo_count",
     "town_lat", "town_lon",     # the town, never the house - see scoring notes
+    "listing_status", "listing_checked",
 ]
 
 
@@ -45,9 +46,7 @@ def main():
     for r in rows:
         h = {c: r[c] for c in COLS if r[c] not in (None, "")}
         h["id"] = r["id"]
-        ex = excerpt(r["description"])
-        if ex:
-            h["excerpt"] = ex
+        # description stays in the database - the card does not show it
         out.append(h)
 
     OUT.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")),

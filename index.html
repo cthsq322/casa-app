@@ -111,11 +111,15 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
  padding:15px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:10px}
 .card.flag{border-left:4px solid var(--warn)}
-.shot{display:block;position:relative;margin:-15px -16px 0;aspect-ratio:16/10;
+.card.gone{opacity:.62}
+.card.gone .price{text-decoration:line-through;text-decoration-thickness:2px}
+.dead{background:var(--warn);color:var(--paper);font-size:12.5px;font-weight:600;
+ border-radius:8px;padding:5px 10px;align-self:flex-start}
+.shot{display:block;position:relative;margin:-15px -16px 0;height:clamp(96px,26vw,150px);
  background:var(--accent-s);overflow:hidden;border-radius:14px 14px 0 0}
 .shot img{width:100%;height:100%;object-fit:cover;display:block}
-.shot .cnt{position:absolute;right:9px;bottom:9px;background:rgba(0,0,0,.55);
- color:#fff;font-size:11.5px;padding:3px 9px;border-radius:999px;
+.shot .cnt{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.5);
+ color:#fff;font-size:11px;padding:2px 8px;border-radius:999px;
  backdrop-filter:blur(3px)}
 .shot.tile{background:#e8e4dc}
 .shot.tile img{image-rendering:auto;filter:saturate(.85)}
@@ -124,7 +128,7 @@ input[type=search]::-webkit-search-cancel-button{display:none}
  border-radius:50%;background:var(--warn);border:2px solid #fff;
  box-shadow:0 1px 4px rgba(0,0,0,.45)}
 .shot.none,.shot.broken{display:flex;align-items:center;justify-content:center;
- aspect-ratio:auto;padding:14px;font-size:12.5px;color:var(--soft);
+ height:auto;min-height:0;padding:9px 14px;font-size:12px;color:var(--soft);
  background:var(--accent-s);text-align:center}
 .shot.broken img,.shot.broken .cnt{display:none}
 .shot.broken:before{content:'фото не открылось — смотри объявление'}
@@ -239,6 +243,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
   <button data-f="fresh">Не тронутые</button>
   <button data-f="planned">📅 С датой</button>
   <button data-f="wa">💬 Можно писать</button>
+  <button data-f="gone">🚫 Снятые</button>
   <button data-f="mine">С заметками</button>
   <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
   <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
@@ -438,7 +443,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-1701-f7b2011';
+const BUILD='20260810-1731-4ab96eb';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -561,6 +566,8 @@ function keep(h){
  if(filt==='work'&&!touchedBy(h.id,me))return false;
  if(filt==='fresh'&&(stVal(h.id)||(NOTES[h.id]||[]).length||vTime(h.id)))return false;
  if(filt==='planned'&&!vTime(h.id))return false;
+ if(filt==='gone'&&h.listing_status!=='gone')return false;
+ if(filt==='live'&&h.listing_status==='gone')return false;
  if(filt==='wa'&&!(h.agent_phone&&telList(h.agent_phone).some(isMobile)))return false;
  if(filt==='flag'&&!h.desc_blockers)return false;
  if(filt==='rota'&&!vTime(h.id))return false;
@@ -697,7 +704,8 @@ function card(h){
  const rooms=(h.desc_rooms||'').split(';').map(s=>s.trim()).filter(Boolean);
  const rel=h.elevation_relative_m;
  const relT=rel==null?'—':(rel>0?'+'+Math.round(rel):Math.round(rel));
- return '<article class="card'+(flags.length?' flag':'')+'">'+
+ return '<article class="card'+(flags.length?' flag':'')+
+   (h.listing_status==='gone'?' gone':'')+'">'+
   '<div class="top"><span class="price">'+eur(h.price_eur)+'</span>'+
    (h.auto_score!=null?'<span class="nota'+(h.score_parts<5?' thin':'')+
      '" title="известно '+h.score_parts+' из 7 критериев">'+h.auto_score+'</span>':'')+
@@ -714,6 +722,10 @@ function card(h){
         (h.photo_count?'<span class="cnt">'+h.photo_count+' фото</span>':'')+
       '</a>'
     : mapThumb(h))+
+  (h.listing_status==='gone'
+    ? '<div class="dead">объявление снято с сайта'+
+      (h.listing_checked?' · проверено '+h.listing_checked.slice(5,10):'')+'</div>'
+    : '')+
   '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
   '<div class="stats">'+
    '<div class="stat"><div class="v">'+m2(h.land_area_m2)+'</div><div class="k">земля м²</div></div>'+
@@ -728,7 +740,7 @@ function card(h){
   (flags.length?'<div class="tags">'+flags.map(f=>'<span class="tag bad">⚠ '+f+'</span>').join('')+'</div>':'')+
   (goods.length?'<div class="tags">'+goods.slice(0,6).map(g=>'<span class="tag">'+g+'</span>').join('')+'</div>':'')+
   (rooms.length?'<div class="tags">'+rooms.slice(0,5).map(r=>'<span class="tag rooms">'+r+'</span>').join('')+'</div>':'')+
-  (h.excerpt?'<p class="exc">'+esc(h.excerpt)+'</p>':'')+
+
   (h.agent_phone?'<div class="tels">'+
     telList(h.agent_phone).slice(0,3).map(function(t){
       const m=isMobile(t);
