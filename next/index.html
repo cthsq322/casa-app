@@ -236,6 +236,14 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
  color:var(--accent);background:transparent}
 .swapd{font-size:11.5px;color:var(--soft)}
 .bday.later{color:var(--soft);background:transparent;border:1px solid var(--line)}
+.dchips{display:flex;gap:6px;overflow-x:auto;padding:10px 0 6px;scrollbar-width:none}
+.dchips::-webkit-scrollbar{display:none}
+.dchip{flex:0 0 auto;padding:7px 13px;font-variant-numeric:tabular-nums;font-size:13.5px}
+.dchip.on{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.dstop.planned{border-left:3px dashed var(--gold);background:transparent}
+.plab{font-size:11.5px;color:var(--gold);font-weight:600}
+.dmove{margin-left:auto;display:flex;gap:5px}
+.dmove button{padding:3px 9px;font-size:11.5px}
 .dayhead{display:flex;align-items:center;gap:10px;background:var(--accent);
  color:var(--paper);border-radius:13px 13px 0 0;padding:11px 14px;font-size:16px;margin-top:10px}
 .dayhead .cnt2{margin-left:auto;font-size:13px;opacity:.9}
@@ -653,7 +661,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2305-fbf339b';
+const BUILD='20260810-2318-e39a9f6';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1754,12 +1762,27 @@ async function renderDay(){
     if(!h) return null;
     const pp=pinPos(h); if(pp) h=Object.assign({},h,{lat:pp[0],lon:pp[1]});
     return {h:h,t:t,ok:vOk(id),before:vBefore(id)};
-  }).filter(Boolean).sort(function(a,b){ return a.t.localeCompare(b.t); });
+  }).filter(Boolean);
+  // plus the houses we PLAN to ask for this day - slots without a booking
+  Object.keys(SLOTS).forEach(function(id){
+    const m=SLOTS[id];
+    if(typeof m!=='string'||m.slice(0,10)!==key) return;
+    if(vTime(id)||outOfLoop(id)) return;
+    let h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    if(!h) return;
+    const pp=pinPos(h); if(pp) h=Object.assign({},h,{lat:pp[0],lon:pp[1]});
+    stops.push({h:h, t:key+'T'+m.slice(11,16), ok:false, planned:true});
+  });
+  stops.sort(function(a,b){ return a.t.localeCompare(b.t); });
 
-  let html='<div class="dayhead">'+
-    '<button class="dnav" data-day="-1">&larr;</button>'+
-    '<b>'+dayTitle(dayOff)+'</b>'+
-    '<button class="dnav" data-day="1">&rarr;</button>'+
+  let chips='';
+  for(let o=0;o<=6;o++){
+    const d=new Date(); d.setDate(d.getDate()+o);
+    chips+='<button class="dchip'+(o===dayOff?' on':'')+'" data-dsel="'+o+'">'+
+      pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'</button>';
+  }
+  let html='<div class="dchips">'+chips+'</div>'+
+    '<div class="dayhead"><b>'+dayTitle(dayOff)+'</b>'+
     '<span class="cnt2">'+stops.length+' '+
       (stops.length===1?'осмотр':stops.length<5?'осмотра':'осмотров')+'</span></div>';
 
@@ -1782,13 +1805,17 @@ async function renderDay(){
           (mins!=null&&gap<mins?' · НЕ УСПЕВАЕМ':'')+'</div>';
       }
       const t=bestTier(it.h.id);
-      html+='<div class="dstop'+(it.ok?'':' pending')+'">'+
+      html+='<div class="dstop'+(it.ok?'':' pending')+(it.planned?' planned':'')+'">'+
         '<b>'+it.t.slice(11,16)+'</b>'+
         '<span class="pl">'+(it.h.concelho||'?')+'</span>'+
         '<span class="pr">'+eur(it.h.price_eur)+'</span>'+
         (it.h.auto_score!=null?'<span class="nota">'+it.h.auto_score+'</span>':'')+
         (t?'<span class="stars">'+'★'.repeat(t)+'</span>':'')+
-        (it.ok?'':'<span class="warn2">не подтверждён'+
+        (it.planned
+          ? '<span class="plab">план — не договорено</span>'+
+            '<span class="dmove"><button data-slotmv="'+it.h.id+'|-1">&larr; день</button>'+
+            '<button data-slotmv="'+it.h.id+'|1">день &rarr;</button></span>'
+          : it.ok?'':'<span class="warn2">не подтверждён'+
           (it.before?' · ответить до '+it.before.slice(11,16):'')+'</span>')+
         (pinOf(it.h.id)?'<span class="haspin">точка есть</span>'
                 :'<span class="warn2">адрес пришлют</span>')+
@@ -1936,6 +1963,22 @@ document.addEventListener('click',async e=>{
    const okc=await push(); render(); mark();
    toast(okc?(now?'Помечено: ещё не точно':'Подтверждено'):'Сохранено в телефоне',!okc);
    return; }
+ const smv=e.target.closest('[data-slotmv]');
+ if(smv){
+   const bits=smv.dataset.slotmv.split('|');
+   const id=bits[0], dir=parseInt(bits[1],10);
+   const m=SLOTS[id];
+   if(typeof m==='string'){
+     const d=new Date(m.slice(0,10)+'T00:00'); d.setDate(d.getDate()+dir);
+     SLOTS[id]=d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())+m.slice(10);
+     soil('z',id);
+     push().then(mark); renderDay();
+     toast('Перенесено на '+pad2(d.getDate())+'.'+pad2(d.getMonth()+1));
+   }
+   return;
+ }
+ const ds=e.target.closest('[data-dsel]');
+ if(ds){ dayOff=parseInt(ds.dataset.dsel,10); renderDay(); return; }
  if(e.target.id==='soonx'){
    const off=localStorage.getItem('casa_soon_off')==='1';
    localStorage.setItem('casa_soon_off', off?'0':'1');
