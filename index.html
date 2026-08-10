@@ -65,6 +65,10 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 .soon b{color:var(--warn)}
 .soon a{color:var(--accent);text-decoration:none;margin-left:8px;font-weight:600}
 .cal{padding:5px 12px;font-size:12.5px;border-color:var(--accent);color:var(--accent)}
+.conf{padding:5px 12px;font-size:12.5px;border-color:var(--accent);color:var(--accent)}
+.conf.off{border-color:var(--warn);color:var(--warn);font-weight:600}
+.visit.before input{border-color:var(--warn)}
+.soon .s1.due{border-left:3px solid var(--warn);padding-left:9px;margin:3px 0}
 .mine{margin:11px 0 0;font-size:13.5px;color:var(--soft)}
 .mine b{color:var(--ink);font-variant-numeric:tabular-nums}
 .mine .empty{font-style:italic}
@@ -300,6 +304,20 @@ function stBy(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.by:null; 
 function stAt(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.at:null; }
 function vTime(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.t:x; }
 function vBy(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.by:null; }
+function vOk(id){ const x=VISITS[id]; return !(x&&typeof x==='object'&&x.ok===false); }
+function vBefore(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.before:null; }
+function setVisitOk(id,ok,before){
+  const x=VISITS[id]||{};
+  VISITS[id]={t:(typeof x==='object'?x.t:x), by:(typeof x==='object'?x.by:me)||me,
+              ok:ok, before:ok?null:(before||vBefore(id)||defaultBefore())};
+  soil('v',id);
+}
+function defaultBefore(){
+  // agents want an answer the same evening
+  const d=new Date(); d.setHours(20,0,0,0);
+  if(d<new Date()) d.setDate(d.getDate()+1);
+  return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())+'T20:00';
+}
 function rDate(id){ const x=REMIND[id]; return x&&typeof x==='object'?x.d:x; }
 function rBy(id){ const x=REMIND[id]; return x&&typeof x==='object'?x.by:null; }
 function setRemind(id,d){ REMIND[id]={d:d,by:me}; soil('r',id); }
@@ -555,7 +573,14 @@ function noteBlock(h){
    (vTime(h.id)?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+
    (vBy(h.id)?'<span class="vby">'+vBy(h.id)+'</span>':'')+
    (vTime(h.id)?'<button class="cal" data-cal="'+h.id+'">в календарь</button>':'')+
+   (vTime(h.id)?'<button class="conf'+(vOk(h.id)?'':' off')+'" data-conf="'+h.id+'" '+
+     'title="подтверждён или ещё нет">'+(vOk(h.id)?'✓ точно':'? не точно')+'</button>':'')+
    '</div>'+
+   (vTime(h.id)&&!vOk(h.id)
+     ? '<div class="visit before"><span class="vl">ответить до</span>'+
+       '<input type="datetime-local" data-before="'+h.id+'" value="'+
+         (vBefore(h.id)||defaultBefore())+'"></div>'
+     : '')+
   '<div class="visit"><span class="vl">напомнить</span>'+
    '<input type="date" data-remind="'+h.id+'" value="'+(rDate(h.id)||'')+'">'+
    (rDate(h.id)?'<button class="clr" data-rclr="'+h.id+'">x</button>':'')+
@@ -883,7 +908,7 @@ function icsFor(h,t){
   return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//casa//RU','CALSCALE:GREGORIAN',
     'BEGIN:VEVENT','UID:casa-'+h.id+'@cthsq322.github.io','DTSTAMP:'+z(new Date()),
     'DTSTART:'+z(start),'DTEND:'+z(end),
-    'SUMMARY:'+esc('Осмотр дома — '+where+' — '+eur(h.price_eur)),
+    'SUMMARY:'+esc((vOk(h.id)?'':'(не подтверждён) ')+'Осмотр дома — '+where+' — '+eur(h.price_eur)),
     'LOCATION:'+esc(h.lat?h.lat+','+h.lon:where),
     'DESCRIPTION:'+esc((h.agent_phone||'')+'  '+h.url),
     'BEGIN:VALARM','TRIGGER:-P1D','ACTION:DISPLAY',
@@ -904,6 +929,14 @@ function renderSoon(){
     const hours=(when-now)/3600000;
     return (hours>-24 && hours<48) ? {h:h,when:when,hours:hours,note:true} : null;
   }).filter(Boolean);
+  const due=Object.keys(VISITS).map(function(id){
+    if(vOk(id)||!vTime(id)) return null;
+    const bf=vBefore(id); if(!bf) return null;
+    const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    if(!h) return null;
+    const when=new Date(bf), hours=(when-now)/3600000;
+    return hours<48 ? {h:h,when:when,hours:hours,due:true,visit:vTime(id)} : null;
+  }).filter(Boolean);
   const items=Object.keys(VISITS).map(function(id){
     const t=vTime(id); if(!t) return null;
     const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
@@ -911,11 +944,21 @@ function renderSoon(){
     const when=new Date(t);
     const hours=(when-now)/3600000;
     return (hours>-3 && hours<48) ? {h:h,t:t,when:when,hours:hours} : null;
-  }).filter(Boolean).concat(rem).sort(function(a,b){ return a.when-b.when; });
+  }).filter(Boolean).concat(rem).concat(due)
+   .sort(function(a,b){ return (b.due?1:0)-(a.due?1:0) || a.when-b.when; });
   if(!items.length){ box.innerHTML=''; box.className='soon'; return; }
   box.className='soon on';
   box.innerHTML=items.map(function(it){
     const d=it.when, today=d.toDateString()===now.toDateString();
+    if(it.due){
+      const v=new Date(it.visit);
+      return '<div class="s1 due"><b>'+(it.hours<0?'просрочено — ':'ответить до ')+
+        pad2(d.getHours())+':'+pad2(d.getMinutes())+'</b> · '+(it.h.concelho||'?')+
+        ' · осмотр '+pad2(v.getDate())+'.'+pad2(v.getMonth()+1)+' в '+
+        pad2(v.getHours())+':'+pad2(v.getMinutes())+
+        (it.h.agent_phone?' <a href="tel:'+telHref(it.h.agent_phone)+'">позвонить</a>':'')+
+        '</div>';
+    }
     const word = it.note
       ? (today?'сегодня напомнить':(it.hours<0?'просрочено напоминание':'завтра напомнить'))
       : it.hours<0 ? 'идёт сейчас'
@@ -1041,6 +1084,12 @@ async function saveNote(id,text,tier,quiet){
 }
 
 document.addEventListener('click',async e=>{
+ const cf=e.target.closest('[data-conf]');
+ if(cf){ const id=cf.dataset.conf, now=vOk(id);
+   setVisitOk(id,!now);
+   const okc=await push(); render(); mark();
+   toast(okc?(now?'Помечено: ещё не точно':'Подтверждено'):'Сохранено в телефоне',!okc);
+   return; }
  const cal=e.target.closest('[data-cal]');
  if(cal){
    const h=HOUSES.find(function(x){return String(x.id)===String(cal.dataset.cal);});
@@ -1113,6 +1162,10 @@ document.addEventListener('click',async e=>{
 });
 
 document.addEventListener('change',async e=>{
+ const bf=e.target.closest('[data-before]');
+ if(bf){ setVisitOk(bf.dataset.before,false,bf.value);
+   const okb=await push(); render(); mark();
+   toast(okb?'Напомню ответить':'Сохранено в телефоне',!okb); return; }
  const rm=e.target.closest('[data-remind]');
  if(rm){ const id=rm.dataset.remind;
    if(rm.value) setRemind(id,rm.value); else { delete REMIND[id]; soil('r',id); }
