@@ -442,7 +442,13 @@ function mergeNotes(fresh){
   [...map.values()].forEach(function(n){(out[n.house_id]=out[n.house_id]||[]).push(n);});
   return {notes:out,pending:pending};
 }
-let FAVS={}, REMIND={}, SKIP={}, PINS={}, TELS={};
+let FAVS={}, REMIND={}, SKIP={}, PINS={}, TELS={}, SLOTS={};
+// a slot set by hand beats whatever the circle computed today
+function slotFor(id){
+  const m=SLOTS[id];
+  if(m&&m.when) return {when:m.when, at:m.at, week:true, swap:[], manual:true};
+  return DAYOF[id];
+}
 function myTel(id){ return (TELS[id]||{}).tel||''; }
 function setTel(id,raw){
   const d=String(raw||'').replace(/[^0-9+]/g,'');
@@ -544,6 +550,7 @@ function cacheSave(){
   localStorage.setItem('casa_skip',JSON.stringify(SKIP));
   localStorage.setItem('casa_pins',JSON.stringify(PINS));
   localStorage.setItem('casa_tels',JSON.stringify(TELS));
+  localStorage.setItem('casa_slots',JSON.stringify(SLOTS));
 }
 function cacheLoad(){
   try{
@@ -554,6 +561,7 @@ function cacheLoad(){
     SKIP=JSON.parse(localStorage.getItem('casa_skip')||'{}');
     PINS=JSON.parse(localStorage.getItem('casa_pins')||'{}');
     TELS=JSON.parse(localStorage.getItem('casa_tels')||'{}');
+    SLOTS=JSON.parse(localStorage.getItem('casa_slots')||'{}');
     return JSON.parse(localStorage.getItem('casa_notes')||'[]');
   }catch(e){ STATUS={}; return []; }
 }
@@ -572,6 +580,7 @@ async function pull(){
     SKIP=mergeMap(d.skip,SKIP,'k');
     PINS=mergeMap(d.pins,PINS,'p');
     TELS=mergeMap(d.tels,TELS,'t');
+    SLOTS=mergeMap(d.slots,SLOTS,'z');
     return d.notes||[];
   }catch(e){ SYNCED=false; return cacheLoad(); }
 }
@@ -609,14 +618,15 @@ async function push(mine){
                 remind:dropDeleted(cur.remind,REMIND,'r'),
                 skip:dropDeleted(cur.skip,SKIP,'k'),
                 pins:dropDeleted(cur.pins,PINS,'p'),
-                tels:dropDeleted(cur.tels,TELS,'t'),v:1};
+                tels:dropDeleted(cur.tels,TELS,'t'),
+                slots:dropDeleted(cur.slots,SLOTS,'z'),v:1};
     const w=await fetch(API,{method:'PUT',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(body)});
     if(!w.ok) throw 0;
     SYNCED=true;
     NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
-    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{}; SKIP=body.skip||{}; PINS=body.pins||{}; TELS=body.tels||{};
+    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{}; SKIP=body.skip||{}; PINS=body.pins||{}; TELS=body.tels||{}; SLOTS=body.slots||{};
     cacheSave();
     DIRTY.clear(); saveDirty();
     return true;
@@ -634,7 +644,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260810-2211-f4598ac';
+const BUILD='20260810-2216-ee69333';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -999,9 +1009,10 @@ function sameAgent(h){
 // several houses, one agent, one message
 function msgForGroup(h){
   const all=[h].concat(sameAgent(h));
+  const DOF=slotFor;
   const NL=String.fromCharCode(10);
   const lines=all.map(function(x){
-    const d=DAYOF[x.id];
+    const d=DOF(x.id);
     return '• '+(x.concelho||'?')+' — '+eur(x.price_eur)+NL+x.url+
       (d&&d.when?NL+'  '+ptDay(d):'');
   });
@@ -1021,7 +1032,7 @@ function msgForGroup(h){
   ].join(NL+NL);
 }
 function msgFor(h){
-  const d=DAYOF[h.id];
+  const d=slotFor(h.id);
   const NL=String.fromCharCode(10);
   const when = d && d.when ? ptDay(d) : null;
   const parts=[
@@ -1087,13 +1098,13 @@ function card(h){
           (h.listing_checked?' · проверено '+h.listing_checked.slice(5,10):''))+
       '</div>'
     : '')+
-  (DAYOF[h.id]&&!outOfLoop(h.id)
+  (slotFor(h.id)&&!outOfLoop(h.id)
     ? '<div class="bday'+(DAYOF[h.id].week?'':' later')+'">'+
-      (DAYOF[h.id].week
-        ? 'звать на <b>'+(DAYOF[h.id].when||('день '+DAYOF[h.id].label))+'</b>, около '+
-          DAYOF[h.id].at+
+      (slotFor(h.id).week
+        ? 'звать на <b>'+(slotFor(h.id).when||('день '+slotFor(h.id).label))+'</b>, около '+
+          slotFor(h.id).at+(slotFor(h.id).manual?' · назначено вручную':'')+
           '<button class="cpday" data-cpday="'+h.id+'">копировать дату</button>'
-        : 'в круге на день '+DAYOF[h.id].label+' — эта часть отложена')+
+        : 'в круге на день '+slotFor(h.id).label+' — эта часть отложена')+
       '</div>'
     : '')+
   (h.listing_checked&&!isSold(h)&&!isReserved(h)
@@ -1940,7 +1951,7 @@ document.addEventListener('click',async e=>{
  }
  const cd=e.target.closest('[data-cpday]');
  if(cd){
-   const d=DAYOF[cd.dataset.cpday];
+   const d=slotFor(cd.dataset.cpday);
    if(d) sendText(ptDay(d), 'Дата');
    return;
  }
