@@ -1,6 +1,6 @@
 <!doctype html><html lang="pt"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Casa</title>
+<title>Дома</title>
 <style>
 :root{--paper:#f4f1ec;--ink:#1c1e1a;--soft:#5b6058;--line:#ddd8cf;--card:#fffdfa;
  --accent:#3f6b4b;--accent-s:#e8efe7;--warn:#a8501f;--warn-s:#f7ebe3;--gold:#8a6d1f;
@@ -47,6 +47,16 @@ input[type=search]{font:inherit;padding:7px 12px;border:1px solid var(--line);
 .stbar button .n{font-variant-numeric:tabular-nums;font-weight:600;background:var(--accent-s);color:var(--accent);border-radius:999px;padding:1px 7px;font-size:12px}
 .stbar button.on .n{background:rgba(255,255,255,.25);color:inherit}
 .stbar button.zero{opacity:.45}
+#people button{border-color:var(--gold)}
+#people button.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.fav{padding:2px 9px;font-size:15px;line-height:1.2;border-color:var(--line);
+ color:var(--soft);background:transparent}
+.fav.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.favo{font-size:11px;color:var(--gold)}
+.stby{font-size:12px;color:var(--soft)}
+.stby b{color:var(--accent)}
+.vby{font-size:11.5px;color:var(--soft)}
+.who2{font-size:12px;color:var(--soft);margin-left:6px}
 .links{display:flex;gap:8px;padding:2px 0 4px;overflow-x:auto;scrollbar-width:none}
 .links::-webkit-scrollbar{display:none}
 .links a{flex:0 0 auto;text-decoration:none;font-size:13.5px;white-space:nowrap;
@@ -122,7 +132,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
 </style></head><body>
 
 <div class="gate" id="gate"><div class="box">
-  <h2>Casa</h2><p>Quem és?</p>
+  <h2>Дома</h2><p>Кто заходит?</p>
   <button data-u="Serhii">Serhii</button>
   <button data-u="Violeta">Violeta</button>
   <button data-u="Milena">Milena</button>
@@ -130,23 +140,24 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
 
 <div class="wrap">
 <header>
-  <h1>Casa</h1><span class="sub" id="sub"></span><span class="sp"></span>
+  <h1>Дома</h1><span class="sub" id="sub"></span><span class="sp"></span>
   <span class="who" id="who"></span>
-  <button id="swap">trocar</button><button id="exp">↓ notas</button><button id="imp">↑ juntar</button><input id="impf" type="file" accept="application/json" style="display:none"><button id="theme">◐</button>
+  <button id="swap">сменить</button><button id="theme">◐</button>
 </header>
 <div class="bar">
-  <button data-f="all" class="on">Todos</button>
-  <button data-f="big">Terreno 3000+</button>
-  <button data-f="high">Em altura</button>
-  <button data-f="alone">Sem vizinhos</button>
-  <button data-f="mine">Com notas</button>
-  <button data-f="flag">⚠ Alerta</button><button data-f="rota">🗺 Rota</button><button data-f="mapa">📍 Mapa</button>
-  <select id="sort" title="ordenar"><option value="score">Nota &darr;</option><option value="tier">N&iacute;vel &starf; &darr;</option><option value="land">Terreno &darr;</option><option value="price">Pre&ccedil;o &uarr;</option><option value="price_d">Pre&ccedil;o &darr;</option><option value="ppm">&euro;/m&sup2; &uarr;</option><option value="area">&Aacute;rea da casa &darr;</option><option value="rooms">Quartos &darr;</option><option value="wc">Casas de banho &darr;</option><option value="alt">Altitude &darr;</option><option value="alone">Longe de vizinhos &darr;</option></select><input id="q" type="search" placeholder="concelho, agência…">
+  <button data-f="all" class="on">Все</button>
+  <button data-f="big">Земля 3000+</button>
+  <button data-f="high">На возвышенности</button>
+  <button data-f="alone">Без соседей</button>
+  <button data-f="mine">С заметками</button>
+  <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
+  <select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select><input id="q" type="search" placeholder="город, адрес, №, цена…">
 </div>
+<div class="stbar" id="people"></div>
 <div class="stbar" id="stbar"></div>
 <div class="links">
-  <a href="frases.html">✍ O que escrever</a>
-  <a href="lista.html">🔗 Links por site</a>
+  <a href="frases.html">✍ Что писать</a>
+  <a href="lista.html">🔗 Ссылки по сайтам</a>
 </div>
 <div id="rota"></div><div id="mapbox"></div><div class="count" id="count"></div>
 <div class="grid" id="grid"></div>
@@ -190,17 +201,39 @@ function mergeNotes(fresh){
   [...map.values()].forEach(function(n){(out[n.house_id]=out[n.house_id]||[]).push(n);});
   return {notes:out,pending:pending};
 }
+let FAVS={};
+function stVal(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.v:x; }
+function stBy(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.by:null; }
+function stAt(id){ const x=STATUS[id]; return x&&typeof x==='object'?x.at:null; }
+function vTime(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.t:x; }
+function vBy(id){ const x=VISITS[id]; return x&&typeof x==='object'?x.by:null; }
+function stamp(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
+function setStatus(id,v){ STATUS[id]={v:v,by:me,at:stamp()}; soil('s',id); }
+function setVisit(id,t){ VISITS[id]={t:t,by:me}; soil('v',id); }
+
+function favList(who){ return FAVS[who||me]||[]; }
+function isFav(id,who){ return favList(who).indexOf(String(id))>=0; }
+function toggleFav(id){
+  const l=favList().slice(), i=l.indexOf(String(id));
+  if(i>=0) l.splice(i,1); else l.push(String(id));
+  FAVS[me]=l; soil('f',me);
+}
+function favOwners(id){
+  return Object.keys(FAVS).filter(function(u){ return isFav(id,u); });
+}
 let SYNCED=false;
 
 function cacheSave(){
   localStorage.setItem('casa_notes',JSON.stringify(Object.values(NOTES).flat()));
   localStorage.setItem('casa_status',JSON.stringify(STATUS));
   localStorage.setItem('casa_visits',JSON.stringify(VISITS));
+  localStorage.setItem('casa_favs',JSON.stringify(FAVS));
 }
 function cacheLoad(){
   try{
     STATUS=JSON.parse(localStorage.getItem('casa_status')||'{}');
     VISITS=JSON.parse(localStorage.getItem('casa_visits')||'{}');
+    FAVS=JSON.parse(localStorage.getItem('casa_favs')||'{}');
     return JSON.parse(localStorage.getItem('casa_notes')||'[]');
   }catch(e){ STATUS={}; return []; }
 }
@@ -214,6 +247,7 @@ async function pull(){
     SYNCED=true;
     STATUS=mergeMap(d.status,STATUS,'s');
     VISITS=mergeMap(d.visits,VISITS,'v');
+    FAVS=mergeMap(d.favs,FAVS,'f');
     return d.notes||[];
   }catch(e){ SYNCED=false; return cacheLoad(); }
 }
@@ -224,8 +258,8 @@ function mark(){
   const el=document.getElementById('sub');
   if(!el||!HOUSES.length) return;
   const c=Object.keys(NOTES).filter(function(k){return (NOTES[k]||[]).length;}).length;
-  el.textContent=HOUSES.length+' imóveis · '+c+' com notas · '+
-    (SYNCED?'sincronizado':(retryTimer?'por enviar…':'offline'));
+  el.textContent=HOUSES.length+' домов · '+c+' с заметками · '+
+    (SYNCED?'синхронизировано':(retryTimer?'не отправлено…':'офлайн'));
 }
 async function push(mine){
   cacheSave();
@@ -239,14 +273,15 @@ async function push(mine){
     });
     const body={notes:[...map.values()],
                 status:Object.assign({},cur.status||{},STATUS),
-                visits:Object.assign({},cur.visits||{},VISITS),v:1};
+                visits:Object.assign({},cur.visits||{},VISITS),
+                favs:Object.assign({},cur.favs||{},FAVS),v:1};
     const w=await fetch(API,{method:'PUT',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(body)});
     if(!w.ok) throw 0;
     SYNCED=true;
     NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
-    STATUS=body.status; VISITS=body.visits||{};
+    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{};
     cacheSave();
     DIRTY.clear(); saveDirty();
     return true;
@@ -311,8 +346,38 @@ async function load(){
  if(DIRTY.size){ push().then(mark); }
  document.getElementById('foot').innerHTML=
   '«выше округи» — насколько дом выше среднего рельефа в радиусе 15 км. '+
-  '«до соседа» — до ближайшей постройки по карте. Notas partilhadas entre Serhii, Violeta e Milena.';
+  '«до соседа» — до ближайшей постройки по карте. '+
+  'Оценка: земля 30, комнаты 15, высота 15, без соседей 15, туалеты 10, лес 10, площадь 5. '+
+  'Заметки общие — Serhii, Violeta, Milena.';
  render();
+}
+
+
+// "Лейрия" should find Leiria. Nobody spells a foreign name the same way twice,
+// so transliterate and then match loosely rather than demanding an exact hit.
+const RU_LAT={а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'e',ж:'j',з:'z',и:'i',й:'i',
+  к:'c',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',
+  ц:'c',ч:'ch',ш:'sh',щ:'sh',ъ:'',ы:'i',ь:'',э:'e',ю:'iu',я:'ia'};
+function deaccent(t){ return t.normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function translit(t){
+  // portuguese endings sound nothing like they are written
+  // \b is ASCII-only in JS, so end-of-word has to be spelled out
+  const E='(?![а-яё])';
+  [['ия','ia'],['ий','i'],['уш','os'],['ош','os'],['иш','es'],['аш','as'],['ш','s']]
+    .forEach(function(r){ t=t.replace(new RegExp(r[0]+E,'g'),r[1]); });
+  t=t.replace(/ья/g,'ia');
+  return t.replace(/[а-яё]/g,function(c){ return RU_LAT[c]!==undefined?RU_LAT[c]:c; });
+}
+function matches(hay,query){
+  hay=deaccent(hay.toLowerCase());
+  const q=deaccent(query.toLowerCase());
+  if(hay.includes(q)) return true;
+  if(!/[а-яё]/.test(q)) return false;
+  const t=translit(q);
+  if(hay.includes(t)) return true;
+  // the tail of a transliteration is the least reliable part - drop it
+  const stem=t.slice(0,Math.max(3,t.length-2));
+  return hay.split(/[\s,·]+/).some(function(w){ return w.startsWith(stem); });
 }
 
 function keep(h){
@@ -321,11 +386,22 @@ function keep(h){
  if(filt==='alone'&&!(h.nearest_building_m>=150))return false;
  if(filt==='mine'&&!(NOTES[h.id]||[]).length)return false;
  if(filt==='flag'&&!h.desc_blockers)return false;
- if(filt==='rota'&&!VISITS[h.id])return false;
+ if(filt==='rota'&&!vTime(h.id))return false;
  if(filt==='mapa'&&!h.lat)return false;
- if(filt.indexOf('st:')===0&&STATUS[h.id]!==filt.slice(3))return false;
- if(q){const hay=[h.concelho,h.freguesia,h.district,h.agency_name].filter(Boolean).join(' ').toLowerCase();
-  if(!hay.includes(q))return false;}
+ if(filt.indexOf('st:')===0&&stVal(h.id)!==filt.slice(3))return false;
+ if(filt==='fav'&&!isFav(h.id))return false;
+ if(filt==='favall'&&!favOwners(h.id).length)return false;
+ if(filt.indexOf('by:')===0&&stBy(h.id)!==filt.slice(3))return false;
+ if(q){
+  const num=q.replace(/[^\d]/g,'');
+  if(num.length>=3){
+    const hit=String(h.id)===num||String(Math.round(h.price_eur||0)).startsWith(num)||
+      (h.url||'').includes(num);
+    if(hit) return true;
+  }
+  const hay=[h.concelho,h.freguesia,h.district,h.agency_name,h.address,h.url]
+    .filter(Boolean).join(' ');
+  if(!matches(hay,q))return false;}
  return true;
 }
 
@@ -336,16 +412,19 @@ function noteBlock(h){
  return '<div class="notes">'+
   others.map(n=>'<div class="note other"><b>'+n.author+'</b><span class="t">'+
     (n.updated_at||'').slice(5,16).replace('T',' ')+'</span><br>'+esc(n.text)+'</div>').join('')+
-  '<div class="tiers"><span style="font-size:12px;color:var(--soft)">nível</span>'+
+  '<div class="tiers"><span style="font-size:12px;color:var(--soft)">уровень</span>'+
    [1,2,3].map(t=>'<button data-tier="'+t+'" data-h="'+h.id+'"'+
      (mine&&mine.tier===t?' class="on"':'')+'>'+'★'.repeat(t)+'</button>').join('')+'</div>'+
-  '<textarea data-note="'+h.id+'" placeholder="'+(me||'')+': a tua nota…">'+
+  '<textarea data-note="'+h.id+'" placeholder="'+(me||'')+': твоя заметка…">'+
     esc(mine?mine.text:'')+'</textarea>'+
-  '<div class="visit"><span class="vl">visita</span>'+
-   '<input type="datetime-local" data-visit="'+h.id+'" value="'+(VISITS[h.id]||'')+'">'+
-   (VISITS[h.id]?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+'</div>'+
+  '<div class="visit"><span class="vl">визит</span>'+
+   '<input type="datetime-local" data-visit="'+h.id+'" value="'+(vTime(h.id)||'')+'">'+
+   (vTime(h.id)?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+
+   (vBy(h.id)?'<span class="vby">'+vBy(h.id)+'</span>':'')+'</div>'+
+  (stBy(h.id)?'<div class="stby">'+(ST_SHORT[stVal(h.id)]||stVal(h.id))+
+     ' · <b>'+stBy(h.id)+'</b>'+(stAt(h.id)?' · '+stAt(h.id).slice(5,10):'')+'</div>':'')+
   '<div class="st">'+['escrito','ligado','espera','resposta','marcado','visto','top','arquivo']
-    .map(s=>'<button data-st="'+s+'" data-h="'+h.id+'"'+((STATUS[h.id]||h.status)===s?' class="on"':'')+'>'+ST_SHORT[s]+'</button>').join('')+
+    .map(s=>'<button data-st="'+s+'" data-h="'+h.id+'"'+((stVal(h.id)||h.status)===s?' class="on"':'')+'>'+ST_SHORT[s]+'</button>').join('')+
   '</div></div>';
 }
 
@@ -358,34 +437,45 @@ function card(h){
  return '<article class="card'+(flags.length?' flag':'')+'">'+
   '<div class="top"><span class="price">'+eur(h.price_eur)+'</span>'+
    (h.auto_score!=null?'<span class="nota'+(h.score_parts<5?' thin':'')+
-     '" title="'+h.score_parts+' de 7 critérios conhecidos">'+h.auto_score+'</span>':'')+
+     '" title="известно '+h.score_parts+' из 7 критериев">'+h.auto_score+'</span>':'')+
+   '<button class="fav'+(isFav(h.id)?' on':'')+'" data-fav="'+h.id+'" '+
+     'title="моё избранное">★</button>'+
+   (favOwners(h.id).filter(function(u){return u!==me;}).length?
+     '<span class="favo">'+favOwners(h.id).filter(function(u){return u!==me;})
+       .join(', ')+'</span>':'')+
    '<span class="ref">#'+h.id+'</span></div>'+
   '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
   '<div class="stats">'+
-   '<div class="stat"><div class="v">'+m2(h.land_area_m2)+'</div><div class="k">terreno m²</div></div>'+
-   '<div class="stat"><div class="v'+(h.area_m2?'':' dim')+'">'+m2(h.area_m2)+'</div><div class="k">casa m²</div></div>'+
-   '<div class="stat"><div class="v'+(h.bedrooms?'':' dim')+'">'+(h.bedrooms?'T'+h.bedrooms:'—')+'</div><div class="k">quartos</div></div>'+
-   '<div class="stat"><div class="v'+(h.bathrooms?'':' dim')+'">'+(h.bathrooms||'—')+'</div><div class="k">wc</div></div></div>'+
+   '<div class="stat"><div class="v">'+m2(h.land_area_m2)+'</div><div class="k">земля м²</div></div>'+
+   '<div class="stat"><div class="v'+(h.area_m2?'':' dim')+'">'+m2(h.area_m2)+'</div><div class="k">дом м²</div></div>'+
+   '<div class="stat"><div class="v'+(h.bedrooms?'':' dim')+'">'+(h.bedrooms?'T'+h.bedrooms:'—')+'</div><div class="k">комнаты</div></div>'+
+   '<div class="stat"><div class="v'+(h.bathrooms?'':' dim')+'">'+(h.bathrooms||'—')+'</div><div class="k">туалеты</div></div></div>'+
   '<div class="stats">'+
    '<div class="stat"><div class="v'+(h.elevation_m?'':' dim')+'">'+(h.elevation_m?Math.round(h.elevation_m)+' м':'—')+'</div><div class="k">высота</div></div>'+
    '<div class="stat"><div class="v'+(rel?'':' dim')+'">'+relT+'</div><div class="k">выше округи</div></div>'+
    '<div class="stat"><div class="v'+(h.nearest_building_m?'':' dim')+'">'+(h.nearest_building_m?Math.round(h.nearest_building_m)+' м':'—')+'</div><div class="k">до соседа</div></div>'+
-   '<div class="stat"><div class="v'+(h.dist_lisbon_km?'':' dim')+'">'+(h.dist_lisbon_km?Math.round(h.dist_lisbon_km):'—')+'</div><div class="k">км Lisboa</div></div></div>'+
+   '<div class="stat"><div class="v'+(h.dist_lisbon_km?'':' dim')+'">'+(h.dist_lisbon_km?Math.round(h.dist_lisbon_km):'—')+'</div><div class="k">км до Лиссабона</div></div></div>'+
   (flags.length?'<div class="tags">'+flags.map(f=>'<span class="tag bad">⚠ '+f+'</span>').join('')+'</div>':'')+
   (goods.length?'<div class="tags">'+goods.slice(0,6).map(g=>'<span class="tag">'+g+'</span>').join('')+'</div>':'')+
   (rooms.length?'<div class="tags">'+rooms.slice(0,5).map(r=>'<span class="tag rooms">'+r+'</span>').join('')+'</div>':'')+
   (h.excerpt?'<p class="exc">'+esc(h.excerpt)+'</p>':'')+
   '<div class="acts">'+
-   (h.agent_phone?'<a class="pri" href="tel:+351'+h.agent_phone+'">Ligar</a>':'')+
+   (h.agent_phone?'<a class="pri" href="tel:+351'+h.agent_phone+'">Позвонить</a>':'')+
    (h.whatsapp?'<a href="'+h.whatsapp+'" target="_blank" rel="noopener">WhatsApp</a>':'')+
-   '<a href="'+h.url+'" target="_blank" rel="noopener">Anúncio</a></div>'+
+   '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление</a></div>'+
   noteBlock(h)+'</article>';
 }
 
 
+function visitWord(n){
+  const t=n%10, h=n%100;
+  if(t===1&&h!==11) return 'визит';
+  if(t>=2&&t<=4&&(h<12||h>14)) return 'визита';
+  return 'визитов';
+}
 function fmtDay(v){
   var d=new Date(v+'T00:00'); if(isNaN(d)) return v;
-  return d.toLocaleDateString('pt-PT',{weekday:'long',day:'2-digit',month:'2-digit'});
+  return d.toLocaleDateString('ru-RU',{weekday:'long',day:'2-digit',month:'2-digit'});
 }
 function fmtTime(v){ return (v||'').slice(11,16); }
 function kmBetween(a,b){
@@ -397,10 +487,10 @@ function kmBetween(a,b){
 }
 function renderRota(){
   var box=document.getElementById('rota');
-  var ids=Object.keys(VISITS).filter(function(k){return VISITS[k];});
+  var ids=Object.keys(VISITS).filter(function(k){return vTime(k);});
   if(filt!=='rota'||!ids.length){ box.innerHTML=''; return; }
   var items=ids.map(function(id){
-      return {h:HOUSES.filter(function(x){return String(x.id)===String(id);})[0], t:VISITS[id]};
+      return {h:HOUSES.filter(function(x){return String(x.id)===String(id);})[0], t:vTime(id), by:vBy(id)};
     }).filter(function(x){return x.h;})
       .sort(function(a,b){return a.t.localeCompare(b.t);});
   var days={};
@@ -412,8 +502,8 @@ function renderRota(){
                 .map(function(x){return x.h.lat+','+x.h.lon;});
     var maps=pts.length?'https://www.google.com/maps/dir/'+pts.join('/'):'';
     html+='<div class="day"><div class="dh">'+fmtDay(d)+' &middot; '+list.length+
-          ' visita'+(list.length>1?'s':'')+
-          (maps?'<a class="mapsbtn" target="_blank" rel="noopener" href="'+maps+'">abrir no Maps</a>':'')+
+          ' '+visitWord(list.length)+
+          (maps?'<a class="mapsbtn" target="_blank" rel="noopener" href="'+maps+'">открыть в Maps</a>':'')+
           '</div>';
     list.forEach(function(it,i){
       var prev=i?list[i-1].h:null;
@@ -425,9 +515,10 @@ function renderRota(){
         '<b>'+fmtTime(it.t)+'</b>'+
         '<span class="pl">'+(it.h.concelho||'?')+'</span>'+
         '<span class="pr">'+(it.h.price_eur?new Intl.NumberFormat('pt-PT').format(it.h.price_eur)+' &euro;':'')+'</span>'+
+        (it.by?'<span class="who2">'+it.by+'</span>':'')+
         (it.h.agent_phone?'<a href="tel:+351'+it.h.agent_phone+'">&#9742;</a>':'')+
-        (dist!=null?'<div class="leg">'+Math.round(dist)+' km &middot; ~'+drive+' min de carro'+
-           (tight?' &mdash; pouco tempo entre visitas':'')+'</div>':'')+
+        (dist!=null?'<div class="leg">'+Math.round(dist)+' км &middot; ~'+drive+' мин на машине'+
+           (tight?' &mdash; мало времени между визитами':'')+'</div>':'')+
         '</div>';
     });
     html+='</div>';
@@ -445,12 +536,13 @@ function loadLeaflet(cb){
   var js=document.createElement('script');
   js.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
   js.onload=function(){LEAFLET=true;cb();};
-  js.onerror=function(){toast('Mapa nao carregou',true);};
+  js.onerror=function(){toast('Карта не загрузилась',true);};
   document.head.appendChild(js);
 }
 function pinColour(h){
-  if(STATUS[h.id]==='top') return '#c25a2b';
-  if(VISITS[h.id]) return '#7b3fb5';
+  if(stVal(h.id)==='top') return '#c25a2b';
+  if(isFav(h.id)) return '#c9a227';
+  if(vTime(h.id)) return '#7b3fb5';
   if(h.desc_blockers) return '#b03a3a';
   var t=(NOTES[h.id]||[]).filter(function(n){return n.author===me&&n.tier;})[0];
   if(t&&t.tier>=3) return '#2e6b4f';
@@ -474,15 +566,16 @@ function renderMapa(list){
         fillColor:pinColour(h),fillOpacity:.95});
       var det=[];
       if(h.bedrooms) det.push('T'+h.bedrooms);
-      if(h.land_area_m2) det.push('terreno '+new Intl.NumberFormat('pt-PT').format(h.land_area_m2)+' m²');
-      if(h.elevation_m) det.push(Math.round(h.elevation_m)+' m alt.');
+      if(h.land_area_m2) det.push('земля '+new Intl.NumberFormat('pt-PT').format(h.land_area_m2)+' м²');
+      if(h.elevation_m) det.push(Math.round(h.elevation_m)+' м высота');
       m.bindPopup('<div class="pp"><b>'+(h.concelho||'?')+'</b> &middot; '+eur(h.price_eur)+
         '<div class="m">'+det.join(' &middot; ')+'</div>'+
-        (VISITS[h.id]?'<div class="m">visita '+VISITS[h.id].replace('T',' ')+'</div>':'')+
-        '<a href="'+h.url+'" target="_blank" rel="noopener">ver anúncio</a>'+
-        (h.agent_phone?' &nbsp; <a href="tel:+351'+h.agent_phone+'">ligar</a>':'')+
+        (vTime(h.id)?'<div class="m">визит '+vTime(h.id).replace('T',' ')+
+          (vBy(h.id)?' · '+vBy(h.id):'')+'</div>':'')+
+        '<a href="'+h.url+'" target="_blank" rel="noopener">объявление</a>'+
+        (h.agent_phone?' &nbsp; <a href="tel:+351'+h.agent_phone+'">позвонить</a>':'')+
         ' &nbsp; <a href="https://www.google.com/maps/search/?api=1&query='+h.lat+','+h.lon+
-        '" target="_blank" rel="noopener">rota</a></div>');
+        '" target="_blank" rel="noopener">маршрут</a></div>');
       return m;
     })).addTo(MAP);
     if(pts.length){ MAP.fitBounds(pts,{padding:[30,30],maxZoom:12}); }
@@ -522,26 +615,47 @@ function sortList(list){
 }
 
 
-const ST_LABELS={escrito:'✍ escrevi',ligado:'☎ liguei',
-  espera:'⏳ à espera',resposta:'↩ responderam',marcado:'📅 marcado',
-  visto:'👁 já vimos',top:'★ favorita',arquivo:'✕ fora'};
-const ST_SHORT={escrito:'escrevi',ligado:'liguei',espera:'à espera',
-  resposta:'responderam',marcado:'marcado',visto:'já vimos',
-  top:'favorita',arquivo:'fora'};
+const ST_LABELS={escrito:'✍ написал',ligado:'☎ позвонил',
+  espera:'⏳ жду',resposta:'↩ ответили',marcado:'📅 договорились',
+  visto:'👁 посмотрели',top:'★ фаворит',arquivo:'✕ отпал'};
+const ST_SHORT={escrito:'написал',ligado:'позвонил',espera:'жду',
+  resposta:'ответили',marcado:'договорились',visto:'посмотрели',
+  top:'фаворит',arquivo:'отпал'};
 function migrateStatus(){
   let moved=false;
   Object.keys(STATUS).forEach(function(id){
-    if(STATUS[id]==='visita'){ STATUS[id]='marcado'; moved=true; }
+    if(stVal(id)==='visita'){ STATUS[id]={v:'marcado',by:stBy(id),at:stAt(id)}; moved=true; }
   });
   if(moved){ cacheSave(); }
 }
+function renderPeople(){
+  const box=document.getElementById('people');
+  if(!box) return;
+  const n={};
+  Object.keys(STATUS).forEach(function(id){
+    const by=stBy(id); if(by) n[by]=(n[by]||0)+1;
+  });
+  const mine=favList().length;
+  let html='<button data-f="fav"'+(filt==='fav'?' class="on"':'')+'>★ мои'+
+    '<span class="n">'+mine+'</span></button>';
+  const others=Object.keys(FAVS).filter(function(u){return u!==me&&favList(u).length;});
+  if(others.length) html+='<button data-f="favall"'+(filt==='favall'?' class="on"':'')+
+    '>★ все избранные<span class="n">'+
+    new Set(Object.keys(FAVS).flatMap(function(u){return favList(u);})).size+'</span></button>';
+  Object.keys(n).sort().forEach(function(u){
+    html+='<button data-f="by:'+u+'"'+(filt==='by:'+u?' class="on"':'')+'>'+u+
+      '<span class="n">'+n[u]+'</span></button>';
+  });
+  box.innerHTML=html;
+}
 function renderStBar(){
   migrateStatus();
+  renderPeople();
   const box=document.getElementById('stbar');
   if(!box) return;
   const n={}; Object.keys(ST_LABELS).forEach(function(k){n[k]=0;});
   Object.keys(STATUS).forEach(function(id){
-    if(n[STATUS[id]]!=null) n[STATUS[id]]++;
+    const v=stVal(id); if(n[v]!=null) n[v]++;
   });
   box.innerHTML=Object.keys(ST_LABELS).map(function(k){
     return '<button data-f="st:'+k+'"'+
@@ -552,7 +666,7 @@ function renderStBar(){
 
 function render(){
  const list=sortList(HOUSES.filter(keep));
- document.getElementById('count').textContent=list.length+' de '+HOUSES.length+' imóveis';
+ document.getElementById('count').textContent=list.length+' из '+HOUSES.length+' домов';
  document.getElementById('grid').innerHTML=(filt==='mapa'?'':list.map(card).join(''));
  renderRota(); renderMapa(list); renderStBar();
 }
@@ -567,12 +681,15 @@ async function saveNote(id,text,tier){
    updated_at:new Date().toISOString().slice(0,16).replace('T',' ')});
  NOTES[id]=rest; soil('n',id); render();
  const okd=await push(); mark();
- toast(okd?'Guardado ✓':'Guardado no telemóvel — envio depois',!okd);
+ toast(okd?'Сохранено ✓':'Сохранено в телефоне — отправлю позже',!okd);
 }
 
 document.addEventListener('click',async e=>{
+ const fv=e.target.closest('[data-fav]');
+ if(fv){ toggleFav(fv.dataset.fav); render(); await push(); mark();
+   toast(isFav(fv.dataset.fav)?'В избранном':'Убрано из избранного'); return; }
  const cl=e.target.closest('[data-clr]');
- if(cl){ delete VISITS[cl.dataset.clr]; soil('v',cl.dataset.clr); await push(); render(); toast('Visita removida'); return; }
+ if(cl){ delete VISITS[cl.dataset.clr]; soil('v',cl.dataset.clr); await push(); render(); toast('Визит убран'); return; }
  const u=e.target.closest('[data-u]'); if(u){setUser(u.dataset.u);load();return;}
  const f=e.target.closest('[data-f]');
  if(f){ filt=(filt===f.dataset.f&&filt.indexOf('st:')===0)?'all':f.dataset.f;
@@ -588,18 +705,18 @@ document.addEventListener('click',async e=>{
    await saveNote(id,ta?ta.value:'',+t.dataset.tier);render();return;}
  const s=e.target.closest('[data-st]');
  if(s){const id=+s.dataset.h;
-   STATUS[id]=s.dataset.st; soil('s',id); await push();
+   setStatus(id,s.dataset.st); await push();
    const h=HOUSES.find(x=>x.id===id); if(h)h.status=s.dataset.st;
-   toast('Estado: '+s.dataset.st); render(); return;}
+   toast('Статус: '+(ST_SHORT[s.dataset.st]||s.dataset.st)); render(); return;}
 });
 
 document.addEventListener('change',async e=>{
  const vi=e.target.closest('[data-visit]');
  if(vi){ const id=vi.dataset.visit;
-   if(vi.value){ VISITS[id]=vi.value; STATUS[id]='marcado'; } else { delete VISITS[id]; }
-   soil('v',id); soil('s',id);
+   if(vi.value){ setVisit(id,vi.value); setStatus(id,'marcado'); }
+   else { delete VISITS[id]; soil('v',id); }
    const okd=await push(); render(); mark();
-   toast(okd?'Visita marcada':'Guardado no telemóvel',!okd); return; }
+   toast(okd?'Визит назначен':'Сохранено в телефоне',!okd); return; }
  const ta=e.target.closest('[data-note]');
  if(ta)saveNote(+ta.dataset.note,ta.value,null);
 });
@@ -611,29 +728,4 @@ document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim(
 
 if(me){setUser(me);load();}
 </script>
-<script>
-function dl(name,txt){const b=new Blob([txt],{type:'application/json'});
- const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
-document.addEventListener('click',e=>{
- if(e.target.id==='exp'){
-   dl('casa_notas_'+(me||'x')+'.json',
-      JSON.stringify({user:me,notes:Object.values(NOTES).flat(),status:STATUS},null,1));
-   toast('Ficheiro guardado');
- }
- if(e.target.id==='imp'){document.getElementById('impf').click();}
-});
-document.addEventListener('change',async e=>{
- if(e.target.id!=='impf')return;
- const f=e.target.files[0]; if(!f)return;
- const r=new FileReader();
- r.onload=()=>{try{
-   const d=JSON.parse(r.result);
-   (d.notes||[]).forEach(n=>{
-     const l=(NOTES[n.house_id]||[]).filter(x=>x.author!==n.author);
-     l.push(n); NOTES[n.house_id]=l;});
-   Object.assign(STATUS,d.status||{});
-   persist(); render(); toast('Importado ✓');
- }catch(err){toast('Ficheiro inválido',1)}};
- r.readAsText(f);
-});
-</script></body></html>
+</body></html>
