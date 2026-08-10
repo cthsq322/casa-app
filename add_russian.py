@@ -172,14 +172,20 @@ function translit(t){
 }
 function matches(hay,query){
   hay=deaccent(hay.toLowerCase());
-  const q=deaccent(query.toLowerCase());
+  const q=deaccent(query.toLowerCase()).trim();
+  if(!q) return true;
   if(hay.includes(q)) return true;
-  if(!/[а-яё]/.test(q)) return false;
-  const t=translit(q);
-  if(hay.includes(t)) return true;
-  // the tail of a transliteration is the least reliable part - drop it
-  const stem=t.slice(0,Math.max(3,t.length-2));
-  return hay.split(/[\s,·]+/).some(function(w){ return w.startsWith(stem); });
+  const words=hay.split(/[\s,·]+/);
+  // "Порту де Мош" is three words, each with its own spelling problem
+  return q.split(/\s+/).every(function(part){
+    if(hay.includes(part)) return true;
+    if(!/[а-яё]/.test(part)) return false;
+    const t=translit(part);
+    if(hay.includes(t)) return true;
+    // the tail of a transliteration is the least reliable part - drop it
+    const stem=t.slice(0,Math.max(3,t.length-1));
+    return words.some(function(w){ return w.startsWith(stem); });
+  });
 }
 """
 swap("function keep(h){", SEARCH + "\nfunction keep(h){")

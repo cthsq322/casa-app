@@ -56,6 +56,11 @@ input[type=search]{font:inherit;padding:7px 12px;border:1px solid var(--line);
 .stby{font-size:12px;color:var(--soft)}
 .stby b{color:var(--accent)}
 .vby{font-size:11.5px;color:var(--soft)}
+.nsave{font-size:11.5px;min-height:15px;margin-top:-3px}
+.nsave.idle{color:var(--soft)}
+.nsave.typing{color:var(--soft)}
+.nsave.ok{color:var(--accent)}
+.nsave.wait{color:var(--warn);font-weight:600}
 .who2{font-size:12px;color:var(--soft);margin-left:6px}
 .links{display:flex;gap:8px;padding:2px 0 4px;overflow-x:auto;scrollbar-width:none}
 .links::-webkit-scrollbar{display:none}
@@ -186,6 +191,16 @@ function mergeMap(serverMap,localMap,kind){
   });
   return out;
 }
+// merging keeps everything, so a key I cleared has to be removed on purpose
+function dropDeleted(serverMap,localMap,kind){
+  const out=Object.assign({},serverMap||{},localMap||{});
+  DIRTY.forEach(function(d){
+    if(d.indexOf(kind+':')!==0) return;
+    const id=d.slice(kind.length+1);
+    if((localMap||{})[id]===undefined) delete out[id];
+  });
+  return out;
+}
 function mergeNotes(fresh){
   const map=new Map((fresh||[]).map(function(n){return [key(n),n];}));
   let pending=false;
@@ -271,10 +286,16 @@ async function push(mine){
       const old=map.get(key(n));
       if(!old || n.author===me || (n.updated_at||'')>(old.updated_at||'')) map.set(key(n),n);
     });
+    // a note I deleted is gone from NOTES, so merging alone would bring it back
+    DIRTY.forEach(function(d){
+      if(d.indexOf('n:')!==0) return;
+      const id=d.slice(2);
+      if(!(NOTES[id]||[]).some(function(n){return n.author===me;})) map.delete(id+'|'+me);
+    });
     const body={notes:[...map.values()],
-                status:Object.assign({},cur.status||{},STATUS),
-                visits:Object.assign({},cur.visits||{},VISITS),
-                favs:Object.assign({},cur.favs||{},FAVS),v:1};
+                status:dropDeleted(cur.status,STATUS,'s'),
+                visits:dropDeleted(cur.visits,VISITS,'v'),
+                favs:dropDeleted(cur.favs,FAVS,'f'),v:1};
     const w=await fetch(API,{method:'PUT',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(body)});
@@ -370,14 +391,20 @@ function translit(t){
 }
 function matches(hay,query){
   hay=deaccent(hay.toLowerCase());
-  const q=deaccent(query.toLowerCase());
+  const q=deaccent(query.toLowerCase()).trim();
+  if(!q) return true;
   if(hay.includes(q)) return true;
-  if(!/[а-яё]/.test(q)) return false;
-  const t=translit(q);
-  if(hay.includes(t)) return true;
-  // the tail of a transliteration is the least reliable part - drop it
-  const stem=t.slice(0,Math.max(3,t.length-2));
-  return hay.split(/[\s,·]+/).some(function(w){ return w.startsWith(stem); });
+  const words=hay.split(/[\s,·]+/);
+  // "Порту де Мош" is three words, each with its own spelling problem
+  return q.split(/\s+/).every(function(part){
+    if(hay.includes(part)) return true;
+    if(!/[а-яё]/.test(part)) return false;
+    const t=translit(part);
+    if(hay.includes(t)) return true;
+    // the tail of a transliteration is the least reliable part - drop it
+    const stem=t.slice(0,Math.max(3,t.length-1));
+    return words.some(function(w){ return w.startsWith(stem); });
+  });
 }
 
 function keep(h){
@@ -417,6 +444,9 @@ function noteBlock(h){
      (mine&&mine.tier===t?' class="on"':'')+'>'+'★'.repeat(t)+'</button>').join('')+'</div>'+
   '<textarea data-note="'+h.id+'" placeholder="'+(me||'')+': твоя заметка…">'+
     esc(mine?mine.text:'')+'</textarea>'+
+  '<div class="nsave '+((SAVEMSG[h.id]||{}).state||'idle')+'" data-nsave="'+h.id+'">'+
+    ((SAVEMSG[h.id]||{}).txt || (mine&&mine.text?'сохранено '+
+      (mine.updated_at||'').slice(11):''))+'</div>'+
   '<div class="visit"><span class="vl">визит</span>'+
    '<input type="datetime-local" data-visit="'+h.id+'" value="'+(vTime(h.id)||'')+'">'+
    (vTime(h.id)?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+
@@ -672,16 +702,36 @@ function render(){
 }
 
 const persist=cacheSave;
-async function saveNote(id,text,tier){
+const SAVEMSG={};                     // id -> what the line under the note says
+function noteState(id,state,txt){
+  SAVEMSG[id]={state:state,txt:txt};
+  const el=document.querySelector('[data-nsave="'+id+'"]');
+  if(el){ el.textContent=txt; el.className='nsave '+state; }
+}
+async function saveNote(id,text,tier,quiet){
  const prev=(NOTES[id]||[]).find(n=>n.author===me)||{};
  const rest=(NOTES[id]||[]).filter(n=>n.author!==me);
- rest.push({house_id:id,author:me,
-   text: text!=='' ? text : (prev.text||''),
-   tier: tier!=null ? tier : (prev.tier??null),
-   updated_at:new Date().toISOString().slice(0,16).replace('T',' ')});
- NOTES[id]=rest; soil('n',id); render();
+ const t = tier!=null ? tier : (prev.tier??null);
+ const now=new Date().toISOString().slice(0,16).replace('T',' ');
+
+ if(!text && t==null){                // nothing left worth keeping - delete it
+   // nothing was there - leave whatever the line already says
+   if(!prev.author) return;
+   NOTES[id]=rest; soil('n',id);
+   if(!quiet) render();
+   const gone=await push(); mark();
+   noteState(id,'idle','заметка удалена');
+   toast(gone?'Заметка удалена':'Удалено в телефоне — отправлю позже',!gone);
+   return;
+ }
+
+ rest.push({house_id:id,author:me,text:text,tier:t,updated_at:now});
+ NOTES[id]=rest; soil('n',id);
+ if(!quiet) render();
  const okd=await push(); mark();
- toast(okd?'Сохранено ✓':'Сохранено в телефоне — отправлю позже',!okd);
+ noteState(id, okd?'ok':'wait',
+   okd?'сохранено '+now.slice(11):'не отправлено — сохранено в телефоне');
+ if(!quiet) toast(okd?'Сохранено ✓':'Сохранено в телефоне — отправлю позже',!okd);
 }
 
 document.addEventListener('click',async e=>{
@@ -689,7 +739,10 @@ document.addEventListener('click',async e=>{
  if(fv){ toggleFav(fv.dataset.fav); render(); await push(); mark();
    toast(isFav(fv.dataset.fav)?'В избранном':'Убрано из избранного'); return; }
  const cl=e.target.closest('[data-clr]');
- if(cl){ delete VISITS[cl.dataset.clr]; soil('v',cl.dataset.clr); await push(); render(); toast('Визит убран'); return; }
+ if(cl){ const id=cl.dataset.clr;
+   delete VISITS[id]; soil('v',id);
+   if(stVal(id)==='marcado'){ setStatus(id,'resposta'); }   // agreed, then unagreed
+   await push(); render(); mark(); toast('Визит убран'); return; }
  const u=e.target.closest('[data-u]'); if(u){setUser(u.dataset.u);load();return;}
  const f=e.target.closest('[data-f]');
  if(f){ filt=(filt===f.dataset.f&&filt.indexOf('st:')===0)?'all':f.dataset.f;
@@ -714,16 +767,28 @@ document.addEventListener('change',async e=>{
  const vi=e.target.closest('[data-visit]');
  if(vi){ const id=vi.dataset.visit;
    if(vi.value){ setVisit(id,vi.value); setStatus(id,'marcado'); }
-   else { delete VISITS[id]; soil('v',id); }
+   else { delete VISITS[id]; soil('v',id);
+     if(stVal(id)==='marcado'){ setStatus(id,'resposta'); } }
    const okd=await push(); render(); mark();
    toast(okd?'Визит назначен':'Сохранено в телефоне',!okd); return; }
  const ta=e.target.closest('[data-note]');
- if(ta)saveNote(+ta.dataset.note,ta.value,null);
+ if(ta) saveNote(+ta.dataset.note,ta.value.trim(),null);
 });
 document.getElementById('sort').addEventListener('change',function(e){
  sortBy=e.target.value; localStorage.setItem('casa_sort',sortBy); render();
 });
 document.getElementById('sort').value=localStorage.getItem('casa_sort')||'score';
+const typeTimers={};
+document.addEventListener('input',function(e){
+  const ta=e.target.closest('[data-note]');
+  if(!ta) return;
+  const id=+ta.dataset.note;
+  noteState(id,'typing','печатаешь…');
+  clearTimeout(typeTimers[id]);
+  typeTimers[id]=setTimeout(function(){
+    saveNote(id,ta.value.trim(),null,true);      // quiet: no re-render mid-typing
+  },1200);
+});
 document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render();});
 
 if(me){setUser(me);load();}
