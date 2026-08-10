@@ -225,6 +225,9 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .checked{font-size:11px;color:var(--soft)}
 .pinnote{font-size:11.5px;color:var(--warn);margin-top:-3px}
 .pinnote.ok{color:var(--accent)}
+.dupb{font-size:12px;padding:7px 12px;border-radius:9px;margin:4px 0;
+ background:var(--accent-s);color:var(--accent)}
+.dupb.hard{background:var(--warn-s);color:var(--warn);font-weight:600}
 .pinnote.wait2{color:var(--warn);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .askaddr{padding:3px 10px;font-size:11.5px;border-color:var(--warn);color:var(--warn);
  background:transparent}
@@ -434,6 +437,27 @@ let HOUSES=[],NOTES={},STATUS={},VISITS={},sortBy=localStorage.getItem('casa_sor
 
 const BLOB='019feb59-15e5-7ad0-81ea-0b75e08ca35a';
 const API='https://jsonblob.com/api/jsonBlob/'+BLOB;
+const BLOB2='019fee0d-788d-7403-bf13-39370065df8e';   // заметки живут отдельно
+const API2='https://jsonblob.com/api/jsonBlob/'+BLOB2;
+// wire format of the notes store: one-letter keys to stay small
+function packNote(n){
+  const w={h:n.house_id,a:n.author,u:n.updated_at};
+  if((n.text||'').trim()) w.t=n.text;
+  if(n.tier) w.r=n.tier;
+  return w;
+}
+function unpackNote(w){
+  return {house_id:w.h,author:w.a,text:w.t||'',tier:w.r||null,updated_at:w.u};
+}
+// same house+author on both stores: the newer edit wins
+function newestNotes(lists){
+  const m=new Map();
+  lists.forEach(function(arr){ (arr||[]).forEach(function(n){
+    const k=key(n), old=m.get(k);
+    if(!old||(n.updated_at||'')>(old.updated_at||'')) m.set(k,n);
+  });});
+  return [...m.values()];
+}
 let DIRTY=new Set(JSON.parse(localStorage.getItem('casa_dirty')||'[]'));
 function soil(kind,id){ DIRTY.add(kind+':'+id); saveDirty(); }
 function saveDirty(){ localStorage.setItem('casa_dirty',JSON.stringify([...DIRTY])); }
@@ -608,9 +632,12 @@ function key(n){ return n.house_id+'|'+n.author; }
 
 async function pull(){
   try{
-    const r=await fetch(API+'?t='+Date.now(),{cache:'no-store'});
-    if(!r.ok) throw 0;
-    const d=await r.json();
+    const rs=await Promise.all([
+      fetch(API+'?t='+Date.now(),{cache:'no-store'}),
+      fetch(API2+'?t='+Date.now(),{cache:'no-store'})]);
+    if(!rs[0].ok) throw 0;
+    const d=await rs[0].json();
+    const d2=rs[1].ok?await rs[1].json():{};
     SYNCED=true;
     STATUS=mergeMap(d.status,STATUS,'s');
     VISITS=mergeMap(d.visits,VISITS,'v');
@@ -620,7 +647,8 @@ async function pull(){
     PINS=mergeMap(d.pins,PINS,'p');
     TELS=mergeMap(d.tels,TELS,'t');
     SLOTS=mergeMap(d.slots,SLOTS,'z');
-    return d.notes||[];
+    // старые телефоны ещё пишут заметки в первый store - подмешиваем оба
+    return newestNotes([(d2.notes||[]).map(unpackNote), d.notes||[]]);
   }catch(e){ SYNCED=false; return cacheLoad(); }
 }
 
@@ -657,9 +685,13 @@ function slim(doc){
 async function push(mine){
   cacheSave();
   try{
-    const r=await fetch(API+'?t='+Date.now(),{cache:'no-store'});
-    const cur = r.ok ? await r.json() : {notes:[],status:{}};
-    const map=new Map((cur.notes||[]).map(n=>[key(n),n]));
+    const rs=await Promise.all([
+      fetch(API+'?t='+Date.now(),{cache:'no-store'}),
+      fetch(API2+'?t='+Date.now(),{cache:'no-store'})]);
+    const cur = rs[0].ok ? await rs[0].json() : {notes:[],status:{}};
+    const cur2 = rs[1].ok ? await rs[1].json() : {};
+    const map=new Map(newestNotes([(cur2.notes||[]).map(unpackNote), cur.notes||[]])
+      .map(n=>[key(n),n]));
     Object.values(NOTES).flat().forEach(n=>{
       const old=map.get(key(n));
       if(!old || n.author===me || (n.updated_at||'')>(old.updated_at||'')) map.set(key(n),n);
@@ -670,7 +702,7 @@ async function push(mine){
       const id=d.slice(2);
       if(!(NOTES[id]||[]).some(function(n){return n.author===me;})) map.delete(id+'|'+me);
     });
-    const body=slim({notes:[...map.values()],
+    const body=slim({
                 status:dropDeleted(cur.status,STATUS,'s'),
                 visits:dropDeleted(cur.visits,VISITS,'v'),
                 favs:dropDeleted(cur.favs,FAVS,'f'),
@@ -678,11 +710,16 @@ async function push(mine){
                 skip:dropDeleted(cur.skip,SKIP,'k'),
                 pins:dropDeleted(cur.pins,PINS,'p'),
                 tels:dropDeleted(cur.tels,TELS,'t'),
-                slots:dropDeleted(cur.slots,SLOTS,'z'),v:1});
-    const w=await fetch(API,{method:'PUT',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify(body)});
-    if(!w.ok) throw 0;
+                slots:dropDeleted(cur.slots,SLOTS,'z'),v:2});
+    body.notes=[...map.values()];              // в памяти заметки едут дальше
+    const ws=await Promise.all([
+      fetch(API,{method:'PUT',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body:JSON.stringify(Object.assign({},body,{notes:undefined}))},),
+      fetch(API2,{method:'PUT',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body:JSON.stringify({notes:body.notes.map(packNote),v:2})})]);
+    if(!ws[0].ok||!ws[1].ok) throw 0;          // не отпускаем DIRTY пока оба не взяли
     SYNCED=true;
     NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
     STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{}; SKIP=body.skip||{}; PINS=body.pins||{}; TELS=body.tels||{}; SLOTS=body.slots||{};
@@ -703,7 +740,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-0027-530c658';
+const BUILD='20260811-0050-846e509';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -766,8 +803,11 @@ function setUser(u){me=u;localStorage.setItem('casa_user',u);
 
 async function load(){
  HOUSES=await (await fetch('data.json?v='+Date.now())).json();
- const all=await pull();
- NOTES={};all.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
+ // сперва своё из телефона - несохранённые правки живут именно здесь
+ const mine=cacheLoad();
+ NOTES={};mine.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
+ const all=await pull();          // pull сливает карты dirty-aware поверх кэша
+ if(SYNCED) NOTES=mergeNotes(all).notes;
  mark();
  loadPlan();
  if(DIRTY.size){ push().then(mark); }
@@ -1140,7 +1180,8 @@ function card(h){
  const rel=h.elevation_relative_m;
  const relT=rel==null?'—':(rel>0?'+'+Math.round(rel):Math.round(rel));
  return '<article class="card'+(flags.length?' flag':'')+
-   (isSold(h)?' gone':'')+'">'+
+   (h.dup_note?'<div class="dupb'+(h.dup_of?' hard':'')+'">'+(h.dup_of?'⚠ дубль дома #'+h.dup_of:'')+esc(h.dup_note?(h.dup_of?' — ':'')+h.dup_note:'')+'</div>':'')+
+ (isSold(h)?' gone':'')+'">'+
   '<div class="top"><span class="price">'+eur(h.price_eur)+'</span>'+
    (h.auto_score!=null?'<span class="nota'+(h.score_parts<5?' thin':'')+
      '" title="известно '+h.score_parts+' из 7 критериев">'+h.auto_score+'</span>':'')+

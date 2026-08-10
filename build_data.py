@@ -21,6 +21,7 @@ COLS = [
     "desc_blockers", "desc_goods", "desc_rooms",
     "auto_score", "score_parts", "price_per_m2",
     "first_photo_url", "photo_count",
+    "dup_of", "dup_note",
     "town_lat", "town_lon",     # the town, never the house - see scoring notes
     "listing_status", "listing_checked",
 ]
