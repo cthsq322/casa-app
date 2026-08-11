@@ -147,7 +147,7 @@ body.searching .count{padding:8px 0 4px;font-weight:600;color:var(--accent)}
  display:block}
 .shot .cnt{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.5);
  color:#fff;font-size:11px;padding:2px 8px;border-radius:999px;
- backdrop-filter:blur(3px)}
+ }
 .shot.tile{background:#e8e4dc}
 .shot.tile img{image-rendering:auto;filter:saturate(.85)}
 .shot .pin.rough{background:transparent;border:3px dashed var(--warn);width:26px;height:26px;margin:-13px 0 0 -13px;box-shadow:none}
@@ -232,12 +232,24 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .checked{font-size:11px;color:var(--soft)}
 .pinnote{font-size:11.5px;color:var(--warn);margin-top:-3px}
 .pinnote.ok{color:var(--accent)}
+.msg,.skip,.cal,.conf,.cpday,.askaddr,.msgall{min-height:40px}
+.soonx{min-height:38px}
+.acts a,.lnk{min-height:40px;display:inline-flex;align-items:center;justify-content:center}
+@media(max-width:640px){
+ .bar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+ .bar::-webkit-scrollbar{display:none}
+ .bar button{white-space:nowrap;flex:0 0 auto}
+}
 .card.st-ok{border-left:5px solid var(--accent);
  background:linear-gradient(90deg,var(--accent-s),var(--card) 45%)}
 .card.st-plan{border-left:5px solid var(--warn);
  background:linear-gradient(90deg,var(--warn-s),var(--card) 45%)}
-.card.st-talk{border-left:5px solid #7c9cc4;
- background:linear-gradient(90deg,#7c9cc41c,var(--card) 45%)}
+.card.st-talk{border-left:5px solid var(--talk,#7c9cc4);
+ background:linear-gradient(90deg,var(--talk-s,#7c9cc41c),var(--card) 45%)}
+@media(prefers-color-scheme:dark){:root{--talk:#8fb3d8;--talk-s:#7c9cc430}
+ .twin{background:var(--accent-s)}}
+:root[data-theme=dark]{--talk:#8fb3d8;--talk-s:#7c9cc430}
+:root[data-theme=dark] .twin{background:var(--accent-s)}
 .twin{font-size:12.5px;padding:8px 12px;border-radius:9px;margin:4px 0;
  background:var(--paper);border:1px dashed var(--line)}
 .twworse{color:var(--warn);font-weight:600}
@@ -253,6 +265,9 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .swacts{margin-left:auto;display:flex;gap:6px}
 .swacts a,.swacts button{font-size:14px;text-decoration:none;padding:4px 9px;
  border:1px solid var(--line);border-radius:8px;color:var(--accent)}
+.hotl{color:var(--accent);text-decoration:none;font-weight:600}
+.slotdue{color:var(--warn);font-size:12px;font-weight:700;margin-left:8px}
+.twfacts{font-size:12.5px;color:var(--soft);margin-top:4px}
 .twtel{display:flex;gap:7px;margin-top:6px}
 .cpn{font-size:12.5px;padding:5px 10px;border-color:var(--line);
  font-variant-numeric:tabular-nums}
@@ -265,7 +280,7 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .newday{display:flex;align-items:baseline;gap:10px;margin:14px 0 8px;
  padding:10px 14px;background:var(--accent-s);border-radius:11px;font-size:14px}
 .newday span{color:var(--soft);font-size:12.5px}
-.dupb{font-size:12px;padding:7px 12px;border-radius:9px;margin:4px 0;
+.dupb{font-size:13.5px;padding:8px 13px;border-radius:9px;margin:4px 0;
  background:var(--accent-s);color:var(--accent)}
 .dupb.hard{background:var(--warn-s);color:var(--warn);font-weight:600}
 .pinnote.wait2{color:var(--warn);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -413,8 +428,8 @@ button, .acts a, .dacts a, .pinopen, .wa, .lnk{
   transition:background .12s ease, border-color .12s ease}
 .bar button, .stbar button, #people button, .dchip{
   min-height:38px; padding:7px 14px; font-size:13.5px}
-.st button{min-height:34px; padding:5px 12px; font-size:13px}
-.tiers button{min-height:34px; min-width:44px}
+.st button{min-height:40px; padding:5px 12px; font-size:13px}
+.tiers button{min-height:40px; min-width:44px}
 .acts a, .dacts a{min-height:38px; display:inline-flex; align-items:center;
   justify-content:center}
 .msg,.skip,.cal,.conf,.cpday,.askaddr,.msgall{min-height:32px; border-radius:9px}
@@ -475,7 +490,7 @@ button:active{transform:scale(.985)}
 <div id="toast"></div>
 
 <script>
-let HOUSES=[],NOTES={},STATUS={},VISITS={},sortBy=localStorage.getItem('casa_sort')||'score',filt='all',q='',me=localStorage.getItem('casa_user');
+let HOUSES=[],H_IDX={},TWINS={},NOTES={},STATUS={},VISITS={},sortBy=localStorage.getItem('casa_sort')||'score',filt='all',q='',me=localStorage.getItem('casa_user');
 
 const BLOB='019feb59-15e5-7ad0-81ea-0b75e08ca35a';
 const API='https://jsonblob.com/api/jsonBlob/'+BLOB;
@@ -544,6 +559,14 @@ function mergeNotes(fresh){
 let FAVS={}, REMIND={}, SKIP={}, PINS={}, TELS={}, SLOTS={};
 // a slot set by hand beats whatever the circle computed today
 const RUDAYS=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+function slotDue(id){
+  const m=SLOTS[id];
+  if(typeof m!=='string'||m.length<16||vTime(id)) return false;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const d=new Date(m.slice(0,10)+'T00:00');
+  const diff=(d-today)/86400000;
+  return diff>=0&&diff<=1;                     // сегодня или завтра, не договорено
+}
 function slotFor(id){
   const m=SLOTS[id];
   if(typeof m==='string'&&m.length>=16){           // "2026-08-11 09:15"
@@ -782,7 +805,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-0800-4be1209';
+const BUILD='20260811-0813-faf00a9';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -845,6 +868,9 @@ function setUser(u){me=u;localStorage.setItem('casa_user',u);
 
 async function load(){
  HOUSES=await (await fetch('data.json?v='+Date.now())).json();
+ H_IDX={}; TWINS={};
+ HOUSES.forEach(function(h){ H_IDX[String(h.id)]=h;
+   if(h.dup_of) (TWINS[String(h.dup_of)]=TWINS[String(h.dup_of)]||[]).push(h); });
  // сперва своё из телефона - несохранённые правки живут именно здесь
  const mine=cacheLoad();
  NOTES={};mine.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
@@ -1129,7 +1155,7 @@ function mapThumb(h){
 // gone by two roads: the ad stopped opening, or someone told us it is sold
 // у победителя пары - вся картина: обе цены, оба агента, переплата названа
 function twinBlock(h){
-  const twins=HOUSES.filter(function(x){return String(x.dup_of||'')===String(h.id);});
+  const twins=TWINS[String(h.id)]||[];
   return twins.map(function(t){
     const over=(t.price_eur&&h.price_eur)?t.price_eur-h.price_eur:null;
     return '<div class="twin">'+
@@ -1141,6 +1167,12 @@ function twinBlock(h){
         digits9(t.agent_phone)+'">+351 '+digits9(t.agent_phone)+' — копировать</button>'+
         '<a class="twwa" target="_blank" rel="noopener" href="'+waLink(t.agent_phone)+
         '">WhatsApp</a></div>':'')+
+      '<div class="twfacts">'+[
+        t.bedrooms?'T'+t.bedrooms:null,
+        t.area_m2?Math.round(t.area_m2)+' м²':null,
+        t.land_area_m2?'земля '+new Intl.NumberFormat('pt-PT').format(t.land_area_m2)+' м²':null,
+        t.concelho||null, t.freguesia||null
+      ].filter(Boolean).join(' · ')+'</div>'+
       '<div class="twacts">'+
       '<button data-msg="'+t.id+'">✍ письмо этому</button>'+
       (t.agent_phone?'<a href="tel:'+telHref(t.agent_phone)+'">позвонить</a>':'')+
@@ -1330,7 +1362,7 @@ function card(h){
       (slotFor(h.id).week
         ? 'звать на <b>'+(slotFor(h.id).when||('день '+slotFor(h.id).label))+'</b>, около '+
           slotFor(h.id).at+(slotFor(h.id).manual?' · назначено вручную':'')+
-          '<button class="cpday" data-cpday="'+h.id+'">копировать дату</button>'
+          '<button class="cpday" data-cpday="'+h.id+'">копировать дату</button>'+(slotDue(h.id)?'<span class="slotdue">⚠ уточнить до 20:00</span>':'')
         : 'в круге на день '+slotFor(h.id).label+' — эта часть отложена')+
       '</div>'
     : '')+
@@ -1464,7 +1496,7 @@ function renderRota(){
   });
   if(filt!=='rota'||!ids.length){ box.innerHTML=''; return; }
   var items=ids.map(function(id){
-      let hh=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+      let hh=H_IDX[String(id)];
       if(hh){ const pp=pinPos(hh); if(pp) hh=Object.assign({},hh,{lat:pp[0],lon:pp[1]}); }
       return {h:hh, t:vTime(id), by:vBy(id)};
     }).filter(function(x){return x.h;})
@@ -1490,7 +1522,7 @@ function renderRota(){
       var gap=prev?(new Date(it.t)-new Date(list[i-1].t))/60000:null;
       var spare=(drive!=null&&gap!=null)?gap-drive-45:null;   // 45 min to look round
       var tight=(spare!=null&&spare<0);
-      var full=HOUSES.filter(function(x){return String(x.id)===String(it.h.id);})[0];
+      var full=H_IDX[String(it.h.id)];
       html+='<div class="stop'+(tight?' tight':'')+'">'+
         '<b>'+fmtTime(it.t)+'</b>'+
         '<span class="pl">'+(it.h.concelho||'?')+'</span>'+
@@ -1510,11 +1542,11 @@ function renderRota(){
   box.innerHTML=html;
   var need=[];
   Object.keys(days).forEach(function(d){ need=need.concat(days[d]); });
-  fillRoads(need).then(function(got){ if(got&&filt==='rota') renderRota(); });
+  fillRoads(need).then(function(got){ if(got&&filt==='rota'){clearTimeout(roadT);roadT=setTimeout(renderRota,150);} });
 }
 
 
-var MAP=null, LAYER=null, ROUTE=null, LEAFLET=false;
+var MAP=null, LAYER=null, ROUTE=null, LEAFLET=false, lastMapSig='', roadT=null;
 var DAY_COLOURS=['#c25a2b','#2e6b4f','#7b3fb5','#1f6f8b','#8a6d1f'];
 function loadLeaflet(cb){
   if(LEAFLET) return cb();
@@ -1552,6 +1584,9 @@ function renderMapa(list){
     }
     if(LAYER) MAP.removeLayer(LAYER);
     if(ROUTE) MAP.removeLayer(ROUTE);
+    var sig=list.map(function(h){return h.id+'|'+pinColour(h)+'|'+(vTime(h.id)||'')+(outOfLoop(h.id)?'x':'');}).join(',');
+    if(sig===lastMapSig&&LAYER) return;
+    lastMapSig=sig;
     var pts=[];
     LAYER=L.layerGroup(list.filter(function(h){
       return h.lat && !outOfLoop(h.id);          // выкинутые с карты уходят
@@ -1615,7 +1650,7 @@ function renderMapa(list){
     ROUTE = routeBits.length ? L.layerGroup(routeBits).addTo(MAP) : null;
     days.forEach(function(d){
       fillRoads(byDay[d].sort(function(a,b){return a.t.localeCompare(b.t);}))
-        .then(function(got){ if(got&&filt==='mapa') renderMapa(list); });
+        .then(function(got){ if(got&&filt==='mapa'){clearTimeout(roadT);roadT=setTimeout(function(){lastMapSig='';renderMapa(list);},150);} });
     });
     if(routePts.length){ MAP.fitBounds(routePts,{padding:[45,45],maxZoom:11}); }
     else if(pts.length){ MAP.fitBounds(pts,{padding:[30,30],maxZoom:12}); }
@@ -1722,7 +1757,7 @@ function renderSoon(){
   const now=new Date();
   const rem=Object.keys(REMIND).map(function(id){
     const dt=rDate(id); if(!dt) return null;
-    const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    const h=H_IDX[String(id)];
     if(!h) return null;
     const when=new Date(dt+'T09:00');
     const hours=(when-now)/3600000;
@@ -1731,14 +1766,14 @@ function renderSoon(){
   const due=Object.keys(VISITS).map(function(id){
     if(vOk(id)||!vTime(id)) return null;
     const bf=vBefore(id); if(!bf) return null;
-    const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    const h=H_IDX[String(id)];
     if(!h) return null;
     const when=new Date(bf), hours=(when-now)/3600000;
     return hours<48 ? {h:h,when:when,hours:hours,due:true,visit:vTime(id)} : null;
   }).filter(Boolean);
   const items=Object.keys(VISITS).map(function(id){
     const t=vTime(id); if(!t) return null;
-    const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    const h=H_IDX[String(id)];
     if(!h) return null;
     const when=new Date(t);
     const hours=(when-now)/3600000;
@@ -1971,7 +2006,7 @@ async function renderDay(){
   const stops=Object.keys(VISITS).map(function(id){
     const t=vTime(id); if(!t||t.slice(0,10)!==key) return null;
     if(outOfLoop(id)) return null;               // выкинутый дом дня не держит
-    let h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    let h=H_IDX[String(id)];
     if(!h) return null;
     const pp=pinPos(h); if(pp) h=Object.assign({},h,{lat:pp[0],lon:pp[1]});
     return {h:h,t:t,ok:vOk(id),before:vBefore(id)};
@@ -1981,7 +2016,7 @@ async function renderDay(){
     const m=SLOTS[id];
     if(typeof m!=='string'||m.slice(0,10)!==key) return;
     if(vTime(id)||outOfLoop(id)) return;
-    let h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+    let h=H_IDX[String(id)];
     if(!h) return;
     const pp=pinPos(h); if(pp) h=Object.assign({},h,{lat:pp[0],lon:pp[1]});
     stops.push({h:h, t:key+'T'+m.slice(11,16), ok:false, planned:true});
@@ -2040,11 +2075,18 @@ async function renderDay(){
             '">карта</a>'+
           '<a target="_blank" rel="noopener" href="'+it.h.url+'">объявление</a>'+
         '</div></div>';
-      const fullh=HOUSES.filter(function(x){return String(x.id)===String(it.h.id);})[0];
+      const fullh=H_IDX[String(it.h.id)];
       if(fullh) html+='<div class="incard">'+card(fullh)+'</div>';
     });
+    const mid=stops[Math.floor(stops.length/2)].h;
+    const dkey=dayKey(dayOff).replace(/-/g,'');
     html+='<div class="daysum">за рулём между домами <b>'+
-      Math.floor(total/60)+' ч '+(total%60)+' мин</b></div>';
+      Math.floor(total/60)+' ч '+(total%60)+' мин</b>'+
+      (mid&&mid.concelho?' · <a class="hotl" target="_blank" rel="noopener" '+
+        'href="https://www.google.com/travel/hotels?q='+
+        encodeURIComponent('hoteis baratos perto de '+mid.concelho)+
+        '&dates='+dkey+','+dkey+'">🛏 ночлег в районе '+mid.concelho+'</a>':'')+
+      '</div>';
   }
 
   // who was written to and never answered - the same screen, underneath
@@ -2095,7 +2137,7 @@ let lastOrder=[];
 function renderCard(id){
   const el=document.querySelector('[data-note="'+id+'"]');
   const art=el&&el.closest('.card');
-  const h=HOUSES.filter(function(x){return String(x.id)===String(id);})[0];
+  const h=H_IDX[String(id)];
   if(!art||!h){ render(); return; }
   const focused=document.activeElement===el;
   const caret=focused?[el.selectionStart,el.selectionEnd]:null;
@@ -2399,9 +2441,12 @@ document.addEventListener('input',function(e){
 });
 const qbox=document.getElementById('q'), qclr=document.getElementById('qx');
 qbox.addEventListener('input',function(e){
+  clearTimeout(qbox._t); qbox._t=setTimeout(function(){
   q=e.target.value.trim().toLowerCase();
   qclr.classList.toggle('on',!!q);
   unfreeze(); render();
+
+  },200);
 });
 qclr.addEventListener('click',function(){
   qbox.value=''; q=''; qclr.classList.remove('on'); qbox.focus(); unfreeze(); render();
