@@ -243,8 +243,18 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .twworse{color:var(--warn);font-weight:600}
 .twbetter{color:var(--accent);font-weight:600}
 .twacts{display:flex;gap:7px;margin-top:6px}
+.twtel{display:flex;gap:7px;margin-top:6px}
+.cpn{font-size:12.5px;padding:5px 10px;border-color:var(--line);
+ font-variant-numeric:tabular-nums}
+.twwa{text-decoration:none;font-size:12.5px;color:var(--paper);
+ background:#4caf7d;border-radius:8px;padding:6px 11px;font-weight:600}
+.twacts button{font-size:12.5px;padding:5px 10px;border-color:var(--accent);
+ color:var(--accent)}
 .twacts a{text-decoration:none;font-size:12.5px;color:var(--accent);
  border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+.newday{display:flex;align-items:baseline;gap:10px;margin:14px 0 8px;
+ padding:10px 14px;background:var(--accent-s);border-radius:11px;font-size:14px}
+.newday span{color:var(--soft);font-size:12.5px}
 .dupb{font-size:12px;padding:7px 12px;border-radius:9px;margin:4px 0;
  background:var(--accent-s);color:var(--accent)}
 .dupb.hard{background:var(--warn-s);color:var(--warn);font-weight:600}
@@ -432,6 +442,7 @@ button:active{transform:scale(.985)}
   <button data-f="skipped">🙅 Вне круга</button>
   <button data-f="starred">★ Со звёздами</button>
   <button data-f="dups">⚠ Двойники</button>
+  <button data-f="new">🆕 Новые</button>
   <button data-f="day">📋 Мой день</button>
   <button data-f="mine">С заметками</button>
   <button data-f="flag">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
@@ -761,7 +772,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-0732-64a9e9a';
+const BUILD='20260811-0754-75d7507';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -913,6 +924,7 @@ function keep(h){
  if(filt==='skipped'&&!isSkipped(h.id))return false;
  if(filt==='starred'&&!bestTier(h.id))return false;
  if(filt==='dups'&&!(h.dup_note&&!h.dup_of))return false;
+ if(filt==='new'&&!h.added_at)return false;
  // проигравший двойник не занимает место в общих списках - его инфа на победителе
  if(h.dup_of&&filt!=='dups'&&filt!=='gone'&&!q)return false;
  if(filt==='gone'&&!isSold(h))return false;
@@ -1115,10 +1127,28 @@ function twinBlock(h){
       (over?' <span class="'+(over>0?'twworse':'twbetter')+'">('+
         (over>0?'+':'−')+new Intl.NumberFormat('pt-PT').format(Math.abs(over))+' €'+
         (over>0?' дороже':' дешевле')+')</span>':'')+
+      (t.agent_phone?'<div class="twtel"><button class="cpn" data-cpnum="+351'+
+        digits9(t.agent_phone)+'">+351 '+digits9(t.agent_phone)+' — копировать</button>'+
+        '<a class="twwa" target="_blank" rel="noopener" href="'+waLink(t.agent_phone)+
+        '">WhatsApp</a></div>':'')+
       '<div class="twacts">'+
-      (t.agent_phone?'<a href="tel:'+telHref(t.agent_phone)+'">позвонить второму</a>':'')+
-      '<a target="_blank" rel="noopener" href="'+t.url+'">их объявление</a>'+
+      '<button data-msg="'+t.id+'">✍ письмо этому</button>'+
+      (t.agent_phone?'<a href="tel:'+telHref(t.agent_phone)+'">позвонить</a>':'')+
+      '<a target="_blank" rel="noopener" href="'+t.url+'">объявление</a>'+
       '</div></div>';
+  }).join('');
+}
+// новые дома: день за днём, свежие сверху, с именем того кто нашёл
+function newLedger(list){
+  const days={};
+  list.forEach(function(h){ (days[h.added_at]=days[h.added_at]||[]).push(h); });
+  return Object.keys(days).sort().reverse().map(function(d){
+    const hs=days[d].sort(function(a,b){ return (b.auto_score||0)-(a.auto_score||0); });
+    const who={};
+    hs.forEach(function(h){ who[h.added_by||'?']=(who[h.added_by||'?']||0)+1; });
+    const whoTxt=Object.keys(who).map(function(u){ return u+' — '+who[u]; }).join(' · ');
+    return '<div class="newday"><b>добавлены '+d.slice(8,10)+'.'+d.slice(5,7)+
+      '</b><span>'+whoTxt+'</span></div>'+hs.map(card).join('');
   }).join('');
 }
 function isSold(h){
@@ -2054,7 +2084,9 @@ function render(){
  }
  lastOrder=list.map(function(h){ return h.id; });
  document.getElementById('count').textContent=list.length+' из '+HOUSES.length+' домов';
- document.getElementById('grid').innerHTML=((filt==='mapa'||filt==='plan'||filt==='day')?'':list.map(card).join(''));
+ document.getElementById('grid').innerHTML=
+ (filt==='mapa'||filt==='plan'||filt==='day')?'' :
+ filt==='new' ? newLedger(list) : list.map(card).join('');
  renderRota(); renderMapa(list); renderStBar(); renderPlan(); renderDay();
  if(keepY!=null){
    const put=function(){
@@ -2149,6 +2181,9 @@ document.addEventListener('click',async e=>{
    }
    return;
  }
+ const cpn=e.target.closest('[data-cpnum]');
+ if(cpn){ copyText(cpn.dataset.cpnum).then(function(){ toast('Номер скопирован'); },
+   function(){ toast('Не получилось скопировать',true); }); return; }
  const mg=e.target.closest('[data-msg]');
  if(mg){
    const h=HOUSES.filter(function(x){return String(x.id)===String(mg.dataset.msg);})[0];
