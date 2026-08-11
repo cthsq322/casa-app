@@ -240,6 +240,8 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .msg,.skip,.cal,.conf,.cpday,.askaddr,.msgall{min-height:40px}
 .soonx{min-height:38px}
 .acts a,.lnk{min-height:40px;display:inline-flex;align-items:center;justify-content:center}
+.lnkp{flex-direction:column;gap:0;line-height:1.15}
+.lnkp small{font-size:10px;color:var(--soft);font-weight:600;letter-spacing:.04em}
 html{-webkit-text-size-adjust:100%}
 html,body{overflow-x:hidden;max-width:100%}
 img{max-width:100%;height:auto}
@@ -882,7 +884,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-1119-9c29b92';
+const BUILD='20260811-1120-3790941';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1625,7 +1627,7 @@ function card(h){
   '<div class="acts">'+
    (h.agent_phone?'<a class="call" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
 
-   '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление · <b>'+esc(portalName(h))+'</b></a>'+
+   '<a href="'+h.url+'" target="_blank" rel="noopener" class="lnkp">Объявление<small>'+esc(portalName(h))+'</small></a>'+
    (pinOf(h.id)&&!pinOf(h.id).lat
      ? '<a href="'+esc(pinOf(h.id).url)+'" target="_blank" rel="noopener" '+
        'title="точка от агента">📍 Карта</a>'
