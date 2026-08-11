@@ -178,7 +178,8 @@ body.searching .count{padding:8px 0 4px;font-weight:600;color:var(--accent)}
 .tag.rooms{background:transparent;border:1px solid var(--line);color:var(--soft)}
 .exc{font-size:13px;color:var(--soft)}
 .tels{display:flex;flex-direction:column;gap:6px}
-.telrow{display:flex;gap:6px;align-items:stretch}
+.telrow{display:flex;gap:6px;align-items:stretch;font-size:13.5px}
+.telrow .tel{padding:7px 10px;min-height:36px}
 .telrow .tel{flex:1}
 .wa{display:flex;align-items:center;text-decoration:none;font-size:13.5px;
  padding:0 14px;border-radius:9px;border:1px solid var(--accent);
@@ -208,7 +209,11 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .tiers{display:flex;gap:5px;align-items:center}
 .tiers button{padding:4px 11px;font-size:14px}
 .tiers button.on{background:var(--gold);border-color:var(--gold);color:#fff}
-.stg{display:flex;flex-direction:column;gap:4px}
+.stg{display:flex;flex-direction:column;gap:3px}
+.stg .st{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+ -webkit-overflow-scrolling:touch;padding-bottom:2px}
+.stg .st::-webkit-scrollbar{display:none}
+.stg .st button{flex:0 0 auto;white-space:nowrap}
 .stg .gl{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
  color:var(--soft)}
 .stg.why .gl{color:var(--warn)}
@@ -283,10 +288,11 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
  color:var(--soft);background:transparent}
 .twfacts{font-size:12.5px;color:var(--soft);margin-top:4px}
 .twtel{display:flex;gap:7px;margin-top:6px}
-.cpn{font-size:12.5px;padding:5px 10px;border-color:var(--line);
+.cpn{font-size:12px;padding:4px 9px;min-height:32px;border-color:var(--line);
  font-variant-numeric:tabular-nums}
-.twwa{text-decoration:none;font-size:12.5px;color:var(--paper);
- background:#4caf7d;border-radius:8px;padding:6px 11px;font-weight:600}
+.twwa{text-decoration:none;font-size:12px;color:var(--paper);
+ background:#4caf7d;border-radius:8px;padding:5px 9px;font-weight:600;
+ display:inline-flex;align-items:center}
 .twacts button{font-size:12.5px;padding:5px 10px;border-color:var(--accent);
  color:var(--accent)}
 .twacts a{text-decoration:none;font-size:12.5px;color:var(--accent);
@@ -319,6 +325,10 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .dayhead{display:flex;align-items:center;gap:10px;background:var(--accent);
  color:var(--paper);border-radius:13px 13px 0 0;padding:11px 14px;font-size:16px;margin-top:10px}
 .dayhead .cnt2{margin-left:auto;font-size:13px;opacity:.9}
+.dfilt{display:flex;gap:5px;margin-left:10px}
+.dfilt button{padding:3px 10px;font-size:12px;background:rgba(255,255,255,.18);
+ border-color:transparent;color:var(--paper);min-height:30px}
+.dfilt button.don{background:var(--paper);color:var(--accent);font-weight:700}
 .dnav{padding:2px 11px;background:rgba(255,255,255,.2);border-color:transparent;
  color:var(--paper);font-size:15px}
 .dayempty{background:var(--card);border:1px solid var(--line);border-top:0;
@@ -418,6 +428,8 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
 .msgall{margin-left:8px;padding:3px 10px;font-size:11.5px;border-color:var(--accent);
  color:var(--accent);background:transparent;font-weight:600}
 .msgall.done{background:var(--accent);color:var(--paper)}
+.huntb{padding:5px 11px;font-size:12.5px;min-height:38px;
+ border-color:var(--line);color:var(--soft)}
 .msg{padding:5px 12px;font-size:12.5px;border-color:var(--accent);
  color:var(--accent);font-weight:600}
 .msg.done{background:var(--accent);color:var(--paper)}
@@ -442,7 +454,7 @@ button, .acts a, .dacts a, .pinopen, .wa, .lnk{
   transition:background .12s ease, border-color .12s ease}
 .bar button, .stbar button, #people button, .dchip{
   min-height:38px; padding:7px 14px; font-size:13.5px}
-.st button{min-height:40px; padding:5px 12px; font-size:13px}
+.st button{min-height:36px; padding:5px 12px; font-size:13px}
 .tiers button{min-height:40px; min-width:44px}
 .acts a, .dacts a{min-height:38px; display:inline-flex; align-items:center;
   justify-content:center}
@@ -841,7 +853,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-0909-fb2bbd8';
+const BUILD='20260811-0918-3cdc9f4';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1063,6 +1075,7 @@ function noteBlock(h){
    (vBy(h.id)?'<span class="vby">'+vBy(h.id)+'</span>':'')+
    (vTime(h.id)?'<button class="cal" data-cal="'+h.id+'">в календарь</button>':'')+
    '<button class="msg" data-msg="'+h.id+'">✍ текст агенту</button>'+
+   '<button class="huntb" data-hunt="'+h.id+'">🔎 дубль?</button>'+
    '<button class="skip'+(isSkipped(h.id)?' on':'')+'" data-skip="'+h.id+'">'+
      (isSkipped(h.id)?'вернуть в круг':'убрать из круга')+'</button>'+
    (vTime(h.id)?'<button class="conf'+(vOk(h.id)?'':' off')+'" data-conf="'+h.id+'" '+
@@ -1272,6 +1285,19 @@ function swapCandidates(h){
       && !stVal(x.id) && !vTime(x.id);
   }).map(function(x){ return {h:x, km:kmBetween(h,x)}; })
     .sort(function(a,b){ return a.km-b.km; }).slice(0,3);
+}
+function gotoCard(id){
+  filt='all';
+  document.querySelectorAll('.bar button').forEach(function(b){
+    b.classList.toggle('on', b.dataset.f==='all'); });
+  const qb=document.getElementById('q');
+  if(qb) qb.value=String(id);
+  q=String(id);
+  render();
+  setTimeout(function(){
+    const c=document.querySelector('.card:has([data-note="'+id+'"])');
+    if(c) c.scrollIntoView({behavior:'smooth',block:'start'});
+  },120);
 }
 function isSold(h){
   return h.listing_status==='gone' || stWhy(h.id)==='vendido';
@@ -2062,6 +2088,7 @@ function dayTitle(off){
     pad2(d.getDate())+'.'+pad2(d.getMonth()+1);
 }
 let dayOff = 1;                                  // tomorrow by default
+let dayFilt='all';
 async function renderDay(){
   const box=document.getElementById('dayplan');
   if(!box) return;
@@ -2086,6 +2113,9 @@ async function renderDay(){
     stops.push({h:h, t:key+'T'+m.slice(11,16), ok:false, planned:true});
   });
   stops.sort(function(a,b){ return a.t.localeCompare(b.t); });
+  const shown = dayFilt==='ok' ? stops.filter(function(x){return x.ok&&!x.planned;})
+    : dayFilt==='plan' ? stops.filter(function(x){return x.planned||!x.ok;})
+    : stops;
 
   let chips='';
   for(let o=0;o<=6;o++){
@@ -2095,16 +2125,19 @@ async function renderDay(){
   }
   let html='<div class="dchips">'+chips+'</div>'+
     '<div class="dayhead"><b>'+dayTitle(dayOff)+'</b>'+
-    '<span class="cnt2">'+stops.length+' '+
-      (stops.length===1?'осмотр':stops.length<5?'осмотра':'осмотров')+'</span></div>';
+    '<span class="dfilt">'+[['all','все'],['ok','✓'],['plan','план']]
+      .map(function(x){return '<button data-dfilt="'+x[0]+'"'+
+        (dayFilt===x[0]?' class="don"':'')+'>'+x[1]+'</button>';}).join('')+'</span>'+
+    '<span class="cnt2">'+shown.length+' '+
+      (shown.length===1?'осмотр':shown.length<5?'осмотра':'осмотров')+'</span></div>';
 
-  if(!stops.length){
+  if(!shown.length){
     html+='<div class="dayempty">на этот день ничего не назначено</div>';
   } else {
-    await fillRoads(stops);
+    await fillRoads(shown);
     let total=0;
-    stops.forEach(function(it,i){
-      const prev=i?stops[i-1]:null;
+    shown.forEach(function(it,i){
+      const prev=i?shown[i-1]:null;
       const road=prev?ROADS[roadKey(prev.h,it.h)]:null;
       if(prev){
         const mins=road?Math.round(road.min):null;
@@ -2138,11 +2171,12 @@ async function renderDay(){
              :'https://www.google.com/maps/search/?api=1&query='+it.h.lat+','+it.h.lon)+
             '">карта</a>'+
           '<a target="_blank" rel="noopener" href="'+it.h.url+'">объявление</a>'+
+          '<a data-goto="'+it.h.id+'">карточка</a>'+
         '</div></div>';
       const fullh=H_IDX[String(it.h.id)];
       if(fullh) html+='<div class="incard">'+card(fullh)+'</div>';
     });
-    const mid=stops[Math.floor(stops.length/2)].h;
+    const mid=shown[Math.floor(shown.length/2)].h;
     const dkey=dayKey(dayOff).replace(/-/g,'');
     html+='<div class="daysum">за рулём между домами <b>'+
       Math.floor(total/60)+' ч '+(total%60)+' мин</b>'+
@@ -2307,6 +2341,8 @@ document.addEventListener('click',async e=>{
  }
  const dn=e.target.closest('[data-day]');
  if(dn){ dayOff+=parseInt(dn.dataset.day,10); renderDay(); return; }
+ const df=e.target.closest('[data-dfilt]');
+ if(df){ dayFilt=df.dataset.dfilt; renderDay(); return; }
  const ma=e.target.closest('[data-msgall]');
  if(ma){
    const h=HOUSES.filter(function(x){return String(x.id)===String(ma.dataset.msgall);})[0];
@@ -2326,6 +2362,21 @@ document.addEventListener('click',async e=>{
    }
    return;
  }
+ const hb=e.target.closest('[data-hunt]');
+ if(hb){
+   const hid=hb.dataset.hunt;
+   try{
+     const r=await fetch(API+'?t='+Date.now(),{cache:'no-store'});
+     const cur=await r.json();
+     cur.hunt=cur.hunt||{}; cur.hunt[hid]={by:me,at:stamp()};
+     await fetch(API,{method:'PUT',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify(cur)});
+     toast('Запрос на поиск дубля ушёл — результат появится в журнале');
+   }catch(e){ toast('Не получилось отправить запрос',true); }
+   return;
+ }
+ const gt=e.target.closest('[data-goto]');
+ if(gt){ gotoCard(gt.dataset.goto); return; }
  const ja=e.target.closest('[data-jadd]');
  if(ja){ const b=document.getElementById('jb'+ja.dataset.jadd);
    if(b){ b.style.display=b.style.display==='none'?'block':'none';
