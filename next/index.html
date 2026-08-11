@@ -884,7 +884,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-1358-b69c5c2';
+const BUILD='20260811-1429-8c2f6dc';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1301,7 +1301,7 @@ function newLedger(list){
 }
 function silentHours(id){
   const v=stVal(id);
-  if(['escrito','ligado','espera','semresp'].indexOf(v)<0) return null;
+  if(['escrito','ligado','espera','semresp'].indexOf(v)<0) return null;   // «уточняет» - не молчание
   if(vTime(id)) return null;                       // визит уже есть - не молчун
   const at=stAt(id); if(!at) return null;
   const hrs=(Date.now()-new Date(at.replace(' ','T')))/3600000;
@@ -1907,13 +1907,15 @@ function sortList(list){
 
 
 const ST_REACH=['escrito','ligado','semresp','semtel'];
-const ST_BACK=['espera','resposta','marcado','recusa'];
+const ST_BACK=['espera','resposta','pendente','marcado','recusa'];
 const ST_LABELS={escrito:'✍ написал',ligado:'☎ позвонил',
   semresp:'📵 не дозвонился',semtel:'🚫 нет номера',
-  espera:'⏳ жду',resposta:'↩ ответили',marcado:'📅 договорились',
+  espera:'⏳ жду',resposta:'↩ ответили',pendente:'🕐 ответил · уточняет',
+  marcado:'📅 договорились',
   recusa:'✕ отказ'};
 const ST_SHORT={escrito:'написал',ligado:'позвонил',semresp:'не дозвонился',
-  semtel:'нет номера',espera:'жду',resposta:'ответили',marcado:'договорились',
+  semtel:'нет номера',espera:'жду',resposta:'ответили',
+  pendente:'уточняет',marcado:'договорились',
   visto:'посмотрели',top:'фаворит',recusa:'отказ'};
 // why a no is a no - the part worth remembering
 const WHY={credito:'не под кредит',vendido:'уже продан',
