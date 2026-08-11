@@ -283,6 +283,10 @@ img{max-width:100%;height:auto}
  border:1px solid var(--line);border-radius:8px;color:var(--accent)}
 .hotl{color:var(--accent);text-decoration:none;font-weight:600}
 .slotdue{color:var(--warn);font-size:12px;font-weight:700;margin-left:8px}
+.acc{font-size:12.5px;font-weight:600;padding:7px 12px;margin:4px 0;border-radius:9px}
+.acc.good{background:var(--accent-s);color:var(--accent)}
+.acc.mid{background:var(--paper);color:var(--soft);border:1px solid var(--line)}
+.acc.bad{background:var(--warn-s);color:var(--warn)}
 .nophone{font-size:12px;color:var(--soft);padding:7px 12px;margin:4px 0;
  background:var(--paper);border:1px dashed var(--line);border-radius:9px}
 .journal{margin:4px 0}
@@ -885,7 +889,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-2203-d19771f';
+const BUILD='20260811-2208-7549158';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1525,6 +1529,14 @@ function card(h){
      '<span class="favo">'+favOwners(h.id).filter(function(u){return u!==me;})
        .join(', ')+'</span>':'')+
    '<span class="ref">#'+h.id+'</span></div>'+
+  (h.access_score!=null
+    ? '<div class="acc'+(h.access_score>=32?' good':h.access_score>=20?' mid':' bad')+'">'+
+      (h.access_score>=32?'🟢 развязка отличная':h.access_score>=20?'🟡 развязка средняя':'🔴 РАЗВЯЗКА ПЛОХАЯ')+
+      ' · '+(h.city_name||'')+' '+(h.dist_city_km!=null?Math.round(h.dist_city_km)+' км':'')+
+      (h.dist_highway_km!=null?' · трасса '+Math.round(h.dist_highway_km)+' км':'')+'</div>'
+    : '')+
+  ((h.photo_count||0)===0&&!isSold(h)
+    ? '<div class="acc bad">📷 ФОТО НЕТ — вслепую не ехать</div>' : '')+
   (!h.agent_phone&&!isSold(h)
     ? '<div class="nophone">☎ номера в объявлении нет'+
       (h.domain==='idealista.pt'
