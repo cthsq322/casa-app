@@ -179,7 +179,7 @@ body.searching .count{padding:8px 0 4px;font-weight:600;color:var(--accent)}
 .exc{font-size:13px;color:var(--soft)}
 .tels{display:flex;flex-direction:column;gap:6px}
 .telrow{display:flex;gap:6px;align-items:stretch;font-size:13.5px}
-.telrow .tel{padding:7px 10px;min-height:36px}
+.telrow .tel{padding:7px 10px;min-height:36px;flex:0 1 auto;font-size:13.5px}
 .telrow .tel{flex:1}
 .wa{display:flex;align-items:center;text-decoration:none;font-size:13.5px;
  padding:0 14px;border-radius:9px;border:1px solid var(--accent);
@@ -853,7 +853,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-0918-3cdc9f4';
+const BUILD='20260811-0926-6c1ad27';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1006,6 +1006,8 @@ function keep(h){
  if(filt==='day')return false;           // so does the day
  if(filt==='thisweek'&&(!(DAYOF[h.id]&&DAYOF[h.id].week)||outOfLoop(h.id)))return false;
  if(filt==='skipped'&&!isSkipped(h.id))return false;
+ // скрытый дом не мозолит в общих списках; найдётся поиском или в «Скрытых»
+ if(isSkipped(h.id)&&filt!=='skipped'&&filt!=='gone'&&!q)return false;
  if(filt==='starred'&&!bestTier(h.id))return false;
  if(filt==='dups'&&!(h.dup_note&&!h.dup_of))return false;
  if(filt==='new'&&!h.added_at)return false;
@@ -1022,6 +1024,9 @@ function keep(h){
  if(filt==='favall'&&!favOwners(h.id).length)return false;
  if(filt.indexOf('by:')===0&&stBy(h.id)!==filt.slice(3))return false;
  if(q){
+  // #35 - точный номер дома, больше ничего не подходит
+  const hash=q.trim().match(/^[#№]\s*(\d+)$/);
+  if(hash) return String(h.id)===hash[1];
   // a pasted link finds its own house whatever the tail looks like
   if(q.indexOf('/')>=0 && sameListing(h.url, q)) return true;
   if(q.indexOf('/')>=0 && !sameListing(h.url, q)) return false;
