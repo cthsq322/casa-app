@@ -267,6 +267,17 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
  border:1px solid var(--line);border-radius:8px;color:var(--accent)}
 .hotl{color:var(--accent);text-decoration:none;font-weight:600}
 .slotdue{color:var(--warn);font-size:12px;font-weight:700;margin-left:8px}
+.nophone{font-size:12px;color:var(--soft);padding:7px 12px;margin:4px 0;
+ background:var(--paper);border:1px dashed var(--line);border-radius:9px}
+.journal{margin:4px 0}
+.jrow{font-size:13px;padding:7px 11px;border-left:3px solid var(--line);
+ background:var(--paper);border-radius:0 9px 9px 0;margin:3px 0}
+.jrow .t{color:var(--soft);font-size:11.5px;margin-left:6px}
+.jadd{font-size:12.5px;padding:7px 13px;min-height:38px;border-color:var(--accent);
+ color:var(--accent);margin:2px 0}
+.jbox textarea{width:100%;min-height:64px}
+.jsave{font-size:13px;padding:8px 14px;min-height:40px;border-color:var(--accent);
+ color:var(--accent);font-weight:600;margin:4px 0}
 .twfold{display:block;width:100%;text-align:left;font-size:12.5px;
  padding:9px 12px;margin:4px 0;border:1px dashed var(--line);border-radius:9px;
  color:var(--soft);background:transparent}
@@ -559,7 +570,24 @@ function mergeNotes(fresh){
   [...map.values()].forEach(function(n){(out[n.house_id]=out[n.house_id]||[]).push(n);});
   return {notes:out,pending:pending};
 }
-let FAVS={}, REMIND={}, SKIP={}, PINS={}, TELS={}, SLOTS={};
+let FAVS={}, REMIND={}, SKIP={}, PINS={}, TELS={}, SLOTS={}, ENTRIES={};
+function packEntry(n){ return {h:n.house_id,a:n.author,t:n.text,u:n.at,e:n.eid}; }
+function unpackEntry(w){ return {house_id:w.h,author:w.a,text:w.t,at:w.u,eid:w.e}; }
+function entriesFlat(){ return Object.values(ENTRIES).flat(); }
+function entriesUnion(lists){
+  const m=new Map();
+  lists.forEach(function(arr){(arr||[]).forEach(function(n){ if(n.eid) m.set(n.eid,n); });});
+  const out={};
+  [...m.values()].forEach(function(n){(out[n.house_id]=out[n.house_id]||[]).push(n);});
+  return out;
+}
+function addEntry(id,text){
+  if(!(text||'').trim()) return;
+  const n={house_id:String(id),author:me,text:text.trim(),at:stamp(),
+           eid:id+'|'+me+'|'+Date.now().toString(36)};
+  (ENTRIES[n.house_id]=ENTRIES[n.house_id]||[]).push(n);
+  soil('j',id);
+}
 // a slot set by hand beats whatever the circle computed today
 const RUDAYS=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 function slotDue(id){
@@ -682,6 +710,7 @@ function cacheSave(){
   localStorage.setItem('casa_pins',JSON.stringify(PINS));
   localStorage.setItem('casa_tels',JSON.stringify(TELS));
   localStorage.setItem('casa_slots',JSON.stringify(SLOTS));
+  localStorage.setItem('casa_entries',JSON.stringify(entriesFlat()));
 }
 function cacheLoad(){
   try{
@@ -693,6 +722,7 @@ function cacheLoad(){
     PINS=JSON.parse(localStorage.getItem('casa_pins')||'{}');
     TELS=JSON.parse(localStorage.getItem('casa_tels')||'{}');
     SLOTS=JSON.parse(localStorage.getItem('casa_slots')||'{}');
+    ENTRIES=entriesUnion([JSON.parse(localStorage.getItem('casa_entries')||'[]')]);
     return JSON.parse(localStorage.getItem('casa_notes')||'[]');
   }catch(e){ STATUS={}; return []; }
 }
@@ -715,6 +745,7 @@ async function pull(){
     PINS=mergeMap(d.pins,PINS,'p');
     TELS=mergeMap(d.tels,TELS,'t');
     SLOTS=mergeMap(d.slots,SLOTS,'z');
+    ENTRIES=entriesUnion([entriesFlat(),(d2.entries||[]).map(unpackEntry)]);
     // старые телефоны ещё пишут заметки в первый store - подмешиваем оба
     return newestNotes([(d2.notes||[]).map(unpackNote), d.notes||[]]);
   }catch(e){ SYNCED=false; return cacheLoad(); }
@@ -786,7 +817,9 @@ async function push(mine){
         body:JSON.stringify(Object.assign({},body,{notes:undefined}))},),
       fetch(API2,{method:'PUT',
         headers:{'Content-Type':'application/json','Accept':'application/json'},
-        body:JSON.stringify({notes:body.notes.map(packNote),v:2})})]);
+        body:JSON.stringify({notes:body.notes.map(packNote),
+          entries:Object.values(entriesUnion([entriesFlat(),
+            (cur2.entries||[]).map(unpackEntry)])).flat().map(packEntry),v:2})})]);
     if(!ws[0].ok||!ws[1].ok) throw 0;          // не отпускаем DIRTY пока оба не взяли
     SYNCED=true;
     NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
@@ -808,7 +841,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-0904-093ec31';
+const BUILD='20260811-0909-fb2bbd8';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1009,6 +1042,16 @@ function noteBlock(h){
   '<div class="tiers"><span style="font-size:12px;color:var(--soft)">уровень</span>'+
    [1,2,3].map(t=>'<button data-tier="'+t+'" data-h="'+h.id+'"'+
      (mine&&mine.tier===t?' class="on"':'')+'>'+'★'.repeat(t)+'</button>').join('')+'</div>'+
+  ((ENTRIES[h.id]||[]).length
+    ? '<div class="journal">'+(ENTRIES[h.id]||[]).slice().sort(function(a,b){
+        return (b.at||'').localeCompare(a.at||'');}).map(function(n){
+        return '<div class="jrow"><b>'+esc(n.author)+'</b><span class="t">'+
+          (n.at||'').slice(5,16).replace(' ',' в ')+'</span> '+esc(n.text)+'</div>';
+      }).join('')+'</div>' : '')+
+  '<button class="jadd" data-jadd="'+h.id+'">+ заметка</button>'+
+  '<div class="jbox" id="jb'+h.id+'" style="display:none">'+
+    '<textarea data-jta="'+h.id+'" placeholder="'+(me||'')+': что произошло…"></textarea>'+
+    '<button class="jsave" data-jsave="'+h.id+'">сохранить</button></div>'+
   '<textarea data-note="'+h.id+'" placeholder="'+(me||'')+': твоя заметка…">'+
     esc(mine?mine.text:'')+'</textarea>'+
   '<div class="nsave '+((SAVEMSG[h.id]||{}).state||'idle')+'" data-nsave="'+h.id+'">'+
@@ -1342,6 +1385,12 @@ function card(h){
      '<span class="favo">'+favOwners(h.id).filter(function(u){return u!==me;})
        .join(', ')+'</span>':'')+
    '<span class="ref">#'+h.id+'</span></div>'+
+  (!h.agent_phone&&!isSold(h)
+    ? '<div class="nophone">☎ номера в объявлении нет'+
+      (h.domain==='idealista.pt'
+        ? ' — idealista прячет: открой «объявление» залогиненным или пиши в форму'
+        : ' — писать через «объявление»')+'</div>'
+    : '')+
   (h.dup_note?'<div class="dupb'+(h.dup_of?' hard':'')+'">'+
     (h.dup_of?'⚠ дубль дома #'+h.dup_of+' — ':'')+esc(h.dup_note)+'</div>':'')+
   (silentHours(h.id)
@@ -2277,6 +2326,20 @@ document.addEventListener('click',async e=>{
    }
    return;
  }
+ const ja=e.target.closest('[data-jadd]');
+ if(ja){ const b=document.getElementById('jb'+ja.dataset.jadd);
+   if(b){ b.style.display=b.style.display==='none'?'block':'none';
+     if(b.style.display==='block') b.querySelector('textarea').focus(); }
+   return; }
+ const js=e.target.closest('[data-jsave]');
+ if(js){ const id=js.dataset.jsave;
+   const ta=document.querySelector('[data-jta="'+id+'"]');
+   if(ta&&ta.value.trim()){
+     addEntry(id,ta.value);
+     const okp=await push(); renderCard(id); mark();
+     toast(okp?'Заметка добавлена':'Сохранено в телефоне',!okp);
+   }
+   return; }
  const tf=e.target.closest('[data-twfold]');
  if(tf){
    const b=document.getElementById('tw'+tf.dataset.twfold);
