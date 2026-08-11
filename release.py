@@ -72,7 +72,14 @@ def stage():
     print("дальше: прогнать тесты против next/, потом release.py live")
 
 
+def _no_test_title():
+    s = (HERE / "index.html").read_text(encoding="utf-8")
+    if "Дома · тест" in s:
+        raise SystemExit("СТОП: заголовок «тест» в корне index.html — стенд просочился в корень")
+
+
 def live():
+    _no_test_title()
     if not syntax_ok(NEXT / "index.html"):
         raise SystemExit("не переношу: скрипт в next/ не парсится")
     if not STAMP.exists():
