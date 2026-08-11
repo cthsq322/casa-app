@@ -79,7 +79,6 @@ def _no_test_title():
 
 
 def live():
-    _no_test_title()
     if not syntax_ok(NEXT / "index.html"):
         raise SystemExit("не переношу: скрипт в next/ не парсится")
     if not STAMP.exists():
@@ -90,6 +89,12 @@ def live():
         src = NEXT / f
         if src.exists():
             shutil.copy2(src, HERE / f)
+    # копия несла стендовый заголовок - живому сайту возвращается настоящий
+    idx = HERE / "index.html"
+    idx.write_text(idx.read_text(encoding="utf-8")
+                   .replace("<title>Дома · тест</title>", "<title>Дома</title>"),
+                   encoding="utf-8")
+    _no_test_title()
     STAMP.unlink()
     print("перенесено на рабочий адрес  ->  " + LIVE_URL)
     print("осталось: git add -A && git commit && git push")

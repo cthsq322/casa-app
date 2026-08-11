@@ -325,6 +325,9 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .dayhead{display:flex;align-items:center;gap:10px;background:var(--accent);
  color:var(--paper);border-radius:13px 13px 0 0;padding:11px 14px;font-size:16px;margin-top:10px}
 .dayhead .cnt2{margin-left:auto;font-size:13px;opacity:.9}
+.daymaps{display:block;text-align:center;background:var(--accent);
+ color:var(--paper);text-decoration:none;font-weight:700;font-size:14px;
+ padding:12px;border-radius:0}
 .dfilt{display:flex;gap:5px;margin-left:10px}
 .dfilt button{padding:3px 10px;font-size:12px;background:rgba(255,255,255,.18);
  border-color:transparent;color:var(--paper);min-height:30px}
@@ -853,7 +856,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-0941-6d25243';
+const BUILD='20260811-0948-8fc62ca';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -2134,7 +2137,17 @@ async function renderDay(){
       .map(function(x){return '<button data-dfilt="'+x[0]+'"'+
         (dayFilt===x[0]?' class="don"':'')+'>'+x[1]+'</button>';}).join('')+'</span>'+
     '<span class="cnt2">'+shown.length+' '+
-      (shown.length===1?'осмотр':shown.length<5?'осмотра':'осмотров')+'</span></div>';
+      (shown.length===1?'осмотр':shown.length<5?'осмотра':'осмотров')+'</span></div>'+
+    (function(){
+      const pts=shown.filter(function(x){return x.h.lat;})
+        .map(function(x){return x.h.lat+','+x.h.lon;});
+      if(!pts.length) return '';
+      const dest=pts[pts.length-1], way=pts.slice(0,-1).join('|');
+      return '<a class="daymaps" target="_blank" rel="noopener" href="'+
+        'https://www.google.com/maps/dir/?api=1&destination='+dest+
+        (way?'&waypoints='+encodeURIComponent(way):'')+
+        '&travelmode=driving">🗺 день в картах — поехали от меня</a>';
+    })();
 
   if(!shown.length){
     html+='<div class="dayempty">на этот день ничего не назначено</div>';
