@@ -79,7 +79,14 @@ body.searching .count{padding:8px 0 4px;font-weight:600;color:var(--accent)}
  border:1px solid var(--warn);border-radius:12px;padding:10px 13px;font-size:14px}
 .soon .s1{padding:2px 0}
 .soon.folded .s1{display:none}
-.soonx{float:right;margin:-4px -4px 0 8px;padding:3px 10px;font-size:11.5px;
+.soonhead{display:flex;align-items:center;gap:8px;font-size:13px}
+.soonbad{color:var(--warn);font-weight:700}
+.soon .s1{display:flex;align-items:baseline;gap:8px}
+.soon .sl{flex:1;min-width:0}
+.soon .sr{white-space:nowrap;display:flex;gap:6px}
+.soon .sr a{margin:0;border:1px solid var(--line);border-radius:8px;
+ padding:4px 10px;font-size:14px}
+.soonx{margin-left:auto;padding:4px 12px;font-size:11.5px;
  background:transparent;border-color:var(--warn);color:var(--warn)}
 .incard{margin:0 0 4px}
 .incard .card{border-radius:0;border-left:0;border-right:0;box-shadow:none;margin:0}
@@ -754,7 +761,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-0724-07a2f02';
+const BUILD='20260811-0732-64a9e9a';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1670,9 +1677,16 @@ function renderSoon(){
   }).filter(Boolean).concat(rem).concat(due)
    .sort(function(a,b){ return (b.due?1:0)-(a.due?1:0) || a.when-b.when; });
   if(!items.length){ box.innerHTML=''; box.className='soon'; return; }
-  box.className='soon on'+(localStorage.getItem('casa_soon_off')==='1'?' folded':'');
-  box.innerHTML='<button class="soonx" id="soonx">'+
-    (localStorage.getItem('casa_soon_off')==='1'?'показать':'свернуть')+'</button>'+
+  const folded=localStorage.getItem('casa_soon_off')==='1';
+  box.className='soon on'+(folded?' folded':'');
+  const overdue=items.filter(function(x){return x.due&&x.hours<0;}).length;
+  const next=items.filter(function(x){return !x.due;})[0];
+  box.innerHTML='<div class="soonhead"><b>⏰ '+items.length+'</b>'+
+    (overdue?' <span class="soonbad">просрочено '+overdue+'</span>':'')+
+    (folded&&next?' · ближайшее: '+pad2(next.when.getHours())+':'+
+      pad2(next.when.getMinutes())+' '+(next.h.concelho||'')
+     :'')+
+    '<button class="soonx" id="soonx">'+(folded?'показать':'свернуть')+'</button></div>'+
     items.map(function(it){
     const d=it.when;
     const midnight=new Date(now); midnight.setHours(0,0,0,0);
@@ -1682,13 +1696,14 @@ function renderSoon(){
       days===2?'послезавтра' : pad2(d.getDate())+'.'+pad2(d.getMonth()+1);
     if(it.due){
       const v=new Date(it.visit);
-      return '<div class="s1 due"><b>'+(it.hours<0?'просрочено — ':'ответить '+
+      return '<div class="s1 due"><span class="sl"><b>'+(it.hours<0?'просрочено — ':'ответить '+
         (days===0?'сегодня до ':days===1?'завтра до ':dayWord+' до '))+
         pad2(d.getHours())+':'+pad2(d.getMinutes())+'</b> · '+(it.h.concelho||'?')+
         ' · осмотр '+pad2(v.getDate())+'.'+pad2(v.getMonth()+1)+' в '+
-        pad2(v.getHours())+':'+pad2(v.getMinutes())+
-        (it.h.agent_phone?' <a href="tel:'+telHref(it.h.agent_phone)+'">позвонить</a>':'')+
-        '</div>';
+        pad2(v.getHours())+':'+pad2(v.getMinutes())+'</span>'+
+        '<span class="sr">'+
+        (it.h.agent_phone?'<a href="tel:'+telHref(it.h.agent_phone)+'">☎</a>':'')+
+        '</span></div>';
     }
     const word = it.note
       ? (it.hours<0&&!today ? 'просрочено напоминание' : dayWord+' напомнить')
@@ -1697,11 +1712,12 @@ function renderSoon(){
         ? 'через '+Math.max(1,Math.round(it.hours*60))+' мин · '+
           pad2(d.getHours())+':'+pad2(d.getMinutes())
       : dayWord+' в '+pad2(d.getHours())+':'+pad2(d.getMinutes());
-    return '<div class="s1"><b>'+word+'</b> · '+(it.h.concelho||'?')+
-      (it.by?' · '+it.by:'')+
-      (it.h.agent_phone?' <a href="tel:'+telHref(it.h.agent_phone)+'">позвонить</a>':'')+
-      (it.h.lat?' <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+
-        it.h.lat+','+it.h.lon+'">маршрут</a>':'')+'</div>';
+    return '<div class="s1"><span class="sl"><b>'+word+'</b> · '+(it.h.concelho||'?')+
+      (it.by?' · '+it.by:'')+'</span>'+
+      '<span class="sr">'+
+      (it.h.agent_phone?'<a href="tel:'+telHref(it.h.agent_phone)+'">☎</a>':'')+
+      (it.h.lat?'<a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+
+        it.h.lat+','+it.h.lon+'">🗺</a>':'')+'</span></div>';
   }).join('');
 }
 function renderMine(){
