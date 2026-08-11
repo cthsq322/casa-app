@@ -513,6 +513,7 @@ button:active{transform:scale(.985)}
   <button data-f="thisweek" class="sec">📆 Эта неделя</button>
   <button data-f="skipped" class="sec">🙅 Вне круга</button>
   <button data-f="starred" class="sec">★ Со звёздами</button>
+  <button data-f="norate">☆ Без оценки</button>
   <button data-f="dups" class="sec">⚠ Двойники</button>
   <button data-f="new" class="sec">🆕 Новые</button>
   <button data-f="day">📋 Мой день</button>
@@ -884,7 +885,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-1522-98fdfcf';
+const BUILD='20260811-2203-d19771f';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1040,6 +1041,7 @@ function keep(h){
  // скрытый дом не мозолит в общих списках; найдётся поиском или в «Скрытых»
  if(isSkipped(h.id)&&filt!=='skipped'&&filt!=='gone'&&!q)return false;
  if(filt==='starred'&&!bestTier(h.id))return false;
+ if(filt==='norate'&&(bestTier(h.id)||isSkipped(h.id)||isSold(h)))return false;
  if(filt==='dups'&&!(h.dup_note&&!h.dup_of))return false;
  if(filt==='new'&&!h.added_at)return false;
  // проигравший двойник не занимает место в общих списках - его инфа на победителе
