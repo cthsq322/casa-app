@@ -864,7 +864,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-1012-e3e69c4';
+const BUILD='20260811-1104-98e6414';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1315,6 +1315,13 @@ function gotoCard(id){
     if(c) c.scrollIntoView({behavior:'smooth',block:'start'});
   },120);
 }
+function portalName(h){
+  const d=(h.domain||(h.url||'').split('/')[2]||'').replace('www.','');
+  return {'iadportugal.pt':'iad','imovirtual.com':'imovirtual',
+          'casa.sapo.pt':'sapo','supercasa.pt':'supercasa',
+          'idealista.pt':'idealista','kwportugal.pt':'KW',
+          'era.pt':'ERA','remax.pt':'RE/MAX'}[d]||d.split('.')[0];
+}
 function isSold(h){
   return h.listing_status==='gone' || stWhy(h.id)==='vendido';
 }
@@ -1526,7 +1533,7 @@ function card(h){
   '<div class="acts">'+
    (h.agent_phone?'<a class="call" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
 
-   '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление</a>'+
+   '<a href="'+h.url+'" target="_blank" rel="noopener">Объявление · <b>'+esc(portalName(h))+'</b></a>'+
    (pinOf(h.id)&&!pinOf(h.id).lat
      ? '<a href="'+esc(pinOf(h.id).url)+'" target="_blank" rel="noopener" '+
        'title="точка от агента">📍 Карта</a>'
@@ -1714,7 +1721,7 @@ function renderMapa(list){
         '<div class="m">'+det.join(' &middot; ')+'</div>'+
         (vTime(h.id)?'<div class="m">визит '+vTime(h.id).replace('T',' ')+
           (vBy(h.id)?' · '+vBy(h.id):'')+'</div>':'')+
-        '<a href="'+h.url+'" target="_blank" rel="noopener">объявление</a>'+
+        '<a href="'+h.url+'" target="_blank" rel="noopener">объявление · '+esc(portalName(h))+'</a>'+
         (h.agent_phone?' &nbsp; <a href="tel:+351'+h.agent_phone+'">позвонить</a>':'')+
         ' &nbsp; <a href="https://www.google.com/maps/search/?api=1&query='+h.lat+','+h.lon+
         '" target="_blank" rel="noopener">маршрут</a></div>');
