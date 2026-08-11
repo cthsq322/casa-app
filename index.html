@@ -544,7 +544,7 @@ button:active{transform:scale(.985)}
 <script>
 let HOUSES=[],H_IDX={},TWINS={},NOTES={},STATUS={},VISITS={},sortBy=localStorage.getItem('casa_sort')||'score',filt='all',q='',me=localStorage.getItem('casa_user');
 
-const BLOB='019ff086-e21f-7ff5-8c23-8270cdaecbcc';   // A v2 - пересоздан 11.08 после смерти старого
+const BLOB='019ff336-cdf8-7434-a832-120080cf8449';   // A v3 - пересоздан 12.08   // A v2 - пересоздан 11.08 после смерти старого
 const API='https://jsonblob.com/api/jsonBlob/'+BLOB;
 const BLOB2='019fee0d-788d-7403-bf13-39370065df8e';   // заметки живут отдельно
 const API2='https://jsonblob.com/api/jsonBlob/'+BLOB2;
@@ -889,7 +889,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260811-2208-7549158';
+const BUILD='20260812-0045-2ba17df';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
