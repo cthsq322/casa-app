@@ -98,6 +98,7 @@ footer{color:var(--soft);font-size:13px;margin-top:30px;text-align:center;line-h
  background:var(--card);border:1px solid var(--line);border-radius:999px;
  padding:7px 14px;margin-bottom:14px}
 </style>
+<script src="frases-data.js"></script>
 
 <div class="wrap">
 <a class="back" href="index.html">&larr; casas</a>
@@ -261,65 +262,9 @@ Serhii e Violeta</p>
 <!-- ─── LONG TEMPLATES ─── -->
 <p class="lead">Antes de ir</p>
 
-<div class="step" id="s1" data-n="1">
- <h2>Primeiro contacto &mdash; estilo de rota</h2>
- <p class="why">Час привязан к маршруту, не к желанию. Снимает торг о дне. Сразу спрашивает про кредит.</p>
-
- <div class="f">
-  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
-  <p class="pt">Boa tarde.
-Refer&ecirc;ncia: <em>[TIPO, CIDADE]</em> &mdash; <em>[portal]</em> <em>[n&uacute;mero]</em>.
-
-Estamos a fazer uma rota pela zona centro e norte, com os dias j&aacute; montados &mdash; por isso as horas est&atilde;o presas ao caminho, n&atilde;o &agrave; nossa vontade.
-
-Esta casa fica-nos a jeito <em>[DIA]</em>, por volta das <em>[HORA]</em> &mdash; conseguimos entre as <em>[HORA]</em> e as <em>[HORA+1]</em>. Estamos neste momento em <em>[CIDADE ACTUAL]</em>, a <em>[N]</em> minutos da vossa casa. D&aacute;-lhe jeito?
-
-Se essa hora n&atilde;o servir, diga qual serve nesse mesmo dia &mdash; &eacute; mais f&aacute;cil trocar a hora do que o dia.
-
-Nestes dias queremos ver o m&aacute;ximo poss&iacute;vel para fechar uma lista curta. Se a casa nos agradar, voltamos numa segunda visita com calma e com fam&iacute;lia.
-
-Se tiver mais casas nesta zona &mdash; mesmo as que ainda n&atilde;o est&atilde;o no site &mdash; mande os links. O que nos interessar vemos no mesmo dia, logo a seguir &agrave; sua.
-
-Antes de avan&ccedil;armos: a casa passa no cr&eacute;dito e est&aacute; pronta para a avalia&ccedil;&atilde;o do banco? Temos aprova&ccedil;&atilde;o de dois bancos e vamos &agrave; avalia&ccedil;&atilde;o, por isso conseguimos fechar depressa.
-
-Cumprimentos,
-Serhii</p>
-  <p class="ru">Заменить: тип, cidade, портал, номер, день, часы (2×), текущий город, минуты.</p>
- </div>
-</div>
-
-<div class="step" id="s2" data-n="2">
- <h2>Блок вопросов про документы &mdash; ДО выезда</h2>
- <p class="why">Сегодня отсёк два дома без единого километра. Слать ВСЕГДА перед визитом.</p>
-
- <div class="f">
-  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
-  <p class="pt">Antes de agendarmos, algumas quest&otilde;es importantes:
-
-&bull; O im&oacute;vel &eacute; eleg&iacute;vel para financiamento banc&aacute;rio?
-&bull; Tem licen&ccedil;a de utiliza&ccedil;&atilde;o v&aacute;lida?
-&bull; A caderneta predial e a certid&atilde;o do registo est&atilde;o atualizadas?
-&bull; Tem certificado energ&eacute;tico? Qual &eacute; a classe?
-&bull; As plantas correspondem ao que est&aacute; constru&iacute;do &mdash; sem obras por legalizar?
-&bull; Prev&ecirc; algum problema para passar na avalia&ccedil;&atilde;o banc&aacute;ria?
-
-Perguntamos porque temos cr&eacute;dito aprovado e queremos avan&ccedil;ar r&aacute;pido &mdash; se houver alguma restri&ccedil;&atilde;o preferimos saber j&aacute;, e agradecemos a franqueza.</p>
-  <p class="ru">Отсекает дома с проблемами ДО поездки. Обязательно перед каждым визитом.</p>
- </div>
-</div>
-
-<div class="step" id="s3" data-n="3">
- <h2>Зона пожарного риска &mdash; юг (Pedróg&atilde;o, Castanheira, Figueiró, Alvai&aacute;zere, Ans&iacute;&atilde;o, Sert&atilde;)</h2>
- <p class="why">После пожаров 2017 банки отказывают по объектам в ZRI. Добавлять к блоку 2 для этих муниципий.</p>
-
- <div class="f">
-  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
-  <p class="pt">Uma quest&atilde;o adicional: o im&oacute;vel encontra-se em zona de risco de inc&ecirc;ndio? Existe alguma restri&ccedil;&atilde;o documental que impe&ccedil;a o financiamento banc&aacute;rio?
-
-Perguntamos porque noutra casa desta regi&atilde;o nos disseram que havia restri&ccedil;&otilde;es ligadas a essa classifica&ccedil;&atilde;o.</p>
-  <p class="ru">Прямо спросить про ZRI. Можно добавить к блоку выше одним сообщением.</p>
- </div>
-</div>
+<div id="s1"></div>
+<div id="s2"></div>
+<div id="s3"></div>
 
 <div class="step" id="s4" data-n="4">
  <h2>Licen&ccedil;a de utiliza&ccedil;&atilde;o «ждём от C&acirc;mara» &mdash; уточнить срок</h2>
@@ -356,31 +301,8 @@ Estamos com cr&eacute;dito aprovado em dois bancos e prontos a avan&ccedil;ar as
 
 <p class="lead">Rearranjos de hora</p>
 
-<div class="step" id="s6" data-n="6">
- <h2>Сдвинуть время визита</h2>
- <p class="why">Появился другой объект и маршрут сдвинулся.</p>
-
- <div class="f">
-  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
-  <p class="pt">Surgiu uma visita em <em>[CIDADE]</em> &agrave;s <em>[HORA]</em> que n&atilde;o conseguimos remarcar. Seria poss&iacute;vel passar a nossa visita de <em>[DIA]</em> das <em>[HORA]</em> para as <em>[NOVA HORA]</em>?
-
-Confirmamos presen&ccedil;a &mdash; continuamos muito interessados. Obrigado pela compreens&atilde;o.</p>
-  <p class="ru">Заменить: [CIDADE] нового объекта, его [HORA], [DIA], старый час, [NOVA HORA].</p>
- </div>
-</div>
-
-<div class="step" id="s7" data-n="7">
- <h2>Отмена с переносом &mdash; не сжигать контакт</h2>
- <p class="why">Не приехали — не молчать. Один message сохраняет отношения.</p>
-
- <div class="f">
-  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
-  <p class="pt">Pe&ccedil;o desculpa pelo inc&oacute;modo &mdash; hoje n&atilde;o conseguimos chegar a tempo.
-
-Gost&aacute;r&iacute;amos de manter o interesse na casa: seria poss&iacute;vel reagendar para <em>[DIA]</em> de manh&atilde;? Obrigado pela compreens&atilde;o.</p>
-  <p class="ru">Заменить [DIA]. Утро — потому что чаще соглашаются.</p>
- </div>
-</div>
+<div id="s6"></div>
+<div id="s7"></div>
 
 <p class="lead">Na visita e depois</p>
 
@@ -437,6 +359,41 @@ Vamos preparar uma proposta formal e enviamos ainda <em>[hoje/amanh&atilde;]</em
 <em style="font-style:normal;color:var(--mark)">colchetes</em> = trocar antes de enviar</footer>
 </div>
 <div class="toast" id="toast"></div>
+
+<script>
+/* ── Render picker sections from frases-data.js ─────────────
+   Sections s1, s2, s3, s6, s7 are placeholder <div id="sN">
+   elements filled here from window.FRASES_PICKER so that
+   editing frases-data.js updates both this page and index.html. */
+(function(){
+  if(!window.FRASES_PICKER) return;
+  function escHtml(s){
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+  function ptHtml(raw){
+    // [X] → <em>X</em>, preserve newlines via pre-wrap
+    return escHtml(raw).replace(/\[([^\]]+)\]/g,'<em>$1</em>');
+  }
+  window.FRASES_PICKER.forEach(function(fp){
+    var el=document.getElementById(fp.stepId);
+    if(!el) return;
+    var display=fp.pt_display||fp.pt_raw||'';
+    var noteHtml=fp.note_ru?'<p class="ru">'+escHtml(fp.note_ru)+'</p>':'';
+    el.className='step';
+    el.setAttribute('data-n',fp.stepNum);
+    el.innerHTML=
+      '<h2>'+escHtml(fp.title)+'</h2>'+
+      '<p class="why">'+escHtml(fp.why_ru)+'</p>'+
+      '<div class="f">'+
+        '<button class="cpbtn" aria-label="Copiar">&#x2398;</button>'+
+        '<p class="pt">'+ptHtml(display)+'</p>'+
+        noteHtml+
+      '</div>';
+  });
+})();
+</script>
 
 <script>
 var T=document.getElementById('toast'),tt;

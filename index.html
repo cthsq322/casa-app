@@ -561,7 +561,27 @@ button:active{transform:scale(.985)}
 .fi-house:active{opacity:.75}
 .fi-text{font-size:14px;line-height:1.5;word-break:break-word;white-space:pre-wrap}
 .feedempty{padding:20px 0;text-align:center;color:var(--soft);font-size:14px}
+/* ── MESSAGE PICKER ──────────────────────────────────────── */
+.mpback{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:30;
+ display:flex;align-items:flex-end;overscroll-behavior:contain}
+.mpdrawer{background:var(--card);border-radius:18px 18px 0 0;
+ padding:16px 16px 36px;width:100%;max-height:80vh;overflow-y:auto;
+ box-shadow:0 -4px 24px rgba(0,0,0,.22)}
+.mph{display:flex;align-items:center;margin:0 0 12px}
+.mptitle{font-weight:600;font-size:16px;flex:1;min-width:0;overflow:hidden;
+ text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.mpx{background:transparent;border:0;font-size:22px;padding:6px 8px;
+ color:var(--soft);line-height:1;cursor:pointer;flex:0 0 auto}
+.mpbtn{display:block;width:100%;text-align:left;padding:14px 16px;
+ border:1px solid var(--line);border-radius:12px;margin:6px 0;
+ font-size:15px;min-height:48px;background:var(--card);color:var(--ink);
+ cursor:pointer;font:inherit;line-height:1.3}
+.mpbtn:active{background:var(--accent-s);border-color:var(--accent)}
+.mpbtn.mpfire{border-color:var(--warn);color:var(--warn)}
+.mpbtn.mpfire:active{background:var(--warn-s)}
+.mpnote{font-size:12.5px;color:var(--soft);margin:8px 2px 0;line-height:1.4}
 </style></head><body>
+<script src="frases-data.js"></script>
 
 <div class="gate" id="gate"><div class="box">
   <h2>Дома</h2><p>Кто заходит?</p>
@@ -611,6 +631,16 @@ button:active{transform:scale(.985)}
 <footer id="foot"></footer>
 </div>
 <div id="toast"></div>
+<div id="mpback" class="mpback" style="display:none">
+  <div class="mpdrawer" id="mpdrawer">
+    <div class="mph">
+      <span class="mptitle" id="mptitle"></span>
+      <button class="mpx" id="mpx">✕</button>
+    </div>
+    <div id="mplist"></div>
+    <p class="mpnote" id="mpnote"></p>
+  </div>
+</div>
 
 <script>
 let HOUSES=[],H_IDX={},TWINS={},NOTES={},STATUS={},VISITS={},sortBy=localStorage.getItem('casa_sort')||'score',filt='all',q='',me=localStorage.getItem('casa_user');
@@ -962,7 +992,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260812-1101-401cccb';
+const BUILD='20260812-1213-51c2961';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1550,7 +1580,132 @@ function sameAgent(h){
 }
 
 
-// The link goes first, then this - so no greeting, straight to the point.
+// ── PORTAL DETECTION ─────────────────────────────────────────
+function portalRef(url){
+  var u=String(url||'');
+  var tests=[
+    [/idealista\.pt/,   'idealista',    /\/imovel\/(\d+)/i],
+    [/era\.pt/,         'ERA',          /\/(\d{5,})/],
+    [/imovirtual\.com/, 'Imovirtual',   /\/([A-Z0-9-]{5,})\/?(?:[?#]|$)/i],
+    [/remax\.pt/,       'RE\/MAX',      /(\d{5,})/],
+    [/supercasa\.pt/,   'SuperCasa',    /(\d{5,})/],
+    [/casa\.sapo\.pt/,  'Sapo',         /(\d{5,})/],
+    [/kwportugal\.pt/,  'KW',           /(\d{4,})/],
+    [/century21/,       'C21',          /(\d{4,})/],
+    [/iadportugal\.pt/, 'IAD',          /(\d{4,})/],
+  ];
+  for(var i=0;i<tests.length;i++){
+    if(tests[i][0].test(u)){
+      var m=u.match(tests[i][2]);
+      return {portal:tests[i][1],ref:m?m[1]:''};
+    }
+  }
+  var gm=u.match(/(\d{5,})/);
+  var host=u.match(/\/\/(?:www\.)?([^/]+)/);
+  return {portal:host?host[1]:'portal',ref:gm?gm[1]:''};
+}
+
+// ── WHEN STRING — new format: "hoje às 13h00" / "quinta-feira, 13/08, às 10h00"
+function buildWhenNew(h){
+  var vt=vTime(h.id);
+  if(vt){
+    var s=String(vt).replace('T',' ');
+    var date=s.slice(0,10), atRaw=s.slice(11,16);
+    var atH=atRaw.replace(':','h');
+    var now=new Date();
+    var todayISO=now.getFullYear()+'-'+pad2(now.getMonth()+1)+'-'+pad2(now.getDate());
+    if(date===todayISO) return 'hoje às '+atH;
+    var d=new Date(date+'T00:00');
+    var mm=date.slice(5,7), dd=date.slice(8,10);
+    var dias=['domingo','segunda-feira','terça-feira','quarta-feira',
+              'quinta-feira','sexta-feira','sábado'];
+    return dias[d.getDay()]+', '+dd+'/'+mm+', às '+atH;
+  }
+  var sl=slotFor(h.id);
+  if(sl&&sl.when&&sl.at){
+    var parts=(sl.when||'').split(' ');
+    var dateStr=parts[1]||'';
+    var atH=sl.at.replace(':','h');
+    var now2=new Date();
+    var td=pad2(now2.getDate())+'.'+pad2(now2.getMonth()+1);
+    if(dateStr===td) return 'hoje às '+atH;
+    var RU2PT={'понедельник':'segunda-feira','вторник':'terça-feira',
+      'среда':'quarta-feira','четверг':'quinta-feira','пятница':'sexta-feira',
+      'суббота':'sábado','воскресenье':'domingo','воскресенье':'domingo'};
+    var dia=RU2PT[parts[0]]||parts[0];
+    var data=dateStr.replace('.','/');
+    return dia+(data?', '+data:'')+', às '+atH;
+  }
+  return null;
+}
+
+// ── FIRST CONTACT — auto-filled from house data ───────────
+function buildFirstContact(h){
+  var NL='\n';
+  var pr=portalRef(h.url);
+  var tipo=h.bedrooms?'Moradia T'+h.bedrooms:'Moradia';
+  var cidade=h.concelho||h.town||'';
+  var ref=pr.portal+(pr.ref?' '+pr.ref:'');
+  var quando=buildWhenNew(h);
+  var parts=[
+    'Bom dia.',
+    'Referência: '+tipo+(cidade?', '+cidade:'')+' — '+ref+'.',
+    'Estamos a fazer uma rota pela zona, com os dias já montados — por isso as horas estão presas ao caminho, não à nossa vontade.',
+    quando
+      ?'Esta casa fica-nos a jeito '+quando+'. Dá-lhe jeito?'
+      :'Queríamos ver esta casa — que horas tem disponíveis nos próximos dias?'
+  ];
+  if(quando) parts.push('Se essa hora não servir, diga qual serve nesse mesmo dia — é mais fácil trocar a hora do que o dia.');
+  parts=parts.concat([
+    'Nestes dias queremos ver o máximo possível para fechar uma lista curta. Se a casa nos agradar, voltamos numa segunda visita com calma e com família.',
+    'Se tiver mais casas nesta zona — mesmo as que ainda não estão no site — mande os links.',
+    'Antes de avançarmos: a casa passa no crédito e está pronta para a avaliação do banco? Temos aprovação de dois bancos e vamos à avaliação, por isso conseguimos fechar depressa.',
+    'Cumprimentos,'+NL+'Serhii'
+  ]);
+  return parts.join(NL+NL);
+}
+
+// msgFor kept as alias — used by waSend in twinBlock
+function msgFor(h){ return buildFirstContact(h); }
+
+// ── PICKER HELPERS ────────────────────────────────────────
+var FIRE_CONCELHOS=(window.FRASES_FIRE_CONCELHOS||
+  ['Pedrógão Grande','Castanheira de Pêra','Figueiró dos Vinhos',
+   'Alvaiázere','Ansião','Sertã']);
+function isFireRisk(h){
+  var c=(h.concelho||'').trim().toLowerCase();
+  return FIRE_CONCELHOS.some(function(f){return f.toLowerCase()===c;});
+}
+function buildPickerText(fp,h){
+  if(fp.dynamic) return buildFirstContact(h);
+  return fp.pt_raw||'';
+}
+function closePicker(){
+  var b=document.getElementById('mpback');
+  if(b) b.style.display='none';
+  document.body.style.overflow='';
+}
+function openPicker(h){
+  var fire=isFireRisk(h);
+  var pr=portalRef(h.url);
+  var tipo=h.bedrooms?'T'+h.bedrooms:'';
+  var titulo=[tipo,h.concelho||h.town].filter(Boolean).join(' · ');
+  document.getElementById('mptitle').textContent=titulo||'Выбери шаблон';
+  var fps=(window.FRASES_PICKER||[]).slice();
+  if(fire) fps.sort(function(a,b){return (b.fireRisk?1:0)-(a.fireRisk?1:0);});
+  var list=document.getElementById('mplist');
+  list.innerHTML=fps.map(function(fp){
+    var cls='mpbtn'+(fp.fireRisk?' mpfire':'');
+    return '<button class="'+cls+'" data-pick="'+esc(fp.id)+'">'+esc(fp.label)+'</button>';
+  }).join('');
+  var note=document.getElementById('mpnote');
+  if(note) note.textContent=fire?'⚠ Zona de incêndio — pergunta já em primeiro':'';
+  var back=document.getElementById('mpback');
+  back.dataset.hid=h.id;
+  back.style.display='flex';
+  document.body.style.overflow='hidden';
+}
+
 // several houses, one agent, one message
 function msgForGroup(h){
   const all=[h].concat(sameAgent(h));
@@ -2901,12 +3056,40 @@ document.addEventListener('click',async e=>{
  const cpn=e.target.closest('[data-cpnum]');
  if(cpn){ copyText(cpn.dataset.cpnum).then(function(){ flashCp(cpn); toast('Номер скопирован'); },
    function(){ toast('Не получилось скопировать',true); }); return; }
+ const mpxb=e.target.closest('#mpx');
+ if(mpxb){ closePicker(); return; }
+ if(e.target.id==='mpback'){ closePicker(); return; }
  const mg=e.target.closest('[data-msg]');
  if(mg){
    const h=HOUSES.filter(function(x){return String(x.id)===String(mg.dataset.msg);})[0];
-   if(h){ mg.classList.add('done');
-     setTimeout(function(){ mg.classList.remove('done'); },1800);
-     sendText(msgFor(h), 'Текст'); }
+   if(h) openPicker(h);
+   return;
+ }
+ const pk=e.target.closest('[data-pick]');
+ if(pk){
+   const back=document.getElementById('mpback');
+   const hid=back?back.dataset.hid:null;
+   const h=hid?HOUSES.find(function(x){return String(x.id)===String(hid);}):null;
+   if(!h) return;
+   const fp=(window.FRASES_PICKER||[]).find(function(x){return x.id===pk.dataset.pick;});
+   if(!fp) return;
+   const text=buildPickerText(fp,h);
+   const firstMobile=h.agent_phone?telList(h.agent_phone).find(isMobile):null;
+   if(fp.id==='primeiro-contacto'&&stVal(h.id)!=='escrito'){
+     setStatus(h.id,'escrito'); push().then(mark);
+   }
+   copyText(text).then(function(){
+     closePicker();
+     if(firstMobile){
+       const waUrl='https://wa.me/351'+digits9(firstMobile)+'?text='+encodeURIComponent(text);
+       const a=document.createElement('a');
+       a.href=waUrl;a.target='_blank';a.rel='noopener noreferrer';
+       document.body.appendChild(a);a.click();document.body.removeChild(a);
+       toast('Copiado — a abrir WhatsApp');
+     } else {
+       toast(h.agent_phone?'Copiado — só fixo, sem WhatsApp':'Copiado — sem número');
+     }
+   },function(){ showText(text); closePicker(); });
    return;
  }
  const aa=e.target.closest('[data-askaddr]');
