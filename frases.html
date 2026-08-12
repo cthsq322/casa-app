@@ -1,4 +1,5 @@
-<title>O que escrever &middot; compra de casa</title>
+<title>Frases de campo &middot; compra de casa</title>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 :root{
@@ -20,6 +21,7 @@
   --line:#dde2da;--accent:#2e6b4f;--accent-s:#e8efe9;--mark:#c25a2b;--mark-s:#f7ece5;
   --rail:#c5d2c8;--sh:0 1px 2px rgba(22,32,27,.06),0 8px 20px -12px rgba(22,32,27,.18);}
 
+html,body{overflow-x:hidden;max-width:100%}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);
   font:400 16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -28,7 +30,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 
 h1{font:600 27px/1.15 ui-serif,Georgia,"Times New Roman",serif;margin:0 0 6px;
   letter-spacing:-.01em;text-wrap:balance}
-.sub{color:var(--soft);font-size:14.5px;margin:0}
+.sub{color:var(--soft);font-size:14.5px;margin:0 0 4px}
 .sub em{font-style:normal;background:var(--mark-s);color:var(--mark);
   padding:1px 5px;border-radius:5px}
 
@@ -37,11 +39,12 @@ nav::-webkit-scrollbar{display:none}
 nav a{flex:0 0 auto;text-decoration:none;color:var(--ink);background:var(--card);
   border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13.5px;
   white-space:nowrap}
+nav a.hot{background:var(--accent);color:var(--paper);border-color:var(--accent)}
 
 .lead{font:600 13px/1 -apple-system,sans-serif;letter-spacing:.09em;
   text-transform:uppercase;color:var(--soft);margin:30px 0 2px}
 
-/* the script: a numbered spine you walk down */
+/* spine */
 .step{position:relative;padding-left:38px;margin:18px 0}
 .step:before{content:attr(data-n);position:absolute;left:0;top:0;
   width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--paper);
@@ -53,28 +56,35 @@ nav a{flex:0 0 auto;text-decoration:none;color:var(--ink);background:var(--card)
 .step > h2{font:600 17px/1.25 ui-serif,Georgia,serif;margin:1px 0 3px}
 .step > .why{margin:0 0 10px;font-size:13.5px;color:var(--soft)}
 
-.f{background:var(--card);border:1px solid var(--line);border-radius:13px;
-  box-shadow:var(--sh);padding:13px 15px;margin-bottom:9px;cursor:pointer}
+/* big phrase card */
+.f{position:relative;background:var(--card);border:1px solid var(--line);
+  border-radius:13px;box-shadow:var(--sh);padding:13px 46px 13px 15px;
+  margin-bottom:9px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .f:active{background:var(--accent-s)}
-.pt{font-size:16px;margin:0;white-space:pre-wrap}
+.pt{font-size:16px;margin:0;white-space:pre-wrap;line-height:1.55}
 .pt em{font-style:normal;background:var(--mark-s);color:var(--mark);
   padding:1px 5px;border-radius:5px;font-size:14.5px}
-.ru{margin:6px 0 0;font-size:13.5px;color:var(--soft);line-height:1.45}
+.ru{margin:8px 0 0;font-size:13.5px;color:var(--soft);line-height:1.45}
 .f.done .pt{color:var(--mark)}
 
-/* what he answers -> what you send next */
-.br{border-left:2px solid var(--rail);padding-left:13px;margin:12px 0 0}
-.brl{display:block;font-size:13px;color:var(--accent);font-weight:600;margin-bottom:6px}
-.br .f{margin-bottom:8px}
+/* compact mini cards for quick phrases */
+.f--mini{border-radius:9px;padding:10px 46px 10px 13px;margin:3px 0;box-shadow:none}
+.f--mini .pt{font-size:15px;white-space:normal;line-height:1.4}
+.f--mini.done .pt{color:var(--mark)}
 
-section.lib{background:var(--card);border:1px solid var(--line);border-radius:14px;
-  box-shadow:var(--sh);margin:14px 0;overflow:hidden;scroll-margin-top:12px}
-section.lib .sh{padding:13px 15px;background:var(--accent-s);
-  border-bottom:1px solid var(--line)}
-section.lib .sh h2{font:600 17px/1.2 ui-serif,Georgia,serif;margin:0;color:var(--accent)}
-section.lib .sh p{margin:3px 0 0;font-size:13px;color:var(--soft)}
-section.lib .f{border:0;border-top:1px solid var(--line);border-radius:0;
-  box-shadow:none;margin:0;background:transparent}
+/* copy button */
+.cpbtn{position:absolute;top:10px;right:10px;
+  background:var(--accent-s);border:1px solid var(--line);border-radius:8px;
+  color:var(--accent);font-size:17px;line-height:1;padding:6px 9px;
+  cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.cpbtn:active{background:var(--accent);color:var(--paper)}
+.f.done .cpbtn{background:var(--accent);color:var(--paper)}
+
+/* subgroup labels inside a step */
+.subt{font:600 11.5px/1 -apple-system,sans-serif;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--soft);margin:14px 0 5px;
+  padding-left:0}
+.subt:first-child{margin-top:2px}
 
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(90px);
   background:var(--ink);color:var(--paper);padding:11px 20px;border-radius:999px;
@@ -91,238 +101,298 @@ footer{color:var(--soft);font-size:13px;margin-top:30px;text-align:center;line-h
 
 <div class="wrap">
 <a class="back" href="index.html">&larr; casas</a>
-<h1>O que escrever</h1>
-<p class="sub">Pela ordem da conversa. Toque para copiar. O que est&aacute;
-<em>assim</em> &mdash; trocar antes de enviar. O link da casa colas tu no fim.</p>
+<h1>Frases de campo</h1>
+<p class="sub">Situa&ccedil;&otilde;es reais. Toque no card ou em &#x2398; para copiar.
+O que est&aacute; <em>assim</em> &mdash; trocar antes de enviar.</p>
 
 <nav>
-  <a href="#fav">Мои</a><a href="#g">Conversa</a><a href="#l1">Na casa</a><a href="#l2">Papelada</a>
-  <a href="#l3">Pre&ccedil;o</a><a href="#l4">Mais casas</a>
+  <a class="hot" href="#s0">&#9889;&nbsp;Dia</a>
+  <a href="#s1">1&nbsp;Contacto</a>
+  <a href="#s2">2&nbsp;Docs</a>
+  <a href="#s3">3&nbsp;Inc&ecirc;ndio</a>
+  <a href="#s4">4&nbsp;Licen&ccedil;a</a>
+  <a href="#s5">5&nbsp;Banco&nbsp;n&atilde;o</a>
+  <a href="#s6">6&nbsp;Hora</a>
+  <a href="#s7">7&nbsp;Cancelar</a>
+  <a href="#s8">8&nbsp;2&ordf;&nbsp;visita</a>
+  <a href="#s9">9&nbsp;+Casas</a>
+  <a href="#s10">10&nbsp;Recusa</a>
+  <a href="#s11">11&nbsp;Proposta</a>
 </nav>
 
-<p class="lead" id="g">A conversa</p>
+<!-- ─── SECTION 0: QUICK PHRASES ─── -->
+<div class="step" id="s0" data-n="&#9889;">
+ <h2>В день визита &mdash; быстрые фразы</h2>
+ <p class="why">Без подстановок. Копировать и слать как есть &mdash; любому агенту, мгновенно.</p>
 
-<div class="step" id="fav" data-n="&#9733;">
- <h2>Мои постоянные ответы</h2>
+ <p class="subt">Перед выездом</p>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Pode enviar a localiza&ccedil;&atilde;o exata no Google Maps, por favor?</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Confirma a morada exata da casa?</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Confirmamos a visita de hoje. At&eacute; j&aacute;!</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Como o reconhecemos no local?</p>
+ </div>
 
- <div class="f"><p class="pt">Indique o local exato onde devemos ir &mdash; mande o pin do Google Maps. Vamos num <em>BMW azul</em>.</p>
- <p class="ru">ПЕРЕД КАЖДЫМ ВИЗИТОМ: точный пин + мы на синем BMW (чтобы не искали друг друга).</p></div>
+ <p class="subt">В дороге</p>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Estamos a caminho.</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Estamos a cerca de 30 minutos.</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Estamos a 10 minutos.</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Estamos quase a chegar.</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Vamos atrasar-nos cerca de 15 minutos, pe&ccedil;o desculpa. J&aacute; estamos a caminho.</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">O tr&acirc;nsito est&aacute; complicado &mdash; podemos chegar um pouco mais tarde. Aviso quando estiver perto.</p>
+ </div>
 
- <div class="f"><p class="pt">Quais outros im&oacute;veis seus podemos ver connosco? Mande os links dos que tem na zona centro/norte com terreno at&eacute; 300.000&euro; &mdash; eu digo-lhe em que dias conseguimos passar, e v&ecirc; se lhe d&aacute; para organizar as visitas.</p>
- <p class="ru">«Скиньте ваши другие объекты — я скажу, в какие дни сможем, а вы организуете просмотры».</p></div>
+ <p class="subt">На месте</p>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">J&aacute; cheg&aacute;mos. Onde exatamente o encontramos?</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Estamos &agrave; porta da casa.</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Estamos no ponto que enviou.</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">N&atilde;o conseguimos encontrar a casa. Pode ligar-nos, por favor?</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Pode ligar-nos? &Eacute; mais f&aacute;cil por telefone.</p>
+ </div>
 
- <div class="f"><p class="pt">O que procuramos, para nos poder sugerir outras casas:<br><br>
-&mdash; Casa para viver todo o ano, habit&aacute;vel ou com obras ligeiras (n&atilde;o queremos ru&iacute;na).<br>
-&mdash; Terreno &agrave; volta, a partir de 1.500 m&sup2;, ideal 3.000+. &Eacute; o mais importante para n&oacute;s.<br>
-&mdash; Bons acessos: estrada asfaltada at&eacute; &agrave; porta, sem caminhos de terra. Perto de vila com servi&ccedil;os, at&eacute; 15-20 minutos.<br>
-&mdash; Sem vizinhos colados.<br>
-&mdash; At&eacute; 300.000&euro;, com cr&eacute;dito pr&eacute;-aprovado e capitais pr&oacute;prios.<br>
-&mdash; Zona centro e norte: Leiria, Coimbra, Viseu, Guarda, Aveiro, Porto interior, Minho. Rio n&atilde;o &eacute; prioridade.<br>
-&mdash; Obrigat&oacute;rio: licen&ccedil;a de utiliza&ccedil;&atilde;o em ordem e casa que passe no cr&eacute;dito.<br><br>
-Se tiver algo assim &mdash; mesmo fora dos portais &mdash; mande os links por WhatsApp. Decidimos esta semana.</p>
- <p class="ru">ПОЛНЫЙ ПРОФИЛЬ: что ищем — дом для жизни, земля от 1500 (лучше 3000+), хорошая асфальтовая дорога, без соседей вплотную, до 300k, центр-север, лицензия обязательна.</p></div>
+ <p class="subt">После</p>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Obrigado pelo tempo de hoje.</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Vamos analisar com calma e damos not&iacute;cias ainda hoje.</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Precisamos de ver mais algumas casas antes de decidir. Damos not&iacute;cias esta semana.</p>
+ </div>
 
- <div class="f"><p class="pt">Sobre a avalia&ccedil;&atilde;o: temos pr&eacute;-aprova&ccedil;&atilde;o de cr&eacute;dito, e o valor final do banco depende da avalia&ccedil;&atilde;o do im&oacute;vel &mdash; se a avalia&ccedil;&atilde;o sair bem, o banco acompanha. Al&eacute;m disso temos capitais pr&oacute;prios e apoio da fam&iacute;lia. Se a casa nos convencer e a documenta&ccedil;&atilde;o estiver em ordem, assinamos o CPCV e fechamos.</p>
- <p class="ru">Про оценку: есть пред-одобрение, финальная сумма банка зависит от оценки дома — выйдет хорошо, банк добавит. Плюс свои средства и помощь семьи. Дом убедит и документы в порядке — подписываем CPCV и закрываем. (Цифру не называем — козырь в торге.)</p></div>
-
- <div class="f"><p class="pt">Estamos a subir de Lisboa a fazer uma rota pela zona centro e norte, com visitas j&aacute; marcadas &mdash; as horas est&atilde;o presas ao caminho, n&atilde;o &agrave; nossa vontade. Se essa hora n&atilde;o servir, diga qual serve nesse mesmo dia.</p>
- <p class="ru">Едем маршрутом из Лиссабона, часы привязаны к дороге. Не подходит час — предложите другой в тот же день.</p></div>
-
- <div class="f"><p class="pt">Se tiver mais casas nesta zona com este equil&iacute;brio &mdash; casa habit&aacute;vel + bom terreno, at&eacute; 300.000&euro; &mdash; mesmo as que ainda n&atilde;o est&atilde;o nos portais, mande os links por WhatsApp. Somos compradores reais e estamos na zona esta semana.</p>
- <p class="ru">Есть ещё дома с таким балансом (жилой дом + земля, до 300k) — даже не с порталов — кидайте ссылки в WhatsApp.</p></div>
-
- <div class="f"><p class="pt">Hoje a rota apertou e n&atilde;o conseguimos chegar a tempo &mdash; pedimos desculpa. Conseguimos amanh&atilde; &agrave;s <em>13h30</em>? Estamos mesmo interessados.</p>
- <p class="ru">Сегодня маршрут сжался, не успеваем — извинение + перенос на завтра с новым часом.</p></div>
-
- <div class="f"><p class="pt">Confirmado, at&eacute; j&aacute;. Se houver qualquer mudan&ccedil;a, avise por WhatsApp &mdash; respondemos ao minuto.</p>
- <p class="ru">Подтверждено. Изменения — в WhatsApp, отвечаем за минуту.</p></div>
-
- <div class="f"><p class="pt">Obrigado pelo tempo e pela visita. Esta casa n&atilde;o &eacute; para n&oacute;s &mdash; mas se tiver outras na zona com mais terreno, diga. Boa sorte com a venda!</p>
- <p class="ru">Вежливый отказ после осмотра + просьба других вариантов.</p></div>
-
- <div class="f"><p class="pt">E qual &eacute; a morada exata para onde devo ir? Pode mandar o pin do Google Maps?</p>
- <p class="ru">Точный адрес/пин на карте — куда ехать?</p></div>
+ <p class="subt">Если что-то сорвалось</p>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Surgiu um imprevisto e hoje n&atilde;o conseguimos chegar. Pe&ccedil;o desculpa pelo inc&oacute;modo &mdash; podemos remarcar?</p>
+ </div>
+ <div class="f f--mini">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Fic&aacute;mos presos numa visita anterior. Conseguimos ainda hoje mais tarde?</p>
+ </div>
 </div>
 
-<div class="step" data-n="1">
- <h2>A primeira mensagem</h2>
- <p class="why">Curta. S&oacute; o que interessa: queremos ver, temos o dinheiro,
- a casa d&aacute; para cr&eacute;dito?</p>
+<!-- ─── LONG TEMPLATES ─── -->
+<p class="lead">Antes de ir</p>
 
- <div class="f"><p class="pt">Bom dia. Gost&aacute;vamos de ver esta casa. Temos o cr&eacute;dito j&aacute; aprovado no banco e a entrada pronta. A casa passa no cr&eacute;dito? Se sim, quando podemos ir ver?</p>
- <p class="ru">Добрый день. Хотели бы посмотреть этот дом. Кредит уже одобрен в банке, первый взнос готов. Дом проходит под кредит? Если да — когда можем приехать посмотреть?</p></div>
+<div class="step" id="s1" data-n="1">
+ <h2>Primeiro contacto &mdash; estilo de rota</h2>
+ <p class="why">Час привязан к маршруту, не к желанию. Снимает торг о дне. Сразу спрашивает про кредит.</p>
 
- <div class="f"><p class="pt">Bom dia. Andamos &agrave; procura de casa nesta zona &mdash; casa com terreno &agrave; volta, fora da povoa&ccedil;&atilde;o, sem vizinhos colados. Esta interessa-nos. Temos o cr&eacute;dito aprovado e a entrada pronta. Podemos ir ver esta semana?</p>
- <p class="ru">Добрый день. Мы ищем дом в этом районе — с землёй вокруг, за посёлком, без соседей вплотную. Этот нам подходит. Кредит одобрен, взнос готов. Можем приехать посмотреть на этой неделе?</p></div>
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Boa tarde.
+Refer&ecirc;ncia: <em>[TIPO, CIDADE]</em> &mdash; <em>[portal]</em> <em>[n&uacute;mero]</em>.
+
+Estamos a fazer uma rota pela zona centro e norte, com os dias j&aacute; montados &mdash; por isso as horas est&atilde;o presas ao caminho, n&atilde;o &agrave; nossa vontade.
+
+Esta casa fica-nos a jeito <em>[DIA]</em>, por volta das <em>[HORA]</em> &mdash; conseguimos entre as <em>[HORA]</em> e as <em>[HORA+1]</em>. Estamos neste momento em <em>[CIDADE ACTUAL]</em>, a <em>[N]</em> minutos da vossa casa. D&aacute;-lhe jeito?
+
+Se essa hora n&atilde;o servir, diga qual serve nesse mesmo dia &mdash; &eacute; mais f&aacute;cil trocar a hora do que o dia.
+
+Nestes dias queremos ver o m&aacute;ximo poss&iacute;vel para fechar uma lista curta. Se a casa nos agradar, voltamos numa segunda visita com calma e com fam&iacute;lia.
+
+Se tiver mais casas nesta zona &mdash; mesmo as que ainda n&atilde;o est&atilde;o no site &mdash; mande os links. O que nos interessar vemos no mesmo dia, logo a seguir &agrave; sua.
+
+Antes de avan&ccedil;armos: a casa passa no cr&eacute;dito e est&aacute; pronta para a avalia&ccedil;&atilde;o do banco? Temos aprova&ccedil;&atilde;o de dois bancos e vamos &agrave; avalia&ccedil;&atilde;o, por isso conseguimos fechar depressa.
+
+Cumprimentos,
+Serhii</p>
+  <p class="ru">Заменить: тип, cidade, портал, номер, день, часы (2×), текущий город, минуты.</p>
+ </div>
 </div>
 
-<div class="step" data-n="2">
- <h2>Antes de ir at&eacute; l&aacute;</h2>
- <p class="why">Quatro coisas. Se faltar uma, o banco n&atilde;o d&aacute; o dinheiro
- e n&atilde;o vale a pena fazer a viagem.</p>
+<div class="step" id="s2" data-n="2">
+ <h2>Блок вопросов про документы &mdash; ДО выезда</h2>
+ <p class="why">Сегодня отсёк два дома без единого километра. Слать ВСЕГДА перед визитом.</p>
 
- <div class="f"><p class="pt">Antes de irmos, s&oacute; para saber:
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Antes de agendarmos, algumas quest&otilde;es importantes:
 
-A casa tem licen&ccedil;a de utiliza&ccedil;&atilde;o?
-Est&aacute; sem d&iacute;vidas e sem hipoteca?
-A &aacute;rea na caderneta est&aacute; certa?
-Tem certificado energ&eacute;tico?
+&bull; O im&oacute;vel &eacute; eleg&iacute;vel para financiamento banc&aacute;rio?
+&bull; Tem licen&ccedil;a de utiliza&ccedil;&atilde;o v&aacute;lida?
+&bull; A caderneta predial e a certid&atilde;o do registo est&atilde;o atualizadas?
+&bull; Tem certificado energ&eacute;tico? Qual &eacute; a classe?
+&bull; As plantas correspondem ao que est&aacute; constru&iacute;do &mdash; sem obras por legalizar?
+&bull; Prev&ecirc; algum problema para passar na avalia&ccedil;&atilde;o banc&aacute;ria?
 
-Se estiver tudo bem, vamos ver esta semana.</p>
- <p class="ru">Перед тем как ехать, просто чтобы знать:<br>
- Есть лицензия на проживание?<br>
- Нет долгов и ипотеки?<br>
- Площадь в налоговом паспорте верная?<br>
- Есть энергосертификат?<br><br>
- Если всё в порядке — приедем на этой неделе.</p></div>
+Perguntamos porque temos cr&eacute;dito aprovado e queremos avan&ccedil;ar r&aacute;pido &mdash; se houver alguma restri&ccedil;&atilde;o preferimos saber j&aacute;, e agradecemos a franqueza.</p>
+  <p class="ru">Отсекает дома с проблемами ДО поездки. Обязательно перед каждым визитом.</p>
+ </div>
 </div>
 
-<div class="step" data-n="3">
- <h2>Conforme ele responder</h2>
- <p class="why">Quatro respostas, quatro sa&iacute;das. Nunca ficar &agrave; espera.</p>
+<div class="step" id="s3" data-n="3">
+ <h2>Зона пожарного риска &mdash; юг (Pedróg&atilde;o, Castanheira, Figueiró, Alvai&aacute;zere, Ans&iacute;&atilde;o, Sert&atilde;)</h2>
+ <p class="why">После пожаров 2017 банки отказывают по объектам в ZRI. Добавлять к блоку 2 для этих муниципий.</p>
 
- <div class="br"><span class="brl">Diz que est&aacute; tudo bem</span>
-  <div class="f"><p class="pt">&Oacute;timo. <em>Sexta &agrave;s 10h</em> d&aacute;? Se n&atilde;o, diga a hora que der. Mande a morada. Vamos ser dois.</p>
-  <p class="ru">Отлично. [Пятница в 10:00] подходит? Если нет — скажите когда удобно. Пришлите адрес. Нас будет двое.</p></div></div>
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Uma quest&atilde;o adicional: o im&oacute;vel encontra-se em zona de risco de inc&ecirc;ndio? Existe alguma restri&ccedil;&atilde;o documental que impe&ccedil;a o financiamento banc&aacute;rio?
 
- <div class="br"><span class="brl">Falta um papel</span>
-  <div class="f"><p class="pt">Sem esse papel o banco n&atilde;o d&aacute; o cr&eacute;dito. O dono est&aacute; a tratar? Para quando? Se houver data, vamos ver na mesma.</p>
-  <p class="ru">Без этой бумаги банк кредит не даст. Владелец этим занимается? К какому сроку? Если есть дата — всё равно приедем посмотреть.</p></div></div>
-
- <div class="br"><span class="brl">Responde por alto</span>
-  <div class="f"><p class="pt">Pode responder-me a essas quatro coisas? &Eacute; o que o banco vai pedir. Assim n&atilde;o perdemos tempo os dois.</p>
-  <p class="ru">Можете ответить по этим четырём пунктам? Это то же самое, что запросит банк. Так никто из нас не потеряет время.</p></div></div>
-
- <div class="br"><span class="brl">J&aacute; est&aacute; vendida</span>
-  <div class="f"><p class="pt">Obrigado por dizer. Se cair, avise. Tem outras assim? Tamb&eacute;m as que ainda n&atilde;o p&ocirc;s no site.</p>
-  <p class="ru">Спасибо, что сказали. Если сорвётся — дайте знать. Есть похожие? В том числе те, что ещё не выложены на сайт.</p></div></div>
+Perguntamos porque noutra casa desta regi&atilde;o nos disseram que havia restri&ccedil;&otilde;es ligadas a essa classifica&ccedil;&atilde;o.</p>
+  <p class="ru">Прямо спросить про ZRI. Можно добавить к блоку выше одним сообщением.</p>
+ </div>
 </div>
 
-<div class="step" data-n="4">
- <h2>Na v&eacute;spera</h2>
- <p class="why">Uma linha. Evita chegar l&aacute; e n&atilde;o estar ningu&eacute;m.</p>
+<div class="step" id="s4" data-n="4">
+ <h2>Licen&ccedil;a de utiliza&ccedil;&atilde;o «ждём от C&acirc;mara» &mdash; уточнить срок</h2>
+ <p class="why">«Ждём» — месяц или полгода? Без неё нет ни кредита, ни escritura.</p>
 
- <div class="f"><p class="pt">Bom dia. Confirmamos <em>amanh&atilde; &agrave;s 10h</em>? Mande outra vez a morada, por favor.</p>
- <p class="ru">Добрый день. Подтверждаем [завтра в 10:00]? Пришлите ещё раз адрес, пожалуйста.</p></div>
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Sobre a licen&ccedil;a de utiliza&ccedil;&atilde;o: quando foi submetido o processo na c&acirc;mara? Tem n&uacute;mero de processo? Qual o prazo previsto para a emiss&atilde;o?
+
+Perguntamos porque sem essa licen&ccedil;a o banco n&atilde;o avan&ccedil;a e n&atilde;o se pode fazer escritura. Queremos perceber se falamos de semanas ou de meses.</p>
+  <p class="ru">Уточнить: когда подали → номер процесса → сколько ждать. Без ответа — не едем.</p>
+ </div>
 </div>
 
-<div class="step" data-n="5">
- <h2>Na visita</h2>
- <p class="why">As perguntas do local est&atilde;o em <a href="#l1">Na casa</a>.
- Perguntar sempre onde acaba o terreno.</p>
+<div class="step" id="s5" data-n="5">
+ <h2>Ответ на «банк не финансирует» &mdash; не бросать, а торговать</h2>
+ <p class="why">Если проблема чинится — берём её на себя за счёт цены. Не сдаваться сразу.</p>
+
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Obrigado pela franqueza &mdash; poupou-nos tempo a todos.
+
+Continuamos com interesse, por isso gost&aacute;r&iacute;amos de perceber melhor:
+
+1. Em que consiste exatamente a diverg&ecirc;ncia?
+2. O propriet&aacute;rio tenciona regularizar a situa&ccedil;&atilde;o junto da c&acirc;mara? Existe processo em curso?
+3. Se sim, qual o prazo previsto?
+4. Caso o propriet&aacute;rio n&atilde;o pretenda avan&ccedil;ar, estar&iacute;amos dispon&iacute;veis para assumir esse processo do nosso lado &mdash; mas nesse caso o valor teria de refletir o custo e o risco envolvidos. &Eacute; algo que consideraria?
+
+Estamos com cr&eacute;dito aprovado em dois bancos e prontos a avan&ccedil;ar assim que a documenta&ccedil;&atilde;o o permita.</p>
+  <p class="ru">Что именно → хозяин будет чинить → если нет, берём сами за скидку.</p>
+ </div>
 </div>
 
-<div class="step" data-n="6">
- <h2>No mesmo dia, depois</h2>
- <p class="why">Sim ou n&atilde;o. Nunca deixar sem resposta.</p>
+<p class="lead">Rearranjos de hora</p>
 
- <div class="br"><span class="brl">Gost&aacute;mos</span>
-  <div class="f"><p class="pt">Obrigado pela visita. Gost&aacute;mos da casa e queremos avan&ccedil;ar. Pode mandar os papéis para eu levar ao banco? E qual &eacute; o melhor pre&ccedil;o?</p>
-  <p class="ru">Спасибо за осмотр. Дом понравился, хотим двигаться дальше. Пришлите бумаги — отнесу в банк. И какая лучшая цена?</p></div>
+<div class="step" id="s6" data-n="6">
+ <h2>Сдвинуть время визита</h2>
+ <p class="why">Появился другой объект и маршрут сдвинулся.</p>
 
-  <div class="f"><p class="pt">Se ficarmos com esta casa, fazemos as coisas depressa: assinamos o contrato de promessa com sinal e o banco faz logo a avalia&ccedil;&atilde;o. O nosso processo no banco j&aacute; est&aacute; a andar, do nosso lado n&atilde;o h&aacute; esperas.</p>
-  <p class="ru">Если берём этот дом — делаем всё быстро: подписываем предварительный договор с задатком, банк сразу делает оценку. Наш процесс в банке уже запущен, с нашей стороны задержек нет.</p></div></div>
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Surgiu uma visita em <em>[CIDADE]</em> &agrave;s <em>[HORA]</em> que n&atilde;o conseguimos remarcar. Seria poss&iacute;vel passar a nossa visita de <em>[DIA]</em> das <em>[HORA]</em> para as <em>[NOVA HORA]</em>?
 
- <div class="br"><span class="brl">N&atilde;o gost&aacute;mos</span>
-  <div class="f"><p class="pt">Obrigado pelo tempo. Esta n&atilde;o &eacute; para n&oacute;s &mdash; <em>motivo</em>. Se aparecer outra com mais terreno, avise que continuamos &agrave; procura.</p>
-  <p class="ru">Спасибо за время. Этот не для нас — [причина]. Если появится другой с большей землёй — скажите, мы продолжаем искать.</p></div></div>
+Confirmamos presen&ccedil;a &mdash; continuamos muito interessados. Obrigado pela compreens&atilde;o.</p>
+  <p class="ru">Заменить: [CIDADE] нового объекта, его [HORA], [DIA], старый час, [NOVA HORA].</p>
+ </div>
 </div>
 
-<div class="step" data-n="7">
- <h2>Fazer pre&ccedil;o</h2>
- <p class="why">O nosso lado forte &eacute; sermos r&aacute;pidos. Dizer isso junto com o
- n&uacute;mero.</p>
+<div class="step" id="s7" data-n="7">
+ <h2>Отмена с переносом &mdash; не сжигать контакт</h2>
+ <p class="why">Не приехали — не молчать. Один message сохраняет отношения.</p>
 
- <div class="f"><p class="pt">Damos <em>valor</em> &euro;. Temos o cr&eacute;dito aprovado e a entrada pronta, conseguimos fechar r&aacute;pido. D&aacute;? Diga at&eacute; <em>sexta</em>, se puder.</p>
- <p class="ru">Даём [сумма] €. Кредит одобрен, взнос готов, можем закрыть быстро. Пойдёт? Ответьте до [пятницы], если можно.</p></div>
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Pe&ccedil;o desculpa pelo inc&oacute;modo &mdash; hoje n&atilde;o conseguimos chegar a tempo.
 
- <div class="f"><p class="pt">Se aceitarem, assinamos o contrato de promessa esta semana e damos o sinal. A seguir &eacute; s&oacute; a avalia&ccedil;&atilde;o do banco e a escritura.</p>
- <p class="ru">Если соглашаются — подписываем предварительный договор на этой неделе и даём задаток. Дальше только оценка банка и сделка.</p></div>
-
- <div class="f"><p class="pt">Em quanto tempo &eacute; que o dono quer fechar isto?</p>
- <p class="ru">В какой срок владелец хочет всё закрыть?</p></div>
+Gost&aacute;r&iacute;amos de manter o interesse na casa: seria poss&iacute;vel reagendar para <em>[DIA]</em> de manh&atilde;? Obrigado pela compreens&atilde;o.</p>
+  <p class="ru">Заменить [DIA]. Утро — потому что чаще соглашаются.</p>
+ </div>
 </div>
 
-<div class="step" data-n="8">
- <h2>Se n&atilde;o responder</h2>
- <p class="why">Uma vez. Depois passa &agrave; casa seguinte &mdash; temos 164.</p>
+<p class="lead">Na visita e depois</p>
 
- <div class="f"><p class="pt">Bom dia. Esta casa ainda est&aacute; &agrave; venda? Se j&aacute; est&aacute; vendida, diga-me para eu n&atilde;o estar a insistir.</p>
- <p class="ru">Добрый день. Этот дом ещё продаётся? Если уже продан — скажите, чтобы я не дёргал.</p></div>
+<div class="step" id="s8" data-n="8">
+ <h2>Вторая визита с замерами</h2>
+ <p class="why">Рулетка читается как серьёзность. Агент понимает: это почти сделка.</p>
+
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Estaremos hoje em <em>[CIDADE]</em> &agrave;s <em>[HORA]</em> e passamos por <em>[CIDADE DA CASA]</em> a seguir. Seria poss&iacute;vel uma segunda visita por volta das <em>[HORA]</em>? Queremos tirar medidas da cozinha e do per&iacute;metro do terreno.
+Obrigado.</p>
+  <p class="ru">Текущий город + час → город дома + час второго визита.</p>
+ </div>
 </div>
 
-<p class="lead">Perguntas &agrave; parte</p>
+<div class="step" id="s9" data-n="9">
+ <h2>Попросить другие дома зоны</h2>
+ <p class="why">У агентов всегда есть то, чего нет на портале. После каждого визита.</p>
 
-<section class="lib" id="l1">
- <div class="sh"><h2>Na casa</h2>
- <p>No local. O que n&atilde;o se v&ecirc; nas fotos e custa dinheiro depois.</p></div>
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Se tiver mais casas nesta zona &mdash; mesmo as que ainda n&atilde;o est&atilde;o no site &mdash; mande os links. O que nos interessar vemos no mesmo dia, logo a seguir &agrave; sua.</p>
+  <p class="ru">Короткая, слать после любого визита. Работает.</p>
+ </div>
+</div>
 
- <div class="f"><p class="pt">A &aacute;gua &eacute; da rede ou de furo? E o esgoto, rede ou fossa?</p>
- <p class="ru">Вода городская или из скважины? Канализация центральная или септик?</p></div>
+<div class="step" id="s10" data-n="10">
+ <h2>После визита &mdash; вежливый отказ</h2>
+ <p class="why">Не молчать — агент запомнит и предложит следующий объект.</p>
 
- <div class="f"><p class="pt">O telhado foi refeito quando? H&aacute; humidade?</p>
- <p class="ru">Когда перекрывали крышу? Есть сырость?</p></div>
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Obrigado pelo tempo de hoje. A casa &eacute; bonita, mas n&atilde;o &eacute; o que procuramos &mdash; <em>[MOTIVO: o terreno &eacute; pequeno para o que precisamos / o acesso &eacute; dif&iacute;cil / precisa de obras acima do nosso or&ccedil;amento]</em>.
 
- <div class="f"><p class="pt">Como &eacute; que a casa aquece no inverno? Fica caro?</p>
- <p class="ru">Чем дом отапливается зимой? Дорого выходит?</p></div>
+Se surgir algo na zona com <em>[CRIT&Eacute;RIO]</em>, avise-nos por favor. Continuamos &agrave; procura.</p>
+  <p class="ru">Заменить [MOTIVO] на реальную причину. [КРИТЕРИЙ] — что нужно дальше.</p>
+ </div>
+</div>
 
- <div class="f"><p class="pt">Onde &eacute; que acaba o terreno? Pode mostrar?</p>
- <p class="ru">Где заканчивается участок? Покажете?</p></div>
+<div class="step" id="s11" data-n="11">
+ <h2>После визита &mdash; интерес, готовим предложение</h2>
+ <p class="why">Закрепить интерес и запросить документы — сразу, в тот же вечер.</p>
 
- <div class="f"><p class="pt">A estrada at&eacute; c&aacute; &eacute; p&uacute;blica? Est&aacute; boa no inverno?</p>
- <p class="ru">Дорога сюда общественная? Зимой нормальная?</p></div>
+ <div class="f">
+  <button class="cpbtn" aria-label="Copiar">&#x2398;</button>
+  <p class="pt">Obrigado pela visita. A casa interessa-nos seriamente.
 
- <div class="f"><p class="pt">V&atilde;o construir alguma coisa nos terrenos ao lado?</p>
- <p class="ru">На соседних участках собираются что-то строить?</p></div>
+Vamos preparar uma proposta formal e enviamos ainda <em>[hoje/amanh&atilde;]</em>. Entretanto: poderia enviar a caderneta predial e a certid&atilde;o de registo predial, para adiantarmos com o banco?</p>
+  <p class="ru">Заменить [hoje/amanhã]. Документы просить сразу — агент видит серьёзность.</p>
+ </div>
+</div>
 
- <div class="f"><p class="pt">Andou algu&eacute;m a viver aqui nos &uacute;ltimos anos?</p>
- <p class="ru">Здесь кто-то жил в последние годы?</p></div>
-</section>
-
-<section class="lib" id="l2">
- <div class="sh"><h2>Papelada</h2>
- <p>Para al&eacute;m das quatro do passo 2.</p></div>
-
- <div class="f"><p class="pt">O banco vai avaliar a casa. Acha que d&aacute; o valor que est&atilde;o a pedir?</p>
- <p class="ru">Банк будет оценивать дом. Думаете, потянет на ту цену, что просят?</p></div>
-
- <div class="f"><p class="pt">O terreno &eacute; urbano ou r&uacute;stico? D&aacute; para construir mais alguma coisa?</p>
- <p class="ru">Земля городская или сельская (rústico)? Можно ещё что-то построить?</p></div>
-
- <div class="f"><p class="pt">H&aacute; d&iacute;vidas de IMI ou do cond&oacute;mino?</p>
- <p class="ru">Есть долги по налогу IMI или по кондоминиуму?</p></div>
-
- <div class="f"><p class="pt">Quem vende &eacute; a ag&ecirc;ncia ou o dono? Com quem falo?</p>
- <p class="ru">Продаёт агентство или сам владелец? С кем говорить?</p></div>
-</section>
-
-<section class="lib" id="l3">
- <div class="sh"><h2>Pre&ccedil;o</h2>
- <p>Antes de dizer um n&uacute;mero.</p></div>
-
- <div class="f"><p class="pt">H&aacute; quanto tempo &eacute; que est&aacute; &agrave; venda?</p>
- <p class="ru">Сколько времени дом в продаже? Долго = есть место торговаться.</p></div>
-
- <div class="f"><p class="pt">J&aacute; houve outras propostas?</p>
- <p class="ru">Уже были другие предложения?</p></div>
-
- <div class="f"><p class="pt">Por quanto &eacute; que o dono vende esta semana?</p>
- <p class="ru">За сколько владелец продаст на этой неделе?</p></div>
-</section>
-
-<section class="lib" id="l4">
- <div class="sh"><h2>Mais casas</h2>
- <p>O que interessa &eacute; o que ainda n&atilde;o est&aacute; no site.</p></div>
-
- <div class="f"><p class="pt">Procuramos casa sozinha, com terreno &agrave; volta, em s&iacute;tio alto, com mato ou pinhal, sem vizinhos colados. At&eacute; <em>valor</em> &euro;. Se tiver alguma assim que ainda n&atilde;o p&ocirc;s no site, mande.</p>
- <p class="ru">Ищем отдельно стоящий дом, с землёй вокруг, на высоком месте, лес или сосняк рядом, без соседей вплотную. До [сумма] €. Если есть такое и ещё не на сайте — пришлите.</p></div>
-
- <div class="f"><p class="pt">Tamb&eacute;m trabalha noutros concelhos aqui &agrave; volta? Interessa-nos <em>Leiria, Pombal, Figueir&oacute; dos Vinhos</em>.</p>
- <p class="ru">Вы работаете и по другим муниципалитетам рядом? Нам интересны [список].</p></div>
-</section>
-
-<footer>Cr&eacute;dito aprovado &middot; entrada pronta &middot; fechamos r&aacute;pido<br>
-&mdash; dizer isto em todas as mensagens. &Eacute; o que nos p&otilde;e &agrave; frente de quem ainda anda a pedir cr&eacute;dito.</footer>
+<footer>Situa&ccedil;&otilde;es reais &middot; 12.08.2026 &middot; toque para copiar<br>
+<em style="font-style:normal;color:var(--mark)">colchetes</em> = trocar antes de enviar</footer>
 </div>
 <div class="toast" id="toast"></div>
 
