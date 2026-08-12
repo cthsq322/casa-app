@@ -528,6 +528,39 @@ button, .acts a, .dacts a, .pinopen, .wa, .lnk{
 .visit input,.addtel input,.pinrow input{min-height:38px}
 button:active{transform:scale(.985)}
 @media (prefers-reduced-motion:reduce){button:active{transform:none}}
+/* ── ЛЕНТА ЗАМЕТОК ──────────────────────────────────────────── */
+#feedbox{display:none}
+#feedbox.on{display:block;margin:6px 0}
+.feedstats{font-size:13px;color:var(--soft);padding:6px 0 10px}
+.feedstats b{color:var(--warn)}
+.feedbar{display:flex;gap:6px;flex-wrap:wrap;padding:4px 0 10px;overflow-x:auto;scrollbar-width:none}
+.feedbar::-webkit-scrollbar{display:none}
+.feedchip{padding:7px 14px;font-size:13px;min-height:40px;border-radius:999px;
+ border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font:inherit;
+ transition:background .12s,border-color .12s}
+.feedchip.on{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.feedchip:active{transform:scale(.985)}
+.feedwrap{position:sticky;top:0;z-index:6;background:var(--paper);padding:6px 0 4px;margin:0 0 4px}
+.feedfind{display:flex;align-items:center;gap:8px;background:var(--card);
+ border:1px solid var(--line);border-radius:999px;padding:3px 6px 3px 14px;box-shadow:var(--sh)}
+.feedfind .mag{font-size:15px;opacity:.65}
+#feedq{font:inherit;font-size:16px;padding:9px 2px;border:0;outline:0;
+ background:transparent;color:var(--ink);flex:1;min-width:60px;-webkit-appearance:none}
+#feedq::-webkit-search-cancel-button{display:none}
+#feedqx{border:0;background:transparent;color:var(--soft);font-size:15px;
+ padding:7px 11px;cursor:pointer;font:inherit}
+.feeditem{padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+ background:var(--card);box-shadow:var(--sh);margin-bottom:8px;overflow:hidden}
+.feeditem-unsent{border-left:4px solid var(--warn)}
+.fi-meta{font-size:12px;color:var(--soft);margin-bottom:4px;
+ display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fi-badge{background:var(--warn);color:#fff;border-radius:999px;
+ padding:2px 8px;font-size:11.5px;font-weight:600}
+.fi-house{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:6px;
+ cursor:pointer;min-height:40px;display:flex;align-items:center}
+.fi-house:active{opacity:.75}
+.fi-text{font-size:14px;line-height:1.5;word-break:break-word;white-space:pre-wrap}
+.feedempty{padding:20px 0;text-align:center;color:var(--soft);font-size:14px}
 </style></head><body>
 
 <div class="gate" id="gate"><div class="box">
@@ -559,6 +592,7 @@ button:active{transform:scale(.985)}
   <button data-f="new" class="sec">🆕 Новые</button>
   <button data-f="day">📋 Мой день</button>
   <button data-f="mine" class="sec">С заметками</button>
+  <button data-f="notes">📝 Лента</button>
   <button data-f="flag" class="sec">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
   <button id="morebtn">ещё ▾</button><select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
 <div class="findwrap"><div class="find"><span class="mag">🔍</span><input id="q" type="search" placeholder="Найти: город, телефон, № или цена"><button id="qx" title="очистить">✕</button></div></div>
@@ -572,7 +606,7 @@ button:active{transform:scale(.985)}
   <a href="frases.html">✍ Что писать</a>
   <a href="lista.html">🔗 Ссылки по сайтам</a>
 </div>
-<div id="dayplan"></div><div id="rota"></div><div id="planbox"></div><div id="mapbox"></div><div class="count" id="count"></div>
+<div id="dayplan"></div><div id="rota"></div><div id="planbox"></div><div id="mapbox"></div><div id="feedbox"></div><div class="count" id="count"></div>
 <div class="grid" id="grid"></div>
 <footer id="foot"></footer>
 </div>
@@ -580,6 +614,7 @@ button:active{transform:scale(.985)}
 
 <script>
 let HOUSES=[],H_IDX={},TWINS={},NOTES={},STATUS={},VISITS={},sortBy=localStorage.getItem('casa_sort')||'score',filt='all',q='',me=localStorage.getItem('casa_user');
+let feedAuthor='',feedUnsent=false,feedQ='';
 
 const BLOB='019ff336-cdf8-7434-a832-120080cf8449';   // A v3 - пересоздан 12.08   // A v2 - пересоздан 11.08 после смерти старого
 const API='https://jsonblob.com/api/jsonBlob/'+BLOB;
@@ -842,8 +877,9 @@ function mark(){
   if(!el||!HOUSES.length) return;
   const c=Object.keys(NOTES).filter(function(k){
     return (NOTES[k]||[]).some(function(n){return (n.text||'').trim();}); }).length;
+  const nd=[...DIRTY].filter(function(d){return d.startsWith('n:')||d.startsWith('j:');}).length;
   el.textContent=HOUSES.length+' домов · '+c+' с заметками · '+
-    (SYNCED?'синхронизировано':(retryTimer?'не отправлено…':'офлайн'));
+    (SYNCED?'синхронизировано':(retryTimer?'не отправлено: '+nd:'офлайн'));
 }
 function slim(doc){
   // defaults go unsaid - the reader assumes them anyway
@@ -1070,6 +1106,7 @@ function myWork(who){
   return HOUSES.filter(function(h){ return touchedBy(h.id,who); });
 }
 function keep(h){
+ if(filt==='notes') return false;
  if(filt==='mine'&&!(NOTES[h.id]||[]).some(function(n){return (n.text||'').trim();}))return false;
  if(filt==='work'&&!touchedBy(h.id,me))return false;
  if(filt==='fresh'&&(stVal(h.id)||vTime(h.id)||
@@ -2575,6 +2612,86 @@ function renderCard(id){
   }
   renderStBar(); renderProgress(); renderMine(); renderSoon(); mark();
 }
+function notePlural(n){
+  const t=n%10,h=n%100;
+  if(t===1&&h!==11) return 'заметка';
+  if(t>=2&&t<=4&&(h<12||h>14)) return 'заметки';
+  return 'заметок';
+}
+function feedAllItems(){
+  const items=[];
+  Object.values(NOTES).flat().forEach(function(n){
+    if(!(n.text||'').trim()) return;
+    items.push({type:'note',house_id:String(n.house_id),author:n.author||'?',
+      text:n.text,at:n.updated_at||'',
+      unsent:dirtyHas('n',n.house_id)&&n.author===me});
+  });
+  Object.values(ENTRIES).flat().forEach(function(n){
+    if(!(n.text||'').trim()) return;
+    items.push({type:'entry',house_id:String(n.house_id),author:n.author||'?',
+      text:n.text,at:n.at||'',
+      unsent:dirtyHas('j',n.house_id)&&n.author===me});
+  });
+  items.sort(function(a,b){return (b.at||'').localeCompare(a.at||'');});
+  return items;
+}
+function renderFeed(){
+  const box=document.getElementById('feedbox');
+  if(!box) return;
+  if(filt!=='notes'){box.innerHTML='';box.className='';return;}
+  const all=feedAllItems();
+  const authorSet=new Set();
+  all.forEach(function(n){authorSet.add(n.author);});
+  const authors=[...authorSet].sort();
+  const houseSet=new Set(all.map(function(n){return n.house_id;}));
+  const unsentTotal=all.filter(function(n){return n.unsent;}).length;
+  let visible=all.slice();
+  if(feedAuthor) visible=visible.filter(function(n){return n.author===feedAuthor;});
+  if(feedUnsent) visible=visible.filter(function(n){return n.unsent;});
+  if(feedQ){const ql=feedQ.toLowerCase();visible=visible.filter(function(n){return (n.text||'').toLowerCase().includes(ql);});}
+  const statsHtml='<div class="feedstats">'+
+    all.length+' '+notePlural(all.length)+
+    ' · '+houseSet.size+' '+
+    (houseSet.size===1?'дом':houseSet.size<5?'дома':'домов')+
+    (unsentTotal?' · <b>'+unsentTotal+' не отправлено</b>':'')+
+    '</div>';
+  const authorChips=[''].concat(authors).map(function(a){
+    const on=feedAuthor===a;
+    return '<button class="feedchip'+(on?' on':'')+'" data-fa="'+esc(a)+'">'+(a||'Все')+'</button>';
+  }).join('');
+  const unsentChip='<button class="feedchip'+(feedUnsent?' on':'')+'" data-fa-unsent="1">не отправлено</button>';
+  const barHtml='<div class="feedbar">'+authorChips+unsentChip+'</div>';
+  const searchHtml='<div class="feedwrap"><div class="feedfind">'+
+    '<span class="mag">🔍</span>'+
+    '<input id="feedq" type="search" placeholder="поиск по тексту заметок" value="'+esc(feedQ)+'">'+
+    (feedQ?'<button id="feedqx">✕</button>':'')+
+    '</div></div>';
+  const itemsHtml=visible.length?visible.map(function(n){
+    const h=H_IDX[n.house_id];
+    const city=h?(h.concelho||''):'';
+    const atFmt=(n.at||'').slice(5,16).replace(' ',' в ');
+    return '<div class="feeditem'+(n.unsent?' feeditem-unsent':'')+'">'+
+      '<div class="fi-meta">'+esc(n.author)+' · '+atFmt+
+        (n.unsent?'<span class="fi-badge">не отправлено</span>':'')+
+      '</div>'+
+      '<div class="fi-house" data-goto="'+n.house_id+'">#'+n.house_id+
+        (city?' · '+esc(city):'')+
+      '</div>'+
+      '<div class="fi-text">'+esc(n.text)+'</div>'+
+      '</div>';
+  }).join(''):'<div class="feedempty">нет заметок с такими фильтрами</div>';
+  box.className='on';
+  box.innerHTML=statsHtml+barHtml+searchHtml+itemsHtml;
+  const fq=document.getElementById('feedq');
+  if(fq){
+    fq.addEventListener('input',function(){
+      feedQ=fq.value.trim().toLowerCase();renderFeed();
+    });
+  }
+  const fqx=document.getElementById('feedqx');
+  if(fqx){ fqx.addEventListener('click',function(){ feedQ='';renderFeed(); }); }
+}
+
 function render(){
  // searching means looking for one house - everything else steps aside
  document.body.classList.toggle('searching', !!q);
@@ -2591,11 +2708,11 @@ function render(){
    });
  }
  lastOrder=list.map(function(h){ return h.id; });
- document.getElementById('count').textContent=list.length+' из '+HOUSES.length+' домов';
+ document.getElementById('count').textContent=filt==='notes'?'':list.length+' из '+HOUSES.length+' домов';
  document.getElementById('grid').innerHTML=
- (filt==='mapa'||filt==='plan'||filt==='day')?'' :
+ (filt==='mapa'||filt==='plan'||filt==='day'||filt==='notes')?'' :
  filt==='new' ? newLedger(list) : list.map(card).join('');
- renderRota(); renderMapa(list); renderStBar(); renderPlan(); renderDay();
+ renderRota(); renderMapa(list); renderStBar(); renderPlan(); renderDay(); renderFeed();
  if(keepY!=null){
    const put=function(){
      if(Math.abs(window.scrollY-keepY)>2) window.scrollTo({top:keepY,behavior:'instant'});
@@ -2865,8 +2982,14 @@ document.addEventListener('click',async e=>{
    if(stVal(id)==='marcado'){ setStatus(id,'resposta'); }   // agreed, then unagreed
    await push(); render(); mark(); toast('Визит убран'); return; }
  const u=e.target.closest('[data-u]'); if(u){setUser(u.dataset.u);load();return;}
+ const faUnsent=e.target.closest('[data-fa-unsent]');
+ if(faUnsent){ feedUnsent=!feedUnsent; renderFeed(); return; }
+ const fa=e.target.closest('[data-fa]');
+ if(fa){ const val=fa.dataset.fa;
+   feedAuthor=(feedAuthor===val&&val!=='')?'':val; renderFeed(); return; }
  const f=e.target.closest('[data-f]');
  if(f){ filt=(filt===f.dataset.f&&filt.indexOf('st:')===0)?'all':f.dataset.f;
+   if(filt!=='notes'){feedAuthor='';feedUnsent=false;feedQ='';}
    document.querySelectorAll('[data-f]').forEach(x=>
      x.classList.toggle('on',x.dataset.f===filt));
    unfreeze(); render(); return;}
