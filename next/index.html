@@ -116,6 +116,10 @@ body.searching .count{padding:8px 0 4px;font-weight:600;color:var(--accent)}
  font-size:15px;line-height:1.4;border-color:var(--line);
  color:var(--soft);background:transparent}
 .fav.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.want{padding:0;min-height:40px;width:40px;text-align:center;flex:0 0 auto;
+ font-size:18px;line-height:40px;border-color:var(--line);
+ color:var(--soft);background:transparent}
+.want.on{background:#2196f3;border-color:#2196f3;color:#fff}
 .favo{font-size:11px;color:var(--gold)}
 .stby{font-size:12px;color:var(--soft)}
 .stby b{color:var(--accent)}
@@ -466,6 +470,7 @@ img{max-width:100%;height:auto}
 .stop a{text-decoration:none;color:var(--accent);font-size:18px;margin-left:8px}
 .stop .leg{font-size:12.5px;color:var(--soft);margin-top:4px}
 .stop.tight{background:var(--warn-s)}
+.stop.want-stop{border-left:3px solid #2196f3}
 .stop .leg{font-variant-numeric:tabular-nums}
 .stop.tight .leg{color:var(--warn);font-weight:600}
 .gate{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;
@@ -605,6 +610,7 @@ button:active{transform:scale(.985)}
   <button data-f="gone" class="sec">🚫 Снятые</button>
   <button data-f="plan" class="sec">🧭 Круг</button>
   <button data-f="thisweek" class="sec">📆 Эта неделя</button>
+  <button data-f="want" id="wantbtn">👁 Хочу<span class="n" id="wantcnt"></span></button>
   <button data-f="skipped" class="sec">🙅 Вне круга</button>
   <button data-f="starred" class="sec">★ Со звёздами</button>
   <button data-f="norate">☆ Без оценки</button>
@@ -710,12 +716,18 @@ function mergeNotes(fresh){
   [...map.values()].forEach(function(n){(out[n.house_id]=out[n.house_id]||[]).push(n);});
   return {notes:out,pending:pending};
 }
-let FAVS={}, REMIND={}, SKIP={}, PINS={}, TELS={}, SLOTS={}, ENTRIES={}, ZZZ={};
+let FAVS={}, REMIND={}, SKIP={}, PINS={}, TELS={}, SLOTS={}, ENTRIES={}, ZZZ={}, WANT={};
 function isZzz(id){ return !!ZZZ[id]; }
 function toggleZzz(id){
   if(ZZZ[id]) delete ZZZ[id];
   else ZZZ[id]={by:me, at:stamp()};
   soil('w',id);
+}
+function isWant(id){ return !!WANT[id]; }
+function toggleWant(id){
+  if(WANT[id]) delete WANT[id];
+  else WANT[id]={by:me, at:stamp()};
+  soil('x',id);
 }
 function packEntry(n){ return {h:n.house_id,a:n.author,t:n.text,u:n.at,e:n.eid}; }
 function unpackEntry(w){ return {house_id:w.h,author:w.a,text:w.t,at:w.u,eid:w.e}; }
@@ -894,6 +906,7 @@ async function pull(){
     TELS=mergeMap(d.tels,TELS,'t');
     SLOTS=mergeMap(d.slots,SLOTS,'z');
     ZZZ=mergeMap(d.zzz,ZZZ,'w');
+    WANT=mergeMap(d.want,WANT,'x');
     ENTRIES=entriesUnion([entriesFlat(),(d2.entries||[]).map(unpackEntry)]);
     // старые телефоны ещё пишут заметки в первый store - подмешиваем оба
     return newestNotes([(d2.notes||[]).map(unpackNote), d.notes||[]]);
@@ -960,7 +973,8 @@ async function push(mine){
                 pins:dropDeleted(cur.pins,PINS,'p'),
                 tels:dropDeleted(cur.tels,TELS,'t'),
                 slots:dropDeleted(cur.slots,SLOTS,'z'),
-                zzz:dropDeleted(cur.zzz,ZZZ,'w'),v:2});
+                zzz:dropDeleted(cur.zzz,ZZZ,'w'),
+                want:dropDeleted(cur.want,WANT,'x'),v:2});
     body.notes=[...map.values()];              // в памяти заметки едут дальше
     const ws=await Promise.all([
       fetch(API,{method:'PUT',
@@ -974,7 +988,7 @@ async function push(mine){
     if(!ws[0].ok||!ws[1].ok) throw 0;          // не отпускаем DIRTY пока оба не взяли
     SYNCED=true;
     NOTES={}; body.notes.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
-    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{}; SKIP=body.skip||{}; PINS=body.pins||{}; ZZZ=body.zzz||{}; TELS=body.tels||{}; SLOTS=body.slots||{};
+    STATUS=body.status; VISITS=body.visits||{}; FAVS=body.favs||{}; REMIND=body.remind||{}; SKIP=body.skip||{}; PINS=body.pins||{}; ZZZ=body.zzz||{}; WANT=body.want||{}; TELS=body.tels||{}; SLOTS=body.slots||{};
     cacheSave();
     DIRTY.clear(); saveDirty();
     return true;
@@ -992,7 +1006,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260812-1213-51c2961';
+const BUILD='20260812-1530-c750e5e';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1063,6 +1077,8 @@ async function load(){
  NOTES={};mine.forEach(n=>{(NOTES[n.house_id]=NOTES[n.house_id]||[]).push(n)});
  const all=await pull();          // pull сливает карты dirty-aware поверх кэша
  if(SYNCED) NOTES=mergeNotes(all).notes;
+ // pre-seed id=35 for Serhii if not yet marked
+ if(!WANT['35']){ WANT['35']={by:'Serhii',at:'2026-08-12T15:00'}; soil('x','35'); }
  mark();
  loadPlan();
  if(DIRTY.size){ push().then(mark); }
@@ -1163,6 +1179,7 @@ function keep(h){
  if(filt.indexOf('st:')===0&&stVal(h.id)!==filt.slice(3))return false;
  if(filt==='fav'&&!isFav(h.id))return false;
  if(filt==='favall'&&!favOwners(h.id).length)return false;
+ if(filt==='want'&&!isWant(h.id))return false;
  if(filt.indexOf('by:')===0&&stBy(h.id)!==filt.slice(3))return false;
  if(q){
   // #35 - точный номер дома, больше ничего не подходит
@@ -1824,6 +1841,7 @@ function card(h){
   (favOwners(h.id).filter(function(u){return u!==me;}).length?
     '<span class="favo">'+favOwners(h.id).filter(function(u){return u!==me;})
       .join(', ')+'</span>':'')+
+  '<button class="want'+(isWant(h.id)?' on':'')+'" data-want="'+h.id+'" title="хочу посмотреть">👁</button>'+
   '<span class="ref">#'+h.id+'</span></div>'+
  // ZONE 3: PLACE — Concelho · Freguesia
  '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
@@ -2082,7 +2100,7 @@ function renderRota(){
       var spare=(drive!=null&&gap!=null)?gap-drive-45:null;
       var tight=(spare!=null&&spare<0);
       var full=H_IDX[String(it.h.id)];
-      html+='<div class="stop'+(tight?' tight':'')+'">'+
+      html+='<div class="stop'+(tight?' tight':'')+(isWant(String(it.h.id))?' want-stop':'')+'">'+
         '<b>'+fmtTime(it.t)+'</b>'+
         '<span class="pl">'+(it.h.concelho||'?')+'</span>'+
         '<span class="pr">'+(it.h.price_eur?new Intl.NumberFormat('pt-PT').format(it.h.price_eur)+' &euro;':'')+'</span>'+
@@ -2453,6 +2471,13 @@ function renderProgress(){
     '<span class="rest">осталось <b>'+(HOUSES.length-done)+'</b></span></div>'+
     '<div class="pbar"><i style="width:'+pct+'%"></i></div>';
 }
+function updateWantBtn(){
+  const cnt=Object.keys(WANT).length;
+  const el=document.getElementById('wantcnt');
+  if(el) el.textContent=cnt>0?cnt:'';
+  const btn=document.getElementById('wantbtn');
+  if(btn) btn.classList.toggle('on',filt==='want');
+}
 function renderPeople(){
   const box=document.getElementById('people');
   if(!box) return;
@@ -2734,6 +2759,7 @@ function renderStBar(){
   migrateStatus();
   renderPeople();
   renderProgress();
+  updateWantBtn();
   renderMine();
   renderSoon();
   const box=document.getElementById('stbar');
@@ -2977,6 +3003,14 @@ document.addEventListener('click',async e=>{
    if(filt==='day'||filt==='rota'||filt==='mapa'){ render(); } else { renderCard(id); }
    mark();
    toast(okz?(was?'Разбудил':'Дом в сне — окно свободно'):'Сохранено в телефоне',!okz);
+   return; }
+ const wb=e.target.closest('[data-want]');
+ if(wb){ const id=wb.dataset.want, was=isWant(id);
+   toggleWant(id);
+   const okw=await push();
+   if(filt==='want'){ render(); } else { renderCard(id); }
+   updateWantBtn(); mark();
+   toast(okw?(was?'Убрал из «хочу»':'Добавлен в «хочу посмотреть»'):'Сохранено в телефоне',!okw);
    return; }
  const pt=e.target.closest('[data-put]');
  if(pt){ const parts=pt.dataset.put.split('|');
