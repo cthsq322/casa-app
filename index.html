@@ -585,6 +585,13 @@ button:active{transform:scale(.985)}
 .mpbtn.mpfire{border-color:var(--warn);color:var(--warn)}
 .mpbtn.mpfire:active{background:var(--warn-s)}
 .mpnote{font-size:12.5px;color:var(--soft);margin:8px 2px 0;line-height:1.4}
+.mpsmart{margin:10px 0 2px;padding:11px 13px;background:var(--accent-s);
+ border:1px solid var(--accent);border-radius:12px;font-size:14px}
+.mpsmart.warn{background:var(--warn-s);border-color:var(--warn)}
+.mpsmart .smreason{color:var(--soft);font-size:12.5px;margin:0 0 7px;line-height:1.4}
+.mpsmart .smrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.smtime{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
+.smadj{padding:5px 13px;font-size:13px;border-radius:999px;display:none}
 </style></head><body>
 <script src="frases-data.js"></script>
 
@@ -645,6 +652,14 @@ button:active{transform:scale(.985)}
     </div>
     <div id="mplist"></div>
     <p class="mpnote" id="mpnote"></p>
+    <div id="mpsmart" class="mpsmart" style="display:none">
+      <div class="smreason" id="smreason">calculando…</div>
+      <div class="smrow">
+        <button class="smadj" id="smMinus">−15</button>
+        <span class="smtime" id="smtime">—</span>
+        <button class="smadj" id="smPlus">+15</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1006,7 +1021,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260812-1530-c750e5e';
+const BUILD='20260812-1649-4daeb79';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1656,14 +1671,144 @@ function buildWhenNew(h){
   return null;
 }
 
+// ── SMART WHEN — travel-aware time suggestion ─────────────
+var _mpSmartMin=null,_mpSmartDay=null;
+function smTimeToMin(t){
+  var s=String(t).replace('T',' ');
+  var hh=s.slice(11,16); var p=hh.split(':');
+  return parseInt(p[0],10)*60+parseInt(p[1],10);
+}
+function smMinToHHMM(m){
+  var h=Math.floor(m/60)%24,mm=m%60;
+  return ('0'+h).slice(-2)+':'+('0'+mm).slice(-2);
+}
+function smRound15(m){ return Math.ceil(m/15)*15; }
+function smEstimateDrive(a,b){
+  var km=kmBetween(a,b); if(!km||km===0) return 30;
+  return Math.round(km*1.3/65*60)+5;
+}
+function smFmtViagem(min){
+  if(!min||min<=0) return '';
+  var h=Math.floor(min/60),m=min%60;
+  return h?(m?h+'h'+('0'+m).slice(-2)+'min':h+'h'):m+'min';
+}
+function buildSmartWhenStr(day,minFromMidnight){
+  var d=new Date(day+'T00:00');
+  var dias=['domingo','segunda-feira','terça-feira','quarta-feira',
+            'quinta-feira','sexta-feira','sábado'];
+  var mm=day.slice(5,7),dd=day.slice(8,10);
+  var now=new Date();
+  var todayISO=now.getFullYear()+'-'+pad2(now.getMonth()+1)+'-'+pad2(now.getDate());
+  var atH=smMinToHHMM(minFromMidnight).replace(':','h');
+  if(day===todayISO) return 'hoje às '+atH;
+  return dias[d.getDay()]+', '+dd+'/'+mm+', às '+atH;
+}
+async function smTryFitOnDay(h,day){
+  var VISIT_MIN=45,DAY_START=9*60,DAY_END=20*60;
+  var hLat=h.lat,hLon=h.lon;
+  var pp=pinPos(h); if(pp){hLat=pp[0];hLon=pp[1];}
+  if(!hLat||!hLon) return null;
+  var hH={lat:hLat,lon:hLon};
+
+  var events=[];
+  Object.keys(VISITS).forEach(function(id){
+    if(String(id)===String(h.id)) return;
+    var t=vTime(id); if(!t) return;
+    if(String(t).slice(0,10)!==day) return;
+    var hh=H_IDX[String(id)]; if(!hh) return;
+    var pp2=pinPos(hh);
+    if(pp2) hh=Object.assign({},hh,{lat:pp2[0],lon:pp2[1]});
+    events.push({min:smTimeToMin(t),h:hh,label:(hh.concelho||hh.town||'?')});
+  });
+  Object.keys(SLOTS).forEach(function(id){
+    if(String(id)===String(h.id)) return;
+    var ms=SLOTS[id];
+    if(typeof ms!=='string'||ms.length<16) return;
+    if(ms.slice(0,10)!==day) return;
+    if(vTime(id)) return; // already as confirmed visit above
+    var hh=H_IDX[String(id)]; if(!hh) return;
+    var pp2=pinPos(hh);
+    if(pp2) hh=Object.assign({},hh,{lat:pp2[0],lon:pp2[1]});
+    events.push({min:smTimeToMin(ms),h:hh,label:(hh.concelho||hh.town||'?')});
+  });
+  events.sort(function(a,b){return a.min-b.min;});
+
+  // No other events on this day — slot time or 10:00
+  if(!events.length){
+    var ms2=SLOTS[h.id];
+    var slotMin=null;
+    if(typeof ms2==='string'&&ms2.length>=16&&ms2.slice(0,10)===day){
+      slotMin=smTimeToMin(ms2);
+    }
+    return {fits:true,timeMin:slotMin||10*60,day:day,reason:'dia livre, sem visitas'};
+  }
+
+  // Gaps: [before first], [between each pair], [after last]
+  var gaps=[];
+  gaps.push({fromH:null,fromMin:DAY_START,
+             toH:events[0].h,toMin:events[0].min,toLabel:events[0].label+' '+smMinToHHMM(events[0].min)});
+  for(var i=0;i<events.length-1;i++){
+    gaps.push({fromH:events[i].h,fromMin:events[i].min+VISIT_MIN,fromLabel:events[i].label+' '+smMinToHHMM(events[i].min),
+               toH:events[i+1].h,toMin:events[i+1].min,toLabel:events[i+1].label+' '+smMinToHHMM(events[i+1].min)});
+  }
+  var last=events[events.length-1];
+  gaps.push({fromH:last.h,fromMin:last.min+VISIT_MIN,fromLabel:last.label+' '+smMinToHHMM(last.min),
+             toH:null,toMin:DAY_END});
+
+  for(var gi=0;gi<gaps.length;gi++){
+    var g=gaps[gi];
+    var travelTo=0,travelFrom=0;
+    if(g.fromH){
+      var r1=null;
+      try{ r1=await roadBetween(g.fromH,hH); }catch(e){}
+      travelTo=r1&&r1.min?Math.round(r1.min*1.15):smEstimateDrive(g.fromH,hH);
+    }
+    if(g.toH){
+      var r2=null;
+      try{ r2=await roadBetween(hH,g.toH); }catch(e){}
+      travelFrom=r2&&r2.min?Math.round(r2.min*1.15):smEstimateDrive(hH,g.toH);
+    }
+    var arrive=g.fromMin+travelTo;
+    var depart=arrive+VISIT_MIN;
+    if(arrive>=DAY_START&&arrive<=DAY_END-VISIT_MIN&&depart+travelFrom<=g.toMin){
+      var sugMin=smRound15(arrive);
+      // if rounding pushed us out of window, use un-rounded
+      if(sugMin+VISIT_MIN+travelFrom>g.toMin) sugMin=arrive;
+      var reason='';
+      if(g.fromH) reason='após '+g.fromLabel+', viagem '+smFmtViagem(travelTo);
+      else if(g.toH) reason='antes de '+g.toLabel;
+      return {fits:true,timeMin:sugMin,day:day,reason:reason||'janela disponível'};
+    }
+  }
+  return {fits:false,day:day};
+}
+async function smartWhenAsync(h){
+  var ms=SLOTS[h.id];
+  var daysToScan=[];
+  if(typeof ms==='string'&&ms.length>=10){
+    daysToScan=[ms.slice(0,10)];
+  } else {
+    var base=new Date();
+    for(var di=0;di<7;di++){
+      var d=new Date(base.getTime()+di*86400000);
+      daysToScan.push(d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()));
+    }
+  }
+  for(var di=0;di<daysToScan.length;di++){
+    var r=await smTryFitOnDay(h,daysToScan[di]);
+    if(r&&r.fits) return r;
+  }
+  return {fits:false,reason:'sem janela livre nos próximos dias'};
+}
+
 // ── FIRST CONTACT — auto-filled from house data ───────────
-function buildFirstContact(h){
+function buildFirstContact(h,forceWhen){
   var NL='\n';
   var pr=portalRef(h.url);
   var tipo=h.bedrooms?'Moradia T'+h.bedrooms:'Moradia';
   var cidade=h.concelho||h.town||'';
   var ref=pr.portal+(pr.ref?' '+pr.ref:'');
-  var quando=buildWhenNew(h);
+  var quando=forceWhen!==undefined?forceWhen:buildWhenNew(h);
   var parts=[
     'Bom dia.',
     'Referência: '+tipo+(cidade?', '+cidade:'')+' — '+ref+'.',
@@ -1693,16 +1838,18 @@ function isFireRisk(h){
   var c=(h.concelho||'').trim().toLowerCase();
   return FIRE_CONCELHOS.some(function(f){return f.toLowerCase()===c;});
 }
-function buildPickerText(fp,h){
-  if(fp.dynamic) return buildFirstContact(h);
+function buildPickerText(fp,h,timeOverride){
+  if(fp.dynamic) return buildFirstContact(h,timeOverride);
   return fp.pt_raw||'';
 }
 function closePicker(){
   var b=document.getElementById('mpback');
   if(b) b.style.display='none';
   document.body.style.overflow='';
+  _mpSmartMin=null; _mpSmartDay=null;
 }
 function openPicker(h){
+  _mpSmartMin=null; _mpSmartDay=null;
   var fire=isFireRisk(h);
   var pr=portalRef(h.url);
   var tipo=h.bedrooms?'T'+h.bedrooms:'';
@@ -1721,6 +1868,43 @@ function openPicker(h){
   back.dataset.hid=h.id;
   back.style.display='flex';
   document.body.style.overflow='hidden';
+
+  // ── smart time panel ──────────────────────────────────────
+  var smDiv=document.getElementById('mpsmart');
+  var smReason=document.getElementById('smreason');
+  var smTimeEl=document.getElementById('smtime');
+  var smMinus=document.getElementById('smMinus');
+  var smPlus=document.getElementById('smPlus');
+  if(smDiv&&smReason&&smTimeEl){
+    smDiv.style.display='block';
+    smDiv.className='mpsmart';
+    smReason.textContent='calculando horário…';
+    smTimeEl.textContent='—';
+    if(smMinus) smMinus.style.display='none';
+    if(smPlus) smPlus.style.display='none';
+    var pickHid=h.id; // capture for closure check
+    smartWhenAsync(h).then(function(result){
+      var curHid=document.getElementById('mpback').dataset.hid;
+      if(!smDiv||String(curHid)!==String(pickHid)) return; // picker changed house or closed
+      if(result.fits){
+        _mpSmartMin=result.timeMin;
+        _mpSmartDay=result.day;
+        smDiv.className='mpsmart';
+        smReason.textContent=result.reason;
+        smTimeEl.textContent=smMinToHHMM(_mpSmartMin).replace(':','h');
+        if(smMinus) smMinus.style.display='';
+        if(smPlus) smPlus.style.display='';
+      } else {
+        smDiv.className='mpsmart warn';
+        smReason.textContent='sem janela livre — '+
+          (result.reason||'próximos dias ocupados')+
+          ' — conseguimos nos próximos dias, diga o que lhe dá jeito';
+        smTimeEl.textContent='';
+      }
+    }).catch(function(){
+      if(smDiv) smDiv.style.display='none';
+    });
+  }
 }
 
 // several houses, one agent, one message
@@ -3099,6 +3283,21 @@ document.addEventListener('click',async e=>{
    if(h) openPicker(h);
    return;
  }
+ // ── smart time ±15 buttons ────────────────────────────────
+ const smM=e.target.closest('#smMinus');
+ if(smM&&_mpSmartMin!==null&&_mpSmartDay){
+   _mpSmartMin=Math.max(9*60,_mpSmartMin-15);
+   var stEl=document.getElementById('smtime');
+   if(stEl) stEl.textContent=smMinToHHMM(_mpSmartMin).replace(':','h');
+   return;
+ }
+ const smP=e.target.closest('#smPlus');
+ if(smP&&_mpSmartMin!==null&&_mpSmartDay){
+   _mpSmartMin=Math.min(19*60,_mpSmartMin+15);
+   var stEl2=document.getElementById('smtime');
+   if(stEl2) stEl2.textContent=smMinToHHMM(_mpSmartMin).replace(':','h');
+   return;
+ }
  const pk=e.target.closest('[data-pick]');
  if(pk){
    const back=document.getElementById('mpback');
@@ -3107,7 +3306,11 @@ document.addEventListener('click',async e=>{
    if(!h) return;
    const fp=(window.FRASES_PICKER||[]).find(function(x){return x.id===pk.dataset.pick;});
    if(!fp) return;
-   const text=buildPickerText(fp,h);
+   var timeOverride=undefined;
+   if(fp.dynamic&&_mpSmartMin!==null&&_mpSmartDay){
+     timeOverride=buildSmartWhenStr(_mpSmartDay,_mpSmartMin);
+   }
+   const text=buildPickerText(fp,h,timeOverride);
    const firstMobile=h.agent_phone?telList(h.agent_phone).find(isMobile):null;
    if(fp.id==='primeiro-contacto'&&stVal(h.id)!=='escrito'){
      setStatus(h.id,'escrito'); push().then(mark);
