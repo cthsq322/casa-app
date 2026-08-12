@@ -146,7 +146,7 @@ body.searching .count{padding:8px 0 4px;font-weight:600;color:var(--accent)}
 .shot img{width:100%;height:100%;object-fit:cover;object-position:center 42%;
  display:block}
 .shot .cnt{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.5);
- color:#fff;font-size:11px;padding:2px 8px;border-radius:999px;
+ color:#fff;font-size:12px;padding:2px 8px;border-radius:999px;
  }
 .shot.tile{background:#e8e4dc}
 .shot.tile img{image-rendering:auto;filter:saturate(.85)}
@@ -179,7 +179,7 @@ body.searching .count{padding:8px 0 4px;font-weight:600;color:var(--accent)}
 .exc{font-size:13px;color:var(--soft)}
 .tels{display:flex;flex-direction:column;gap:6px}
 .telrow{display:flex;gap:6px;align-items:stretch;font-size:13.5px}
-.telrow .tel{padding:7px 10px;min-height:36px;flex:0 1 auto;font-size:13.5px}
+.telrow .tel{padding:7px 10px;min-height:40px;flex:0 1 auto;font-size:13.5px}
 .telrow .tel{flex:1}
 .wa{display:flex;align-items:center;text-decoration:none;font-size:13.5px;
  padding:0 14px;border-radius:9px;border:1px solid var(--accent);
@@ -191,15 +191,20 @@ body.searching .count{padding:8px 0 4px;font-weight:600;color:var(--accent)}
 .tel{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:15px;
  font-weight:600;font-variant-numeric:tabular-nums;border-radius:9px;
  border:1px solid var(--accent);background:var(--accent-s);color:var(--accent)}
-.tel .cp{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);opacity:.75;font-weight:400}
+.tel .cp{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);opacity:.75;font-weight:400}
 .tel.done{border-style:solid;border-color:var(--accent);color:var(--accent)}
 .tel.done .cp{color:var(--accent)}
 .tel.done .cp:after{content:' ✓'}
-.acts{display:flex;gap:7px}
-.acts a{flex:1;text-align:center;text-decoration:none;font-size:14px;padding:8px;
- border-radius:9px;border:1px solid var(--line);color:var(--ink)}
+.acts{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 24px),transparent 100%);
+  mask-image:linear-gradient(to right,#000 calc(100% - 24px),transparent 100%)}
+.acts::-webkit-scrollbar{display:none}
+.acts a,.acts button.lnk{flex:0 0 auto;text-align:center;text-decoration:none;font-size:14px;
+ padding:8px 12px;border-radius:9px;border:1px solid var(--line);color:var(--ink);
+ display:inline-flex;align-items:center;justify-content:center;min-height:40px;white-space:nowrap}
 .acts a.pri{background:var(--accent);border-color:var(--accent);color:var(--paper);font-weight:600}
 .acts a.call{color:var(--soft)}
+.acts a.wa-act{background:var(--accent);border-color:var(--accent);color:var(--paper);font-weight:600}
 .notes{border-top:1px dashed var(--line);padding-top:9px;display:flex;flex-direction:column;gap:7px}
 .note{font-size:13.5px;background:var(--accent-s);border-radius:9px;padding:7px 10px}
 .note.other{background:transparent;border:1px solid var(--line)}
@@ -241,7 +246,7 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .soonx{min-height:38px}
 .acts a,.lnk{min-height:40px;display:inline-flex;align-items:center;justify-content:center}
 .lnkp{flex-direction:column;gap:0;line-height:1.15}
-.lnkp small{font-size:10px;color:var(--soft);font-weight:600;letter-spacing:.04em}
+.lnkp small{font-size:12px;color:var(--soft);font-weight:600;letter-spacing:.04em}
 html{-webkit-text-size-adjust:100%}
 html,body{overflow-x:hidden;max-width:100%}
 img{max-width:100%;height:auto}
@@ -283,32 +288,47 @@ img{max-width:100%;height:auto}
  border:1px solid var(--line);border-radius:8px;color:var(--accent)}
 .hotl{color:var(--accent);text-decoration:none;font-weight:600}
 .slotdue{color:var(--warn);font-size:12px;font-weight:700;margin-left:8px}
+/* .acc used only for non-junction info (legacy, keep for .acc.bad nophone etc) */
 .acc{font-size:12.5px;font-weight:600;padding:7px 12px;margin:4px 0;border-radius:9px}
 .acc.good{background:var(--accent-s);color:var(--accent)}
 .acc.mid{background:var(--paper);color:var(--soft);border:1px solid var(--line)}
 .acc.bad{background:var(--warn-s);color:var(--warn)}
-/* compact junction dot-line — replaces .acc for road junction only */
-.junc{font-size:12px;display:flex;align-items:center;gap:5px;margin:1px 0;padding:1px 0}
+/* no-photo placeholder — same height as a real shot so cards never jump */
+.shot-warn{display:flex;align-items:center;justify-content:center;
+  margin:-15px -16px 0;height:clamp(150px,42vw,220px);border-radius:14px 14px 0 0;
+  background:var(--warn-s);color:var(--warn);font-size:13px;font-weight:600;text-align:center;padding:12px}
+/* junction dot-line */
+.junc{font-size:12px;display:flex;align-items:center;gap:5px;margin:0;padding:2px 0}
 .junc::before{content:'●';font-size:9px;flex:0 0 auto}
 .junc.good{color:var(--accent)}
 .junc.mid{color:var(--soft)}
-.junc.bad{color:var(--warn);font-weight:700}
-/* compact key-numbers row (replaces two .stats grids) */
+.junc.bad{color:var(--warn);font-weight:600}
+/* compact key-numbers row */
 .srow{font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;
- padding:5px 0;border-block:1px solid var(--line)}
+ padding:5px 0;border-block:1px solid var(--line);
+ overflow-x:auto;scrollbar-width:none;white-space:nowrap;-webkit-overflow-scrolling:touch}
+.srow::-webkit-scrollbar{display:none}
+/* inline copy icon button */
+.cpicon{border:0;background:transparent;padding:2px 3px;cursor:pointer;color:var(--soft);
+  border-radius:4px;display:inline-flex;align-items:center;vertical-align:middle;flex-shrink:0}
+.cpicon:hover,.cpicon:focus-visible{color:var(--ink);outline:none}
+.cpicon.ok{color:var(--accent)}
+.cpsvg{display:block}
+/* slot-manual note */
+.slot-manual{font-size:10px;color:var(--soft);margin-left:3px;opacity:.8}
 .nophone{font-size:12px;color:var(--soft);padding:7px 12px;margin:4px 0;
  background:var(--paper);border:1px dashed var(--line);border-radius:9px}
 .journal{margin:4px 0}
 .jrow{font-size:13px;padding:7px 11px;border-left:3px solid var(--line);
  background:var(--paper);border-radius:0 9px 9px 0;margin:3px 0}
 .jrow .t{color:var(--soft);font-size:11.5px;margin-left:6px}
-.jadd{font-size:12.5px;padding:7px 13px;min-height:38px;border-color:var(--accent);
+.jadd{font-size:12.5px;padding:7px 13px;min-height:40px;border-color:var(--accent);
  color:var(--accent);margin:2px 0}
 .jbox textarea{width:100%;min-height:64px}
 .jsave{font-size:13px;padding:8px 14px;min-height:40px;border-color:var(--accent);
  color:var(--accent);font-weight:600;margin:4px 0}
 .twfold{display:block;width:100%;text-align:left;font-size:12.5px;
- padding:9px 12px;margin:4px 0;border:1px dashed var(--line);border-radius:9px;
+ padding:9px 12px;min-height:40px;margin:4px 0;border:1px dashed var(--line);border-radius:9px;
  color:var(--soft);background:transparent}
 .twfacts{font-size:12.5px;color:var(--soft);margin-top:4px}
 .twtel{display:flex;gap:7px;margin-top:6px}
@@ -335,9 +355,14 @@ img{max-width:100%;height:auto}
   border:1px solid var(--line);border-top:0}
 .rleg{background:var(--paper);border-left:2px solid var(--line);margin-left:22px;
   padding:5px 12px;font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums}
-.bday{font-size:12.5px;color:var(--accent);background:var(--accent-s);
- border-radius:8px;padding:5px 9px;display:flex;align-items:center;gap:8px;
- flex-wrap:wrap}
+.bday{font-size:13px;color:var(--accent);background:var(--accent-s);
+ border-radius:8px;padding:6px 10px;display:flex;align-items:center;gap:6px;
+ flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.bday::-webkit-scrollbar{display:none}
+.bday b{font-variant-numeric:tabular-nums}
+.bday.z7visit{font-weight:600}
+.bday.z7visit.notok{color:var(--warn);background:var(--warn-s)}
+/* .cpday kept for backward compat with JS handler — visually replaced by .cpicon */
 .cpday{padding:3px 10px;font-size:11.5px;border-color:var(--accent);
  color:var(--accent);background:transparent}
 .swapd{font-size:11.5px;color:var(--soft)}
@@ -466,7 +491,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
 .msgall{margin-left:8px;padding:3px 10px;font-size:11.5px;border-color:var(--accent);
  color:var(--accent);background:transparent;font-weight:600}
 .msgall.done{background:var(--accent);color:var(--paper)}
-.huntb{padding:5px 11px;font-size:12.5px;min-height:38px;
+.huntb{padding:5px 11px;font-size:12.5px;min-height:40px;
  border-color:var(--line);color:var(--soft)}
 .msg{padding:5px 12px;font-size:12.5px;border-color:var(--accent);
  color:var(--accent);font-weight:600}
@@ -477,8 +502,7 @@ footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:v
  color:var(--soft);font-style:italic}
 .pnight{padding:9px 14px;border-top:1px solid var(--line);font-size:13px;
  color:var(--soft);background:var(--accent-s)}
-.cpday{padding:3px 10px;font-size:11.5px;border-color:var(--accent);
- color:var(--accent);background:transparent}
+/* .cpday duplicate removed — defined above */
 .swapd{font-size:11.5px;color:var(--soft)}
 .same{font-size:12px;color:var(--accent);background:var(--accent-s);
  border-radius:8px;padding:6px 10px;cursor:pointer;display:flex;
@@ -492,11 +516,11 @@ button, .acts a, .dacts a, .pinopen, .wa, .lnk{
   transition:background .12s ease, border-color .12s ease}
 .bar button, .stbar button, #people button, .dchip{
   min-height:38px; padding:7px 14px; font-size:13.5px}
-.st button{min-height:36px; padding:5px 12px; font-size:13px}
+.st button{min-height:40px; padding:5px 12px; font-size:13px}
 .tiers button{min-height:40px; min-width:44px}
 .acts a, .dacts a{min-height:38px; display:inline-flex; align-items:center;
   justify-content:center}
-.msg,.skip,.cal,.conf,.cpday,.askaddr,.msgall{min-height:32px; border-radius:9px}
+.msg,.skip,.cal,.conf,.cpday,.askaddr,.msgall{min-height:40px; border-radius:9px}
 .tel{border-radius:10px; min-height:40px}
 .card{gap:11px}
 .stg .gl{margin-bottom:2px}
@@ -1097,18 +1121,49 @@ function keep(h){
  return true;
 }
 
+// ── date helpers ──────────────────────────────────────────────
+const DOW_SHORT=['вс','пн','вт','ср','чт','пт','сб'];
+const FULL2SHORT={'воскресенье':'вс','понедельник':'пн','вторник':'вт','среда':'ср','четверг':'чт','пятница':'пт','суббота':'сб'};
+function fmtVisit(t){
+  if(!t) return '';
+  const clean=(t||'').replace(' ','T');
+  const date=clean.slice(0,10), time=clean.slice(11,16)||'';
+  const d=new Date(date+'T00:00');
+  const dow=DOW_SHORT[d.getDay()]||'';
+  return dow+' '+date.slice(8,10)+'.'+date.slice(5,7)+(time?' · '+time:'');
+}
+function shortDow(when){
+  const parts=(when||'').split(' ');
+  return (FULL2SHORT[parts[0]]||parts[0].slice(0,2))+(parts[1]?' '+parts[1]:'');
+}
+// ── copy icon SVG (inline, no CDN) ──────────────────────────────
+const _cpSVG='<svg class="cpsvg" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6.5A1.5 1.5 0 0 0 3 11h2"/></svg>';
+const _ckSVG='<svg class="cpsvg" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5,8.5 6.5,12.5 13.5,3.5"/></svg>';
+function cpBtn(dataAttr,klass){
+  return '<button class="cpicon'+(klass?' '+klass:'')+'" '+dataAttr+' title="скопировать">'+_cpSVG+'</button>';
+}
+// flash checkmark for 1 s, then restore
+function flashCp(el){
+  if(!el) return;
+  el.innerHTML=_ckSVG; el.classList.add('ok');
+  setTimeout(function(){ el.innerHTML=_cpSVG; el.classList.remove('ok'); },1000);
+}
+
 function noteBlock(h){
  const list=(NOTES[h.id]||[]);
  const mine=list.find(n=>n.author===me);
  const others=list.filter(n=>n.author!==me);
  return '<div class="notes">'+
-  (tierOwners(h.id).length>1
-    ? '<div class="tiero">'+tierOwners(h.id).join(' · ')+'</div>' : '')+
-  others.map(n=>'<div class="note other"><b>'+n.author+'</b><span class="t">'+
-    (n.updated_at||'').slice(5,16).replace('T',' ').replace(' ',' в ')+'</span><br>'+esc(n.text)+'</div>').join('')+
+  // ZONE 10: rating (tiers) — always first in notes block
   '<div class="tiers"><span style="font-size:12px;color:var(--soft)">уровень</span>'+
    [1,2,3].map(t=>'<button data-tier="'+t+'" data-h="'+h.id+'"'+
-     (mine&&mine.tier===t?' class="on"':'')+'>'+'★'.repeat(t)+'</button>').join('')+'</div>'+
+     (mine&&mine.tier===t?' class="on"':'')+'>'+'★'.repeat(t)+'</button>').join('')+
+  (tierOwners(h.id).length>1
+    ? '<span class="tiero" style="font-size:11px;color:var(--soft);margin-left:4px">'+tierOwners(h.id).join(' · ')+'</span>' : '')+
+  '</div>'+
+  // ZONE 11: notes — others first, then own
+  others.map(n=>'<div class="note other"><b>'+n.author+'</b><span class="t">'+
+    (n.updated_at||'').slice(5,16).replace('T',' ').replace(' ',' в ')+'</span><br>'+esc(n.text)+'</div>').join('')+
   ((ENTRIES[h.id]||[]).length
     ? '<div class="journal">'+(ENTRIES[h.id]||[]).slice().sort(function(a,b){
         return (b.at||'').localeCompare(a.at||'');}).map(function(n){
@@ -1524,139 +1579,150 @@ function ptDay(d){
 
 function card(h){
  const flags=(h.desc_blockers||'').split(';').map(s=>s.trim()).filter(Boolean);
- const goods=(h.desc_goods||'').split(';').map(s=>s.trim()).filter(Boolean);
+ const goodsRaw=(h.desc_goods||'').split(';').map(s=>s.trim()).filter(Boolean);
+ // JUNCTION BUG FIX: remove any "развязка …" entry from goods — prevents double-junction row
+ const goods=goodsRaw.filter(g=>!/^развязка/i.test(g));
  const rooms=(h.desc_rooms||'').split(';').map(s=>s.trim()).filter(Boolean);
- const rel=h.elevation_relative_m;
- const relT=rel==null?'—':(rel>0?'+'+Math.round(rel):Math.round(rel));
  const stage = vOk(h.id) ? ' st-ok'
    : slotFor(h.id) ? ' st-plan'
    : (['escrito','ligado','espera','semresp'].indexOf(stVal(h.id))>=0 ? ' st-talk' : '');
- return '<article class="card'+(flags.length?' flag':'')+stage+
- (isSold(h)?' gone':'')+'">'+
-  '<div class="top"><span class="price">'+eur(h.price_eur)+'</span>'+
-   (h.auto_score!=null?'<span class="nota'+(h.score_parts<5?' thin':'')+
-     '" title="известно '+h.score_parts+' из 7 критериев">'+h.auto_score+'</span>':'')+
-   '<button class="fav'+(isFav(h.id)?' on':'')+'" data-fav="'+h.id+'" '+
-     'title="моё избранное">★</button>'+
-   (favOwners(h.id).filter(function(u){return u!==me;}).length?
-     '<span class="favo">'+favOwners(h.id).filter(function(u){return u!==me;})
-       .join(', ')+'</span>':'')+
-   '<span class="ref">#'+h.id+'</span></div>'+
-  (h.access_score!=null
-    ? '<div class="junc'+(h.access_score>=32?' good':h.access_score>=20?' mid':' bad')+'">'+
-      (h.access_score>=32?'развязка отличная':h.access_score>=20?'развязка средняя':'РАЗВЯЗКА ПЛОХАЯ')+
-      ' · '+(h.city_name||'')+' '+(h.dist_city_km!=null?Math.round(h.dist_city_km)+' км':'')+
-      (h.dist_highway_km!=null?' · трасса '+Math.round(h.dist_highway_km)+' км':'')+'</div>'
+ // First mobile number → WhatsApp in actions (zone 9)
+ const firstMobile = h.agent_phone ? telList(h.agent_phone).find(isMobile) : null;
+ // Zone 7: compact visit display
+ const sl = slotFor(h.id);
+ const visitDisplay = vTime(h.id)
+   ? '<div class="bday z7visit'+(vOk(h.id)?'':' notok')+'"><b>'+fmtVisit(vTime(h.id))+'</b>'+(vOk(h.id)?' ✓':'')+'</div>'
+   : (sl && !outOfLoop(h.id) && !isZzz(h.id))
+   ? '<div class="bday z7visit'+(sl.week?'':' notok')+'">'+(sl.week
+     ? 'звать на <b>'+shortDow(sl.when||'')+' · '+(sl.at||'')+'</b>'+
+       (sl.manual?'<span class="slot-manual" title="назначено вручную">✎</span>':'')+
+       cpBtn('data-cpday="'+h.id+'"','cpday')+
+       (slotDue(h.id)?'<span class="slotdue">⚠ уточнить до 20:00</span>':'')
+     : 'в круге — день '+sl.label+' отложен')+'</div>'
+   : '';
+ return '<article class="card'+(flags.length?' flag':'')+stage+(isSold(h)?' gone':'')+'">'+
+ // ZONE 1: PHOTO or fixed-height placeholder — no card-height jumping
+ (h.first_photo_url
+   ? '<a class="shot" href="'+h.url+'" target="_blank" rel="noopener">'+
+       '<img src="'+h.first_photo_url+'" alt="" loading="lazy" decoding="async" '+
+       'onerror="this.closest(\'.shot\').classList.add(\'broken\')">'+
+       (h.photo_count?'<span class="cnt">'+h.photo_count+' фото</span>':'')+
+     '</a>'
+   : '<div class="shot-warn">📷 ФОТО НЕТ — вслепую не ехать</div>')+
+ // Status: sold / reserved
+ ((isSold(h)||isReserved(h))
+   ? '<div class="dead'+(isReserved(h)?' held':'')+'">'+
+     (stWhy(h.id)==='reservado'
+       ? 'зарезервирован — сказал '+(stBy(h.id)||'кто-то')+
+         (stAt(h.id)?' '+stAt(h.id).slice(5,16).replace(' ',' в '):'')+
+         ' · бронь может сорваться, держим на виду'
+     : stWhy(h.id)==='vendido'
+       ? 'продан — сказал '+(stBy(h.id)||'кто-то')+
+         (stAt(h.id)?' '+stAt(h.id).slice(5,16).replace(' ',' в '):'')
+       : 'объявление снято с сайта'+
+         (h.listing_checked?' · проверено '+h.listing_checked.slice(5,10):''))+
+     '</div>'
+   : '')+
+ // ZONE 2: HEADER — price · score · star · #id
+ '<div class="top"><span class="price">'+eur(h.price_eur)+'</span>'+
+  (h.auto_score!=null?'<span class="nota'+(h.score_parts<5?' thin':'')+
+    '" title="известно '+h.score_parts+' из 7 критериев">'+h.auto_score+'</span>':'')+
+  '<button class="fav'+(isFav(h.id)?' on':'')+'" data-fav="'+h.id+'" '+
+    'title="моё избранное">★</button>'+
+  (favOwners(h.id).filter(function(u){return u!==me;}).length?
+    '<span class="favo">'+favOwners(h.id).filter(function(u){return u!==me;})
+      .join(', ')+'</span>':'')+
+  '<span class="ref">#'+h.id+'</span></div>'+
+ // ZONE 3: PLACE — Concelho · Freguesia
+ '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
+ // ZONE 4: NUMBERS — land_area · area · T · wc (scrollable row)
+ '<div class="srow">'+m2(h.land_area_m2)+' м²'+
+  (h.area_m2?' · '+m2(h.area_m2)+' м²':'')+
+  (h.bedrooms?' · T'+h.bedrooms:'')+
+  (h.bathrooms?' · '+h.bathrooms+' wc':'')+
+ '</div>'+
+ // ZONE 5: JUNCTION — single line, dot colour, no CAPS
+ (h.access_score!=null
+   ? '<div class="junc'+(h.access_score>=32?' good':h.access_score>=20?' mid':' bad')+'">'+
+     (h.access_score>=32?'развязка отличная':h.access_score>=20?'развязка средняя':'развязка плохая')+
+     ' · '+(h.city_name||'')+' '+(h.dist_city_km!=null?Math.round(h.dist_city_km)+' км':'')+
+     '</div>'
+   : '')+
+ // ZONE 6: TAGS — flags, goods (filtered), rooms — compact chips
+ (flags.length?'<div class="tags">'+flags.map(f=>'<span class="tag bad">⚠ '+f+'</span>').join('')+'</div>':'')+
+ (goods.length?'<div class="tags">'+goods.slice(0,6).map(g=>'<span class="tag">'+g+'</span>').join('')+'</div>':'')+
+ (rooms.length?'<div class="tags">'+rooms.slice(0,5).map(r=>'<span class="tag rooms">'+r+'</span>').join('')+'</div>':'')+
+ // Status banners — dup, quiet, twin (supplemental, preserved)
+ (h.dup_note?'<div class="dupb'+(h.dup_of?' hard':'')+'">'+
+   (h.dup_of?'⚠ дубль дома #'+h.dup_of+' — ':'')+esc(h.dup_note)+'</div>':'')+
+ (isZzz(h.id)
+   ? '<div class="quiet long">💤 в сне с '+((ZZZ[h.id]||{}).at||'').slice(11,16)+
+     '<button class="swapb" data-zzz="'+h.id+'">разбудить</button></div>'
+   : '')+
+ (silentHours(h.id)&&!isZzz(h.id)
+   ? '<div class="quiet'+(silentHours(h.id)>=4?' long':'')+'">'+
+     '🔇 молчит '+silentHours(h.id)+' ч'+
+     '<button class="swapb" data-zzz="'+h.id+'">💤 в сон</button>'+
+     (silentHours(h.id)>=4?'<button class="swapb" data-swap="'+h.id+'">замена рядом</button>':'')+
+     '</div><div class="swapbox" id="swap'+h.id+'"></div>'
+   : '')+
+ twinBlock(h)+
+ // ZONE 7: VISIT — compact format "пт 14.08 · 12:30", ✎ for manual
+ visitDisplay+
+ // ZONE 8: CONTACTS — "свой номер" first, then agent phones with copy icons
+ '<div class="tels">'+
+  '<div class="telrow addtel"><span class="vl">свой номер</span>'+
+    '<input type="tel" inputmode="tel" data-mytel="'+h.id+'" '+
+    'placeholder="+351…" value="'+esc(myTel(h.id))+'"></div>'+
+  (myTel(h.id)
+    ? '<div class="telrow"><button class="tel mine" data-tel="'+myTel(h.id)+'">'+
+      prettyTel(myTel(h.id))+'<span class="cp">нашли сами</span></button>'+
+      cpBtn('data-cpnum="'+myTel(h.id)+'"')+'</div>'
     : '')+
-  ((h.photo_count||0)===0&&!isSold(h)
-    ? '<div class="acc bad">📷 ФОТО НЕТ — вслепую не ехать</div>' : '')+
-  (!h.agent_phone&&!isSold(h)
-    ? '<div class="nophone">☎ номера в объявлении нет'+
-      (h.domain==='idealista.pt'
-        ? ' — idealista прячет: открой «объявление» залогиненным или пиши в форму'
-        : ' — писать через «объявление»')+'</div>'
-    : '')+
-  (h.dup_note?'<div class="dupb'+(h.dup_of?' hard':'')+'">'+
-    (h.dup_of?'⚠ дубль дома #'+h.dup_of+' — ':'')+esc(h.dup_note)+'</div>':'')+
-  (isZzz(h.id)
-    ? '<div class="quiet long">💤 в сне с '+((ZZZ[h.id]||{}).at||'').slice(11,16)+
-      '<button class="swapb" data-zzz="'+h.id+'">разбудить</button></div>'
-    : '')+
-  (silentHours(h.id)&&!isZzz(h.id)
-    ? '<div class="quiet'+(silentHours(h.id)>=4?' long':'')+'">'+
-      '🔇 молчит '+silentHours(h.id)+' ч'+
-      '<button class="swapb" data-zzz="'+h.id+'">💤 в сон</button>'+
-      (silentHours(h.id)>=4?'<button class="swapb" data-swap="'+h.id+'">замена рядом</button>':'')+
-      '</div><div class="swapbox" id="swap'+h.id+'"></div>'
-    : '')+
-  twinBlock(h)+
-  (h.first_photo_url
-    ? '<a class="shot" href="'+h.url+'" target="_blank" rel="noopener">'+
-        '<img src="'+h.first_photo_url+'" alt="" loading="lazy" decoding="async" '+
-        'onerror="this.closest(\'.shot\').classList.add(\'broken\')">'+
-        (h.photo_count?'<span class="cnt">'+h.photo_count+' фото</span>':'')+
-      '</a>'
-    : mapThumb(h))+
-  ((isSold(h)||isReserved(h))
-    ? '<div class="dead'+(isReserved(h)?' held':'')+'">'+
-      (stWhy(h.id)==='reservado'
-        ? 'зарезервирован — сказал '+(stBy(h.id)||'кто-то')+
-          (stAt(h.id)?' '+stAt(h.id).slice(5,16).replace(' ',' в '):'')+
-          ' · бронь может сорваться, держим на виду'
-      : stWhy(h.id)==='vendido'
-        ? 'продан — сказал '+(stBy(h.id)||'кто-то')+
-          (stAt(h.id)?' '+stAt(h.id).slice(5,16).replace(' ',' в '):'')
-        : 'объявление снято с сайта'+
-          (h.listing_checked?' · проверено '+h.listing_checked.slice(5,10):''))+
-      '</div>'
-    : '')+
-  (slotFor(h.id)&&!outOfLoop(h.id)&&!vTime(h.id)&&!isZzz(h.id)
-    ? '<div class="bday'+(slotFor(h.id).week?'':' later')+'">'+
-      (slotFor(h.id).week
-        ? 'звать на <b>'+(slotFor(h.id).when||('день '+slotFor(h.id).label))+'</b>, около '+
-          slotFor(h.id).at+(slotFor(h.id).manual?' · назначено вручную':'')+
-          '<button class="cpday" data-cpday="'+h.id+'">копировать дату</button>'+(slotDue(h.id)?'<span class="slotdue">⚠ уточнить до 20:00</span>':'')
-        : 'в круге на день '+slotFor(h.id).label+' — эта часть отложена')+
-      '</div>'
-    : '')+
-  '<div class="place"><b>'+(h.concelho||'—')+'</b>'+(h.freguesia?' <span>· '+h.freguesia+'</span>':'')+'</div>'+
-  '<div class="srow">'+m2(h.land_area_m2)+' м²'+
-   (h.area_m2?' · '+m2(h.area_m2)+' м²':'')+
-   (h.bedrooms?' · T'+h.bedrooms:'')+
-   (h.bathrooms?' · '+h.bathrooms+' wc':'')+
-  '</div>'+
-  (flags.length?'<div class="tags">'+flags.map(f=>'<span class="tag bad">⚠ '+f+'</span>').join('')+'</div>':'')+
-  (goods.length?'<div class="tags">'+goods.slice(0,6).map(g=>'<span class="tag">'+g+'</span>').join('')+'</div>':'')+
-  (rooms.length?'<div class="tags">'+rooms.slice(0,5).map(r=>'<span class="tag rooms">'+r+'</span>').join('')+'</div>':'')+
-
-  '<div class="tels">'+
-   (myTel(h.id)
-     ? '<div class="telrow"><button class="tel mine" data-tel="'+myTel(h.id)+'">'+
-       prettyTel(myTel(h.id))+'<span class="cp">нашли сами</span></button>'+
-       (isMobile(myTel(h.id))
-         ? '<a class="wa" data-wamark="'+h.id+'" href="'+waSend(myTel(h.id),h)+
-           '" target="_blank" rel="noopener">WhatsApp ▸ текст готов</a>' : '')+'</div>'
+ '</div>'+
+ (h.agent_phone?'<div class="tels">'+
+   telList(h.agent_phone).slice(0,3).map(function(t){
+     const m=isMobile(t);
+     return '<div class="telrow">'+
+       '<button class="tel'+(m?'':' fixed')+'" data-tel="'+t+'">'+prettyTel(t)+
+         '<span class="cp">'+(m?'моб':'стац')+'</span></button>'+
+       cpBtn('data-cpnum="'+t+'"')+
+       '</div>';
+   }).join('')+
+   (telList(h.agent_phone).every(function(t){return !isMobile(t);})
+     ? '<div class="onlyfix">только стационарный — WhatsApp не дойдёт, звонить</div>'
      : '')+
-   '<div class="telrow addtel"><span class="vl">свой номер</span>'+
-     '<input type="tel" inputmode="tel" data-mytel="'+h.id+'" '+
-     'placeholder="+351…" value="'+esc(myTel(h.id))+'"></div>'+
-   '</div>'+
-  (h.agent_phone?'<div class="tels">'+
-    telList(h.agent_phone).slice(0,3).map(function(t){
-      const m=isMobile(t);
-      return '<div class="telrow">'+
-        '<button class="tel'+(m?'':' fixed')+'" data-tel="'+t+'">'+prettyTel(t)+
-          '<span class="cp">'+(m?'моб':'стац')+'</span></button>'+
-        (m?'<a class="wa" data-wamark="'+h.id+'" href="'+waSend(t,h)+
-          '" target="_blank" rel="noopener">WhatsApp ▸ текст готов</a>':'')+
-        '</div>';
-    }).join('')+
-    (telList(h.agent_phone).every(function(t){return !isMobile(t);})
-      ? '<div class="onlyfix">только стационарный — WhatsApp не дойдёт, звонить</div>'
-      : '')+
-    '</div>':'')+
-  (sameAgent(h).length
-    ? '<div class="same" data-agent="'+h.id+'">'+
-      '<span class="samet">у агента +'+sameAgent(h).length+': '+
-      sameAgent(h).slice(0,2).map(function(x){return x.concelho||'?';}).join(', ')+
-      (sameAgent(h).length>2?'…':'')+'</span>'+
-      '<button class="msgall" data-msgall="'+h.id+'">✍ письмо на все</button>'+
-      '</div>'
+   '</div>':'')+
+ (!h.agent_phone&&!isSold(h)
+   ? '<div class="nophone">☎ номера в объявлении нет'+
+     (h.domain==='idealista.pt'
+       ? ' — idealista прячет: открой «объявление» залогиненным или пиши в форму'
+       : ' — писать через «объявление»')+'</div>'
+   : '')+
+ (sameAgent(h).length
+   ? '<div class="same" data-agent="'+h.id+'">'+
+     '<span class="samet">у агента +'+sameAgent(h).length+': '+
+     sameAgent(h).slice(0,2).map(function(x){return x.concelho||'?';}).join(', ')+
+     (sameAgent(h).length>2?'…':'')+'</span>'+
+     '<button class="msgall" data-msgall="'+h.id+'">✍ письмо на все</button>'+
+     '</div>'
+   : '')+
+ // ZONE 9: ACTIONS — Позвонить · WA · Объявление · Карта · Ссылка
+ '<div class="acts">'+
+  (h.agent_phone?'<a class="call" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
+  (firstMobile?'<a class="wa-act" data-wamark="'+h.id+'" href="'+waSend(firstMobile,h)+'" target="_blank" rel="noopener">WA</a>':'')+
+  '<a href="'+h.url+'" target="_blank" rel="noopener" class="lnkp">Объявление<small>'+esc(portalName(h))+'</small></a>'+
+  (pinOf(h.id)&&!pinOf(h.id).lat
+    ? '<a href="'+esc(pinOf(h.id).url)+'" target="_blank" rel="noopener" '+
+      'title="точка от агента">📍 Карта</a>'
+    : pinPos(h)
+    ? '<a href="https://www.google.com/maps/search/?api=1&query='+
+      pinPos(h)[0]+','+pinPos(h)[1]+'" target="_blank" '+
+      'rel="noopener" title="где это">📍 Карта</a>'
     : '')+
-  '<div class="acts">'+
-   (h.agent_phone?'<a class="call" href="tel:'+telHref(h.agent_phone)+'">Позвонить</a>':'')+
-
-   '<a href="'+h.url+'" target="_blank" rel="noopener" class="lnkp">Объявление<small>'+esc(portalName(h))+'</small></a>'+
-   (pinOf(h.id)&&!pinOf(h.id).lat
-     ? '<a href="'+esc(pinOf(h.id).url)+'" target="_blank" rel="noopener" '+
-       'title="точка от агента">📍 Карта</a>'
-     : pinPos(h)
-     ? '<a href="https://www.google.com/maps/search/?api=1&query='+
-       pinPos(h)[0]+','+pinPos(h)[1]+'" target="_blank" '+
-       'rel="noopener" title="где это">📍 Карта</a>'
-     : '')+
-   '<button class="lnk" data-link="'+h.id+'" title="скопировать ссылку">🔗</button></div>'+
-  noteBlock(h)+'</article>';
+  '<button class="lnk" data-link="'+h.id+'" title="скопировать ссылку">🔗</button></div>'+
+ // ZONES 10+11: rating (tiers) → others' notes → own note (inside noteBlock)
+ noteBlock(h)+'</article>';
 }
 
 
@@ -1761,7 +1827,7 @@ function gapWords(min){
 
 function fmtDay(v){
   var d=new Date(v+'T00:00'); if(isNaN(d)) return v;
-  return d.toLocaleDateString('ru-RU',{weekday:'long',day:'2-digit',month:'2-digit'});
+  return DOW_SHORT[d.getDay()]+' '+v.slice(8,10)+'.'+v.slice(5,7);
 }
 function fmtTime(v){ return (v||'').slice(11,16); }
 function kmBetween(a,b){
@@ -2716,7 +2782,7 @@ document.addEventListener('click',async e=>{
    return;
  }
  const cpn=e.target.closest('[data-cpnum]');
- if(cpn){ copyText(cpn.dataset.cpnum).then(function(){ toast('Номер скопирован'); },
+ if(cpn){ copyText(cpn.dataset.cpnum).then(function(){ flashCp(cpn); toast('Номер скопирован'); },
    function(){ toast('Не получилось скопировать',true); }); return; }
  const mg=e.target.closest('[data-msg]');
  if(mg){
@@ -2736,7 +2802,7 @@ document.addEventListener('click',async e=>{
  const cd=e.target.closest('[data-cpday]');
  if(cd){
    const d=slotFor(cd.dataset.cpday);
-   if(d) sendText(ptDay(d), 'Дата');
+   if(d){ sendText(ptDay(d), 'Дата'); flashCp(cd); }
    return;
  }
  const sk=e.target.closest('[data-skip]');
