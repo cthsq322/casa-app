@@ -22,7 +22,7 @@ HERE = pathlib.Path(__file__).parent
 NEXT = HERE / "next"
 STAMP = HERE / ".tested"
 FILES = ["index.html", "data.json", "plan.json", "version.txt",
-         "frases.html", "frases-data.js", "lista.html"]
+         "frases.html", "frases-data.js", "lista.html", "propostas.json"]
 
 LIVE_URL = "https://cthsq322.github.io/casa-app/"
 NEXT_URL = "https://cthsq322.github.io/casa-app/next/"

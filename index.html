@@ -536,6 +536,59 @@ button:active{transform:scale(.985)}
 /* ── ЛЕНТА ЗАМЕТОК ──────────────────────────────────────────── */
 #feedbox{display:none}
 #feedbox.on{display:block;margin:6px 0}
+/* ── PROPOSTA TAB ────────────────────────────────────────────── */
+#propostabox{display:none}
+#propostabox.on{display:block;margin:6px 0}
+.pp-layout{display:grid;grid-template-columns:200px 1fr;min-height:60vh;gap:0;
+ border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+@media(max-width:640px){.pp-layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}}
+.pp-sidebar{background:var(--card);border-right:1px solid var(--line);
+ padding:14px 0;overflow-y:auto}
+.pp-sidebar-title{font:700 10px/1 sans-serif;letter-spacing:.18em;text-transform:uppercase;
+ color:var(--soft);padding:0 14px 12px}
+.pp-house-btn{display:block;width:100%;text-align:left;padding:9px 14px;cursor:pointer;
+ background:none;border:none;border-left:3px solid transparent;
+ color:var(--soft);font:400 12.5px/1.4 sans-serif;transition:.12s}
+.pp-house-btn:hover,.pp-house-btn:active{background:var(--accent-s);color:var(--ink)}
+.pp-house-btn.active{border-left-color:var(--accent);background:var(--accent-s);
+ color:var(--ink);font-weight:600}
+.pp-house-btn .pp-price{display:block;font-size:10.5px;color:var(--soft);margin-top:2px}
+.pp-main{padding:18px 20px 40px;overflow-x:hidden}
+@media(max-width:640px){.pp-main{padding:14px 12px 32px}}
+.pp-section{font:700 11px/1 sans-serif;letter-spacing:.12em;text-transform:uppercase;
+ color:var(--soft);margin:20px 0 10px}
+.pp-section:first-child{margin-top:0}
+.pp-sync-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+ padding:10px 14px;border-radius:8px;margin:0 0 16px;font-size:13px;
+ background:var(--accent-s);border:1px solid var(--line)}
+.pp-sync-bar.has-stale{background:var(--warn-s);border-color:var(--warn)}
+.pp-sync-pill{padding:3px 9px;border-radius:999px;font:600 11px/1 sans-serif;
+ letter-spacing:.06em;text-transform:uppercase}
+.pp-pill-ok{background:var(--accent-s);color:var(--accent)}
+.pp-pill-stale{background:var(--warn-s);color:var(--warn)}
+.pp-pill-miss{background:var(--line);color:var(--soft)}
+.pp-last-sync{font-size:11px;color:var(--soft);margin-left:auto}
+.pp-work-row{padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+ margin:0 0 7px;position:relative}
+.pp-work-row.stale{border-left:3px solid var(--warn)}
+.pp-work-row.missing{border-left:3px solid var(--soft);opacity:.75}
+.pp-work-row.synced{border-left:3px solid var(--accent)}
+.pp-work-ru{font:400 13px/1.4 sans-serif;color:var(--soft)}
+.pp-work-pt{font:600 13px/1.5 sans-serif;color:var(--ink);margin:4px 0 6px}
+.pp-work-status{font:600 10px/1 sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.pp-work-status.synced{color:var(--accent)}
+.pp-work-status.stale{color:var(--warn)}
+.pp-work-status.missing{color:var(--soft)}
+.pp-copy-btn{background:none;border:1px solid var(--line);padding:4px 10px;cursor:pointer;
+ font:600 10.5px/1 sans-serif;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--soft);border-radius:4px;transition:.12s}
+.pp-copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.pp-copy-btn.copied{color:var(--accent);border-color:var(--accent)}
+.pp-copy-btn.stale-btn{border-color:var(--warn);color:var(--warn)}
+.pp-q-row{padding:9px 12px;background:var(--accent-s);border-radius:6px;
+ margin:0 0 6px;font-size:13px;line-height:1.45}
+.pp-history{font-size:12px;color:var(--soft);padding:4px 0}
+.pp-history b{color:var(--ink)}
 .feedstats{font-size:13px;color:var(--soft);padding:6px 0 10px}
 .feedstats b{color:var(--warn)}
 .feedbar{display:flex;gap:6px;flex-wrap:wrap;padding:4px 0 10px;overflow-x:auto;scrollbar-width:none}
@@ -626,7 +679,7 @@ button:active{transform:scale(.985)}
   <button data-f="day">📋 Мой день</button>
   <button data-f="mine" class="sec">С заметками</button>
   <button data-f="notes">📝 Лента</button>
-  <button data-f="flag" class="sec">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button>
+  <button data-f="flag" class="sec">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button><button data-f="proposta">📋 Proposta</button>
   <button id="morebtn">ещё ▾</button><select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
 <div class="findwrap"><div class="find"><span class="mag">🔍</span><input id="q" type="search" placeholder="Найти: город, телефон, № или цена"><button id="qx" title="очистить">✕</button></div></div>
 <div class="upd" id="upd"></div>
@@ -639,7 +692,7 @@ button:active{transform:scale(.985)}
   <a href="frases.html">✍ Что писать</a>
   <a href="lista.html">🔗 Ссылки по сайтам</a>
 </div>
-<div id="dayplan"></div><div id="rota"></div><div id="planbox"></div><div id="mapbox"></div><div id="feedbox"></div><div class="count" id="count"></div>
+<div id="dayplan"></div><div id="rota"></div><div id="planbox"></div><div id="mapbox"></div><div id="feedbox"></div><div id="propostabox"></div><div class="count" id="count"></div>
 <div class="grid" id="grid"></div>
 <footer id="foot"></footer>
 </div>
@@ -1021,7 +1074,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260812-1649-4daeb79';
+const BUILD='20260813-1216-182554c';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -3057,6 +3110,256 @@ function renderFeed(){
   if(fqx){ fqx.addEventListener('click',function(){ feedQ='';renderFeed(); }); }
 }
 
+// ─── PROPOSTA TAB ─────────────────────────────────────────────────────────
+var PROPOSTA_DATA=null;   // cached propostas.json
+var ppCurrentId=null;     // selected house id in proposta view
+
+function ppFmtEur(n){
+  if(n==null)return '—';
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' €';
+}
+function ppFmtDate(iso){
+  if(!iso)return '—';
+  // "2026-08-13T11:12:27+00:00" → "13.08.2026"
+  return iso.slice(8,10)+'.'+iso.slice(5,7)+'.'+iso.slice(0,4);
+}
+function ppEsc(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function ppCopyText(btn,text,isStale){
+  if(isStale){
+    var msg='⚠ Перевод устарел — русский текст менялся після '+
+      (btn.dataset.ruUpd?ppFmtDate(btn.dataset.ruUpd):'неизвестной даты')+
+      '.\nВсё равно скопировать?';
+    if(!confirm(msg))return;
+  }
+  var out=text||'';
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(out).then(function(){
+      btn.textContent='Скопировано';btn.classList.add('copied');
+      setTimeout(function(){btn.textContent='Копировать';btn.classList.remove('copied');},1500);
+    });
+  } else {
+    var ta=document.createElement('textarea');ta.value=out;document.body.appendChild(ta);
+    ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    btn.textContent='Скопировано';btn.classList.add('copied');
+    setTimeout(function(){btn.textContent='Копировать';btn.classList.remove('copied');},1500);
+  }
+}
+
+function ppRenderSyncBar(sync){
+  if(!sync)return '';
+  var s=sync.summary||{};
+  var hasStale=s.stale>0;
+  var cls=hasStale?' has-stale':'';
+  var pOk=s.synced?'<span class="pp-sync-pill pp-pill-ok">✓ '+s.synced+' синхронно</span>':'';
+  var pStale=s.stale?'<span class="pp-sync-pill pp-pill-stale">⚠ '+s.stale+' устарело</span>':'';
+  var pMiss=s.missing?'<span class="pp-sync-pill pp-pill-miss">○ '+s.missing+' без PT</span>':'';
+  var lastSync=sync.last_checked?'<span class="pp-last-sync">RU↔PT: '+ppFmtDate(sync.last_checked)+'</span>':'';
+  return '<div class="pp-sync-bar'+cls+'">'+pOk+pStale+pMiss+lastSync+'</div>';
+}
+
+function ppRenderUnits(units){
+  if(!units||!units.length)return '';
+  var html='';
+  units.forEach(function(u){
+    var st=u.status||'MISSING';
+    var stLow=st.toLowerCase();
+    var stLabel=st==='SYNCED'?'✓ синхронно':st==='STALE'?'⚠ устарело':'○ нет PT';
+    var ptText=u.pt_hash?'':'(нет португальского перевода)';
+    html+='<div class="pp-work-row '+stLow+'">';
+    html+='<div class="pp-work-ru">RU: '+ppEsc(u.label)+'</div>';
+    if(u.pt_hash){
+      html+='<div class="pp-work-pt">'+(u.id.indexOf('_work_')>=0?'PT: ':'')
+        +ppEsc(u.label)+'</div>';
+    }
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-top:4px">';
+    html+='<span class="pp-work-status '+stLow+'">'+stLabel+'</span>';
+    if(u.ru_updated_at) html+='<span style="font-size:11px;color:var(--soft)">RU обновлён: '+ppFmtDate(u.ru_updated_at)+'</span>';
+    if(u.pt_hash&&u.pt_updated_at) html+='<span style="font-size:11px;color:var(--soft)">PT: '+ppFmtDate(u.pt_updated_at)+'</span>';
+    html+='</div>';
+    html+='</div>';
+  });
+  return html;
+}
+
+function ppShowHouse(hid){
+  ppCurrentId=hid;
+  var house=PROPOSTA_DATA.houses.find(function(h){return h.id===hid;});
+  if(!house)return;
+  document.querySelectorAll('.pp-house-btn').forEach(function(b){
+    b.classList.toggle('active',parseInt(b.dataset.pid)===hid);
+  });
+  var sync=house.sync||{};
+  var units=sync.units||[];
+  var claims=house.claims||{};
+  var qs=house.agent_questions||[];
+  var fin=house.financibility||{};
+  var links=house.links||{};
+
+  var h=[];
+  // Header
+  h.push('<div class="section-header" style="margin-bottom:12px">');
+  h.push('<div><div class="section-title" style="font-size:17px;font-weight:700">'+ppEsc(house.title)+'</div>');
+  h.push('<div class="section-meta" style="font-size:12px;color:var(--soft)">');
+  h.push(ppEsc((house.location||{}).freguesia||'')+'&nbsp;·&nbsp;');
+  h.push(ppFmtEur((house.offer||{}).price_eur));
+  h.push('</div></div></div>');
+
+  // Sync bar
+  h.push(ppRenderSyncBar(sync));
+
+  // Works with sync status
+  var workUnits=units.filter(function(u){return u.id.indexOf('_work_')>=0;});
+  if(workUnits.length){
+    h.push('<div class="pp-section">Смета работ (RU↔PT синхронизация)</div>');
+    workUnits.forEach(function(u){
+      var st=u.status||'MISSING';
+      var stLow=st.toLowerCase();
+      var stLabel=st==='SYNCED'?'✓ синхронно':st==='STALE'?'⚠ устарело':'○ нет PT';
+      // find work data for name_pt
+      var work=null;
+      var wKey=u.id.replace('h'+hid+'_work_','');
+      var allWorks=(claims.works_l1||[]).concat(claims.works_l2||[]);
+      work=allWorks.find(function(w){return (w.key||'')==wKey;});
+      var namePt=work?work.name_pt:'';
+      var nameRu=work?work.name_ru:u.label;
+      var isStale=st==='STALE';
+
+      h.push('<div class="pp-work-row '+stLow+'">');
+      h.push('<div class="pp-work-ru" style="font-size:12px;color:var(--soft)">🇷🇺 '+ppEsc(nameRu)+'</div>');
+      if(namePt){
+        h.push('<div class="pp-work-pt">🇵🇹 '+ppEsc(namePt)+'</div>');
+        h.push('<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">');
+        h.push('<span class="pp-work-status '+stLow+'">'+stLabel+'</span>');
+        if(u.ru_updated_at) h.push('<span style="font-size:11px;color:var(--soft)">RU: '+ppFmtDate(u.ru_updated_at)+'</span>');
+        if(u.pt_updated_at) h.push('<span style="font-size:11px;color:var(--soft)">PT: '+ppFmtDate(u.pt_updated_at)+'</span>');
+        var copyBtn='<button class="pp-copy-btn'+(isStale?' stale-btn':'')
+          +'" data-ru-upd="'+(u.ru_updated_at||'')+'"'
+          +' onclick="ppCopyText(this,'+JSON.stringify(namePt)+','+isStale+')">Копировать PT</button>';
+        h.push(copyBtn);
+        h.push('</div>');
+      } else {
+        h.push('<div class="pp-work-status missing">○ нет PT</div>');
+      }
+      h.push('</div>');
+    });
+  }
+
+  // Questions before visit
+  var qVisit=fin.questions_before_visit||[];
+  if(qVisit.length){
+    h.push('<div class="pp-section">Вопросы ДО выезда</div>');
+    qVisit.forEach(function(q,i){
+      var qUnit=units.find(function(u){return u.id==='h'+hid+'_qvisit_'+i;});
+      var st=qUnit?qUnit.status:'MISSING';
+      var isStale=st==='STALE';
+      h.push('<div class="pp-q-row">');
+      h.push('<div style="margin-bottom:6px">'+ppEsc(q)+'</div>');
+      h.push('<div style="display:flex;gap:8px;align-items:center">');
+      h.push('<span class="pp-work-status '+(st||'missing').toLowerCase()+'">'+
+        (st==='SYNCED'?'✓':st==='STALE'?'⚠ устарело':'○ нет PT')+'</span>');
+      h.push('<button class="pp-copy-btn'+(isStale?' stale-btn':'')+'" data-ru-upd="'+
+        (qUnit&&qUnit.ru_updated_at||'')+'"'+
+        ' onclick="ppCopyText(this,'+JSON.stringify(q)+','+isStale+')">Копировать</button>');
+      h.push('</div></div>');
+    });
+  }
+
+  // Agent questions
+  if(qs.length){
+    h.push('<div class="pp-section">Вопросы агенту</div>');
+    qs.forEach(function(q){
+      var aqUnit=units.find(function(u){return u.id==='h'+hid+'_aq_'+q.field;});
+      var st=aqUnit?aqUnit.status:'MISSING';
+      var isStale=st==='STALE';
+      h.push('<div class="pp-q-row">');
+      h.push('<b style="font-size:13px">'+ppEsc(q.label)+'</b>');
+      if(q.how_to_close) h.push('<div style="font-size:12px;color:var(--soft);margin:3px 0">'+ppEsc(q.how_to_close.slice(0,200))+'</div>');
+      h.push('<div style="display:flex;gap:8px;align-items:center;margin-top:5px">');
+      h.push('<span class="pp-work-status '+(st||'missing').toLowerCase()+'">'+
+        (st==='SYNCED'?'✓':st==='STALE'?'⚠ устарело':'○ нет PT')+'</span>');
+      if(q.how_to_close){
+        var htc=q.how_to_close;
+        h.push('<button class="pp-copy-btn'+(isStale?' stale-btn':'')+'" data-ru-upd="'+
+          (aqUnit&&aqUnit.ru_updated_at||'')+'"'+
+          ' onclick="ppCopyText(this,'+JSON.stringify(htc)+','+isStale+')">Копировать</button>');
+      }
+      h.push('</div></div>');
+    });
+  }
+
+  // History (last 3 events)
+  if(sync.last_checked){
+    h.push('<div class="pp-section" style="margin-top:24px">Последние изменения</div>');
+    h.push('<div class="pp-history">Последняя проверка: <b>'+ppFmtDate(sync.last_checked)+'</b></div>');
+    var s=sync.summary||{};
+    h.push('<div class="pp-history">Итого: <b>'+s.synced+' синхронно</b>, ');
+    h.push('<b>'+s.stale+' устарело</b>, <b>'+s.missing+' без PT</b></div>');
+  }
+
+  // Links
+  h.push('<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">');
+  if(links.proposta_html) h.push('<a href="'+ppEsc(links.proposta_html)+'" target="_blank" style="font-size:13px;color:var(--accent);padding:7px 13px;border:1px solid var(--line);border-radius:8px;text-decoration:none">Открыть Proposta HTML</a>');
+  if(links.reconcile_md) h.push('<a href="'+ppEsc(links.reconcile_md)+'" target="_blank" style="font-size:13px;color:var(--soft);padding:7px 13px;border:1px solid var(--line);border-radius:8px;text-decoration:none">Reconcile</a>');
+  h.push('</div>');
+
+  document.getElementById('pp-main-content').innerHTML=h.join('');
+}
+
+function ppRenderSidebar(){
+  var list=document.getElementById('pp-house-list');
+  if(!list)return;
+  list.innerHTML='';
+  PROPOSTA_DATA.houses.forEach(function(h){
+    var btn=document.createElement('button');
+    btn.className='pp-house-btn'+(h.id===ppCurrentId?' active':'');
+    btn.dataset.pid=h.id;
+    var city=(h.location||{}).freguesia||(h.location||{}).concelho||'';
+    btn.innerHTML='<span>'+ppEsc(city)+'</span>'
+      +'<span class="pp-price">'+ppFmtEur((h.offer||{}).price_eur)+'</span>';
+    btn.onclick=function(){ppShowHouse(h.id);};
+    list.appendChild(btn);
+  });
+}
+
+function renderProposta(){
+  var box=document.getElementById('propostabox');
+  if(!box)return;
+  if(filt!=='proposta'){box.innerHTML='';box.className='';return;}
+  box.className='on';
+  if(PROPOSTA_DATA){
+    box.innerHTML=
+      '<div class="pp-layout">'
+      +'<aside class="pp-sidebar">'
+        +'<div class="pp-sidebar-title">Объекты</div>'
+        +'<div id="pp-house-list"></div>'
+      +'</aside>'
+      +'<main class="pp-main" id="pp-main-content">'
+        +'<div style="color:var(--soft);padding-top:30px;text-align:center">← Выберите объект</div>'
+      +'</main>'
+      +'</div>';
+    ppRenderSidebar();
+    if(ppCurrentId&&PROPOSTA_DATA.houses.find(function(h){return h.id===ppCurrentId;})){
+      ppShowHouse(ppCurrentId);
+    } else if(PROPOSTA_DATA.houses.length){
+      ppShowHouse(PROPOSTA_DATA.houses[0].id);
+    }
+    return;
+  }
+  box.innerHTML='<div style="padding:30px;text-align:center;color:var(--soft)">Загрузка Proposta...</div>';
+  fetch('propostas.json')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      PROPOSTA_DATA=data;
+      renderProposta();
+    })
+    .catch(function(e){
+      box.innerHTML='<div style="padding:20px;color:var(--warn)"><b>Ошибка загрузки propostas.json</b><br><small>'+ppEsc(String(e))+'</small></div>';
+    });
+}
+
 function render(){
  // searching means looking for one house - everything else steps aside
  document.body.classList.toggle('searching', !!q);
@@ -3073,11 +3376,11 @@ function render(){
    });
  }
  lastOrder=list.map(function(h){ return h.id; });
- document.getElementById('count').textContent=filt==='notes'?'':list.length+' из '+HOUSES.length+' домов';
+ document.getElementById('count').textContent=(filt==='notes'||filt==='proposta')?'':list.length+' из '+HOUSES.length+' домов';
  document.getElementById('grid').innerHTML=
- (filt==='mapa'||filt==='plan'||filt==='day'||filt==='notes')?'' :
+ (filt==='mapa'||filt==='plan'||filt==='day'||filt==='notes'||filt==='proposta')?'' :
  filt==='new' ? newLedger(list) : list.map(card).join('');
- renderRota(); renderMapa(list); renderStBar(); renderPlan(); renderDay(); renderFeed();
+ renderRota(); renderMapa(list); renderStBar(); renderPlan(); renderDay(); renderFeed(); renderProposta();
  if(keepY!=null){
    const put=function(){
      if(Math.abs(window.scrollY-keepY)>2) window.scrollTo({top:keepY,behavior:'instant'});

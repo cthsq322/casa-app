@@ -1,0 +1,2027 @@
+{
+  "version": "1.0",
+  "houses": [
+    {
+      "id": 64,
+      "title": "Moradia T4 / Oliveira do Hospital, Vila Franca da Beira",
+      "location": {
+        "address": "Rua da Escola Primária 12, 3405-621 Vila Franca da Beira",
+        "freguesia": "Ervedal e Vila Franca da Beira",
+        "concelho": "Oliveira do Hospital",
+        "district": "Coimbra",
+        "lat": 40.44042510000001,
+        "lon": -7.8642234
+      },
+      "listing": {
+        "price_eur": 299000,
+        "area_m2": 240,
+        "land_area_m2": 1080.0,
+        "bedrooms": 4,
+        "bathrooms": 3,
+        "energy_class": "D",
+        "url": "https://www.era.pt/imovel/moradia-t4-oliveira-do-hospital-vila-franca-da-beira-336250051",
+        "agency": "ERA Oliveira do Hospital / Tábua",
+        "agent": "Paula Ribeiro",
+        "agent_phone": "+351238094070"
+      },
+      "offer": {
+        "price_eur": 240000,
+        "price_ppm2": 1000
+      },
+      "financibility": {
+        "status": "UNDER_QUESTION",
+        "factors": [
+          {
+            "code": "FIRE_ZONE_HIGH",
+            "status": "UNDER_QUESTION",
+            "label": "Высокий пожарный риск — уточнить у банка",
+            "detail": "fire_risk=high, но concelho «Oliveira do Hospital» не в массово-отказном кластере. Конкретный банк может потребовать дополнительный страховой пакет или поднять ставку на 0.3–0.8%.",
+            "pre_visit_question": "Запросите в банке: принимают ли они к финансированию объекты в зоне alto risco de incêndio в Oliveira do Hospital?"
+          },
+          {
+            "code": "LICENCA_OK",
+            "status": "PASSES",
+            "label": "Licença de utilização",
+            "detail": "Подтверждена агентом.",
+            "pre_visit_question": ""
+          },
+          {
+            "code": "TYPOLOGY_OK",
+            "status": "PASSES",
+            "label": "Типология",
+            "detail": "Согласована: 4 спален в DB и 4 в raw_json.",
+            "pre_visit_question": ""
+          },
+          {
+            "code": "UNLICENSED_UNKNOWN",
+            "status": "UNDER_QUESTION",
+            "label": "Нелегализованные постройки — не выяснено",
+            "detail": "Информации об obras sem licença нет. Если есть нелегализованные пристройки — банк оценит только основное здание.",
+            "pre_visit_question": "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в каком состоянии легализация?"
+          },
+          {
+            "code": "AREA_MISMATCH",
+            "status": "UNDER_QUESTION",
+            "label": "Расхождение площади: DB=240.0м², raw_json=540м²",
+            "detail": "Разница 300м² (56%). Вероятно bruta vs útil. Банк оценивает по фактической жилой площади. Если оценка выйдет ниже цены сделки — банк выдаст меньшую сумму.",
+            "pre_visit_question": "Какова точная площадь в caderneta predial? Что из 240м² / 540м² — útil и что bruta?"
+          }
+        ],
+        "questions_before_visit": [
+          "Запросите в банке: принимают ли они к финансированию объекты в зоне alto risco de incêndio в Oliveira do Hospital?",
+          "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в каком состоянии легализация?",
+          "Какова точная площадь в caderneta predial? Что из 240м² / 540м² — útil и что bruta?"
+        ]
+      },
+      "math": {
+        "listing_ppm2": 1246,
+        "offer_ppm2": 1000,
+        "grand_min": 13700,
+        "grand_max": 22500,
+        "imt": 6340,
+        "imt_jovem": 0,
+        "jovem_discount": "100% — полное освобождение (IMT Jovem, до 330 539 €)",
+        "imposto_selo": 1920,
+        "full_entry_min": 256320,
+        "full_entry_max": 271460,
+        "remaining_after_jovem": 7380,
+        "remaining_after_standard": 1040
+      },
+      "infrastructure": {
+        "dist_hospital_km": 0.6,
+        "dist_school_km": 4.8,
+        "dist_pharmacy_km": 9.0,
+        "dist_supermarket_km": 9.2,
+        "dist_highway_km": 18.3,
+        "dist_bombeiros_km": 7.6,
+        "internet_fiber_proxy": "dsl_vdsl",
+        "elevation_m": 381.0
+      },
+      "fire_risk": {
+        "level": "high",
+        "burned_nearby_years": "2017,2022",
+        "dist_bombeiros_km": 7.6
+      },
+      "market": {
+        "ppm2_median": null,
+        "ppm2_p25": null,
+        "ppm2_min": null
+      },
+      "reconcile": {
+        "confirmed_count": 13,
+        "unknown_count": 2,
+        "contradicts_count": 1,
+        "items": [
+          {
+            "field": "area",
+            "label": "Площадь дома",
+            "status": "ПРОТИВОРЕЧИТ",
+            "what": "БД фиксирует 240.0 м², при этом raw_json (из ERA-скрейпа) показывает 540 м². Разница 300 м² — это не погрешность округления, а структурное расхождение.",
+            "why": "Площадь прямо влияет на €/м² и позицию в рыночном сравнении. Если реальная площадь 240 м² — цена 1 246 €/м², медиана рынка. Если 540 м² — 554 €/м², категория 'под реконструкцию'. Также определяет базу расчёта IMT, IMI и ипотечного лимита.",
+            "how_to_close": "Запросить у агента caderneta predial с актуальными данными и свидетельство о регистрации (certidão de registo predial). Возможно, 540 — bruta (общая), 240 — útil (полезная). Это разные понятия, и нужно уточнить, что именно стоит в кадастре.",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "electrical",
+            "label": "Электрика — возраст и состояние",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент письменно подтвердил: «Estamos a confirmar esta informação.». Проводка оригинальная, сертификата CERTIEL нет.",
+            "why": "Оригинальная проводка возраста постройки — пожарный риск и обязательные расходы 8 000–12 000 €. Некоторые банки требуют CERTIEL для ипотеки.",
+            "how_to_close": "Уже в ответах агента. Запросить CERTIEL копию отдельно.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "roof",
+            "label": "Кровля",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «»",
+            "why": "Кровля вмешательств не требует — в смету не включаем.",
+            "how_to_close": "Осмотр кровельщика при втором визите.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "well_present",
+            "label": "Скважина / источник воды",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Из заметок визита: собственная скважина есть и работает.",
+            "why": "Независимость от городской сети — плюс. Но требует лицензии и анализа.",
+            "how_to_close": "Подтверждено визитом. Уточнить глубину, дебит, лицензию.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "water_analysis",
+            "label": "Анализ воды",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «»",
+            "why": "Анализ есть — требуем копию.",
+            "how_to_close": "Запросить результат анализа или организовать самостоятельно.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "water_tank",
+            "label": "Накопительный резервуар",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент: «Existe bomba de água instalada no furo. Não existe depósito.»",
+            "why": "Без резервуара при поломке насоса дом без воды. Установка 2 000–4 000 €.",
+            "how_to_close": "Уже известно из ответа агента.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "windows",
+            "label": "Окна — двойное остекление",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «Não. INSTALAÇÕES»",
+            "why": "Одинарное остекление → высокие теплопотери зимой, расходы 6 500–10 000 € на замену. Также несоответствие заявленному энергоклассу.",
+            "how_to_close": "Подтверждено ответом агента.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "fire_risk",
+            "label": "Зона пожарного риска",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "БД помечает как zona de alto risco de incêndio. Пожары в радиусе в годы: 2017,2022. Пожарная часть: 7.6 км.",
+            "why": "По DL 82/2021 владелец обязан поддерживать 50-метровую противопожарную полосу ежегодно. Страховщики применяют повышенный коэффициент. Риск эвакуации в экстремальные годы. Банки могут потребовать дополнительную страховку. Это реальный ежегодный расход и психологический фактор.",
+            "how_to_close": "Уточнить: вся ли 50-метровая полоса в пределах участка, или частично захватывает соседей. Открытые данные: ICNF SGIF (Sistema de Gestão de Incêndios Florestais).",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "internet",
+            "label": "Интернет — оптоволокно",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "БД: internet_fiber_proxy = «dsl_vdsl». Оптоволокно к дому не проведено, доступен только DSL/VDSL.",
+            "why": "Семья работает удалённо. DSL — нестабильное соединение, скорость ограничена, задержки высокие. Fiber — 100–1000 Мбит/с, стабильно. Отсутствие fiber снижает практическую ценность объекта для remote-work семьи и ограничивает круг будущих покупателей при перепродаже.",
+            "how_to_close": "Уточнить у агента: «Existe fibra ótica disponível nesta rua? Qual operador?» Проверить на meo.pt/nos.pt по адресу объекта.",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "condition",
+            "label": "Общее состояние",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Из заметок визита 12.08.2026: состояние хорошее, можно заезжать и жить. Нужно «местами подкрасить».",
+            "why": "Дом не требует масштабной реконструкции — это плюс. Однако без профессиональных заключений (электрик, кровельщик) «хорошее состояние» — субъективная оценка, а не гарантия.",
+            "how_to_close": "Второй визит с профильными специалистами для проверки ключевых систем.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "heating",
+            "label": "Отопление",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Из визита и/или ответа агента: центральное отопление; два камина; ответ агента: «--- PAGE 3 --- 2. Sim. Existe um sistema de radiadores alimentado por recuperador de calor.».",
+            "why": "Тип отопления определяет расходы на эксплуатацию. Возраст котла/рекуператора — риск внеплановой замены (3 000–8 000 €). Нужно уточнить последнее ТО.",
+            "how_to_close": "Вопрос агенту: тип системы, год установки, последнее ТО котла/рекуператора.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "painting",
+            "label": "Покраска стен",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Из заметок визита: «местами подкрасить».",
+            "why": "Косметические работы — 3 700–5 500 € (Уровень 2, для въезда).",
+            "how_to_close": "Подтверждено визитом. Точная сумма — после замеров.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "licenca_utilizacao",
+            "label": "Licença de utilização",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент: «Sim. A licença de utilização é de 2026.»",
+            "why": "Без licença de utilização банки отказывают в ипотеке.",
+            "how_to_close": "Запросить копию документа.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "caderneta_predial",
+            "label": "Caderneta predial + certidão de registo",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Кадастровые документы не запрашивались или ответ не получен.",
+            "why": "Caderneta даёт VPT (от него IMT если VPT > цена сделки), площади, артикулы. Certidão — обременения, ипотеки, аресты. Без них — слепая сделка.",
+            "how_to_close": "Вопрос агенту. Certidão можно самостоятельно заказать в predial.oa.pt.",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "energy_class",
+            "label": "Энергетический класс (класс D)",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "БД: класс D. Агент: «O certificado energético foi emitido em 20/02/2025 e é válido até 20/02/2035. Nome do Perito Qualificado: Daniel Paulo Abrantes Marialva Número do PQ:»",
+            "why": "Класс D — это официальный документ, продавец будет на него опираться. Если состояние дома не соответствует классу — нужен расчётный лист для понимания. Влияет на аргументацию по цене.",
+            "how_to_close": "Запросить полный сертификат с расчётной частью у агента.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "neighboring_plot",
+            "label": "Соседний участок на продаже",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Из заметок визита: «РЯДОМ ПРОДАЁТСЯ СОСЕДНИЙ УЧАСТОК — уточнить площадь, цену, готовность продать». Ответа агента нет.",
+            "why": "Если участок принадлежит тому же продавцу и продаётся за разумную цену — возможность расширить надел. Важно выяснить ДО сделки, пока актив не ушёл. Площадь менее 3 000 м² (текущий участок 1 080 м²) — ограничение для ряда строительных проектов.",
+            "how_to_close": "Вопрос агенту: площадь, цена, принадлежит ли тому же продавцу, возможна ли совместная сделка или право первого отказа.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          }
+        ]
+      },
+      "claims": {
+        "works_l1": [
+          {
+            "key": "windows",
+            "level": 1,
+            "name_ru": "Окна — замена на двойной стеклопакет по всему дому",
+            "name_pt": "Janelas — substituição por vidro duplo em toda a casa",
+            "cost_min": 6500,
+            "cost_max": 10000,
+            "cost_fixed": null,
+            "source_quote": "Não. INSTALAÇÕES",
+            "source_name": "Опросник агента",
+            "url": "https://www.habitissimo.pt/orcamentos/janelas"
+          },
+          {
+            "key": "water",
+            "level": 1,
+            "name_ru": "Водоснабжение — накопительный резервуар с обвязкой, анализ воды, оформление водозабора",
+            "name_pt": "Abastecimento de água — reservatório com ligações, análise da água, formalização da captação",
+            "cost_min": 2000,
+            "cost_max": 4000,
+            "cost_fixed": null,
+            "source_quote": "Existe bomba de água instalada no furo. Não existe depósito.",
+            "source_name": "Опросник агента",
+            "url": "https://www.habitissimo.pt/orcamentos/canalizacao"
+          },
+          {
+            "key": "dampness",
+            "level": 1,
+            "name_ru": "Устранение точек влажности в подвале",
+            "name_pt": "Eliminação de pontos de humidade na cave",
+            "cost_min": 1500,
+            "cost_max": 3000,
+            "cost_fixed": null,
+            "source_quote": "Existem alguns pontos de humidade, associados também ao facto de a casa estar fechada há algum tempo.",
+            "source_name": "Опросник агента",
+            "url": null
+          }
+        ],
+        "works_l2": [
+          {
+            "key": "painting",
+            "level": 2,
+            "name_ru": "Подготовка и покраска стен",
+            "name_pt": "Preparação e pintura das paredes",
+            "cost_min": 3700,
+            "cost_max": 5500,
+            "cost_fixed": null,
+            "source_quote": "Из заметок визита 12.08.2026: «местами подкрасить»",
+            "source_name": "Заметки визита",
+            "url": "https://www.habitissimo.pt/orcamentos/pintores/pintura-interior"
+          }
+        ],
+        "appliances": [],
+        "total_l1_min": 10000,
+        "total_l1_max": 17000,
+        "total_l2_min": 3700,
+        "total_l2_max": 5500,
+        "grand_min": 13700,
+        "grand_max": 22500
+      },
+      "agent_questions": [
+        {
+          "field": "water_analysis",
+          "label": "Анализ воды",
+          "what": "Агент ответил: «»",
+          "why": "Анализ есть — требуем копию.",
+          "how_to_close": "Запросить результат анализа или организовать самостоятельно.",
+          "status": "ПОДТВЕРЖДЕНО"
+        },
+        {
+          "field": "energy_class",
+          "label": "Энергетический класс (класс D)",
+          "what": "БД: класс D. Агент: «O certificado energético foi emitido em 20/02/2025 e é válido até 20/02/2035. Nome do Perito Qualificado: Daniel Paulo Abrantes Marialva Número do PQ:»",
+          "why": "Класс D — это официальный документ, продавец будет на него опираться. Если состояние дома не соответствует классу — нужен расчётный лист для понимания. Влияет на аргументацию по цене.",
+          "how_to_close": "Запросить полный сертификат с расчётной частью у агента.",
+          "status": "ПОДТВЕРЖДЕНО"
+        },
+        {
+          "field": "neighboring_plot",
+          "label": "Соседний участок на продаже",
+          "what": "Из заметок визита: «РЯДОМ ПРОДАЁТСЯ СОСЕДНИЙ УЧАСТОК — уточнить площадь, цену, готовность продать». Ответа агента нет.",
+          "why": "Если участок принадлежит тому же продавцу и продаётся за разумную цену — возможность расширить надел. Важно выяснить ДО сделки, пока актив не ушёл. Площадь менее 3 000 м² (текущий участок 1 080 м²) — ограничение для ряда строительных проектов.",
+          "how_to_close": "Вопрос агенту: площадь, цена, принадлежит ли тому же продавцу, возможна ли совместная сделка или право первого отказа.",
+          "status": "НЕИЗВЕСТНО"
+        }
+      ],
+      "links": {
+        "proposta_html": "../proposta/out/64_proposta.html",
+        "reconcile_md": "../proposta/out/64_reconcile.md"
+      },
+      "sync": {
+        "last_checked": "2026-08-13T11:12:27+00:00",
+        "units": [
+          {
+            "id": "h64_work_windows",
+            "label": "Окна — замена на двойной стеклопакет по всему дому",
+            "ru_hash": "2458b2507de9d3e3",
+            "pt_hash": "d10aa02cea7f17ad",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h64_work_water",
+            "label": "Водоснабжение — накопительный резервуар с обвязкой, анализ воды, оформление водо",
+            "ru_hash": "d9d78d429d5ae6ae",
+            "pt_hash": "0a254b39b7f0e5d5",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h64_work_dampness",
+            "label": "Устранение точек влажности в подвале",
+            "ru_hash": "e63413001929b221",
+            "pt_hash": "c184663570af7121",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h64_work_painting",
+            "label": "Подготовка и покраска стен",
+            "ru_hash": "7771c9bc9eeb8e74",
+            "pt_hash": "3ad9534df19ea856",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h64_qvisit_0",
+            "label": "Запросите в банке: принимают ли они к финансированию объекты в зоне alto risco d",
+            "ru_hash": "6181ddbd01c960e5",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h64_qvisit_1",
+            "label": "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в ка",
+            "ru_hash": "8cacfa3d141e6e35",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h64_qvisit_2",
+            "label": "Какова точная площадь в caderneta predial? Что из 240м² / 540м² — útil и что bru",
+            "ru_hash": "3cd47a590aa6119d",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h64_aq_water_analysis",
+            "label": "Анализ воды",
+            "ru_hash": "14385feb3596a77a",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h64_aq_energy_class",
+            "label": "Энергетический класс (класс D)",
+            "ru_hash": "3014e331f1d1a39c",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h64_aq_neighboring_plot",
+            "label": "Соседний участок на продаже",
+            "ru_hash": "67ea48011b66ff80",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          }
+        ],
+        "phrases": {
+          "units": [
+            {
+              "id": "phrase_who_we_are",
+              "label": "who we are",
+              "ru_hash": "6ef08fd109aaba54",
+              "pt_hash": "3c2d591ce79eeb8f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_approach_good_condition",
+              "label": "approach good condition",
+              "ru_hash": "ef299b6a6eef501c",
+              "pt_hash": "1744228f1680129e",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_approach_renovation",
+              "label": "approach renovation",
+              "ru_hash": "18ea48467e155c20",
+              "pt_hash": "5dc7a74f86dc7121",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_financing",
+              "label": "financing",
+              "ru_hash": "9b534833ad538fcd",
+              "pt_hash": "b7b607f65d6e4ca2",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_taxes_honest",
+              "label": "taxes honest",
+              "ru_hash": "e0b9ed3fb07bddfe",
+              "pt_hash": "dd74c7037ab5d57f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_conditions",
+              "label": "conditions",
+              "ru_hash": "008406cc4c61196a",
+              "pt_hash": "4c64c9036e7ea706",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_deposit_box",
+              "label": "deposit box",
+              "ru_hash": "c4c02cd8b00e962f",
+              "pt_hash": "c61ef24028c03fb2",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_appraisal",
+              "label": "appraisal",
+              "ru_hash": "e07e4d49578e2552",
+              "pt_hash": "ba0ef412a8e3eb73",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_dialogue",
+              "label": "dialogue",
+              "ru_hash": "4ab4068aee1f5a64",
+              "pt_hash": "fd0f99d0a9c96d3f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_market_context_generic",
+              "label": "market context generic",
+              "ru_hash": "fcde5e916b5ce391",
+              "pt_hash": "79e36975581cd0a7",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            }
+          ],
+          "summary": {
+            "synced": 10,
+            "stale": 0,
+            "missing": 0,
+            "total": 10
+          }
+        },
+        "summary": {
+          "synced": 14,
+          "stale": 0,
+          "missing": 6
+        }
+      }
+    },
+    {
+      "id": 74,
+      "title": "Moradia Isolada T3 / Seia, Seia",
+      "location": {
+        "address": "Seia, Seia",
+        "freguesia": "Paranhos",
+        "concelho": "Seia",
+        "district": "Guarda",
+        "lat": 40.47706544043016,
+        "lon": -7.781473981781
+      },
+      "listing": {
+        "price_eur": 234000,
+        "area_m2": 191,
+        "land_area_m2": 1150.0,
+        "bedrooms": 3,
+        "bathrooms": 2,
+        "energy_class": null,
+        "url": "https://www.era.pt/imovel/moradia-isolada-t3-seia-seia-405240078",
+        "agency": "ERA Gouveia",
+        "agent": "Susana Ramos",
+        "agent_phone": "+351912969770 (WA Carmen Reis); +351926677566 (из объявления, Susana Ramos ERA)"
+      },
+      "offer": {
+        "price_eur": 210000,
+        "price_ppm2": 1099
+      },
+      "financibility": {
+        "status": "UNDER_QUESTION",
+        "factors": [
+          {
+            "code": "FIRE_ZONE_HIGH",
+            "status": "UNDER_QUESTION",
+            "label": "Высокий пожарный риск — уточнить у банка",
+            "detail": "fire_risk=high, но concelho «Seia» не в массово-отказном кластере. Конкретный банк может потребовать дополнительный страховой пакет или поднять ставку на 0.3–0.8%.",
+            "pre_visit_question": "Запросите в банке: принимают ли они к финансированию объекты в зоне alto risco de incêndio в Seia?"
+          },
+          {
+            "code": "LICENCA_OK",
+            "status": "PASSES",
+            "label": "Licença de utilização",
+            "detail": "Подтверждена агентом.",
+            "pre_visit_question": ""
+          },
+          {
+            "code": "TYPOLOGY_OK",
+            "status": "PASSES",
+            "label": "Типология",
+            "detail": "Согласована: 3 спален в DB и 3 в raw_json.",
+            "pre_visit_question": ""
+          },
+          {
+            "code": "UNLICENSED_UNKNOWN",
+            "status": "UNDER_QUESTION",
+            "label": "Нелегализованные постройки — не выяснено",
+            "detail": "Информации об obras sem licença нет. Если есть нелегализованные пристройки — банк оценит только основное здание.",
+            "pre_visit_question": "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в каком состоянии легализация?"
+          },
+          {
+            "code": "AREA_MISMATCH",
+            "status": "UNDER_QUESTION",
+            "label": "Расхождение площади: DB=191.0м², raw_json=272м²",
+            "detail": "Разница 81м² (30%). Вероятно bruta vs útil. Банк оценивает по фактической жилой площади. Если оценка выйдет ниже цены сделки — банк выдаст меньшую сумму.",
+            "pre_visit_question": "Какова точная площадь в caderneta predial? Что из 240м² / 540м² — útil и что bruta?"
+          }
+        ],
+        "questions_before_visit": [
+          "Запросите в банке: принимают ли они к финансированию объекты в зоне alto risco de incêndio в Seia?",
+          "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в каком состоянии легализация?",
+          "Какова точная площадь в caderneta predial? Что из 240м² / 540м² — útil и что bruta?"
+        ]
+      },
+      "math": {
+        "listing_ppm2": 1225,
+        "offer_ppm2": 1099,
+        "grand_min": 10000,
+        "grand_max": 17000,
+        "imt": 4240,
+        "imt_jovem": 0,
+        "jovem_discount": "100% — полное освобождение (IMT Jovem, до 330 539 €)",
+        "imposto_selo": 1680,
+        "full_entry_min": 222380,
+        "full_entry_max": 233620,
+        "remaining_after_jovem": 37620,
+        "remaining_after_standard": 33380
+      },
+      "infrastructure": {
+        "dist_hospital_km": 8.6,
+        "dist_school_km": 5.8,
+        "dist_pharmacy_km": 14.6,
+        "dist_supermarket_km": 7.6,
+        "dist_highway_km": 12.1,
+        "dist_bombeiros_km": 7.3,
+        "internet_fiber_proxy": "fiber",
+        "elevation_m": 405.0
+      },
+      "fire_risk": {
+        "level": "high",
+        "burned_nearby_years": "2017,2022",
+        "dist_bombeiros_km": 7.3
+      },
+      "market": {
+        "ppm2_median": null,
+        "ppm2_p25": null,
+        "ppm2_min": null
+      },
+      "reconcile": {
+        "confirmed_count": 10,
+        "unknown_count": 3,
+        "contradicts_count": 1,
+        "items": [
+          {
+            "field": "area",
+            "label": "Площадь дома",
+            "status": "ПРОТИВОРЕЧИТ",
+            "what": "БД фиксирует 191.0 м², при этом raw_json (из ERA-скрейпа) показывает 272 м². Разница 81 м² — это не погрешность округления, а структурное расхождение.",
+            "why": "Площадь прямо влияет на €/м² и позицию в рыночном сравнении. Если реальная площадь 240 м² — цена 1 246 €/м², медиана рынка. Если 540 м² — 554 €/м², категория 'под реконструкцию'. Также определяет базу расчёта IMT, IMI и ипотечного лимита.",
+            "how_to_close": "Запросить у агента caderneta predial с актуальными данными и свидетельство о регистрации (certidão de registo predial). Возможно, 540 — bruta (общая), 240 — útil (полезная). Это разные понятия, и нужно уточнить, что именно стоит в кадастре.",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "electrical",
+            "label": "Электрика — возраст и состояние",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент письменно подтвердил: «Estamos a confirmar esta informação.». Проводка оригинальная, сертификата CERTIEL нет.",
+            "why": "Оригинальная проводка возраста постройки — пожарный риск и обязательные расходы 8 000–12 000 €. Некоторые банки требуют CERTIEL для ипотеки.",
+            "how_to_close": "Уже в ответах агента. Запросить CERTIEL копию отдельно.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "roof",
+            "label": "Кровля",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «»",
+            "why": "Кровля вмешательств не требует — в смету не включаем.",
+            "how_to_close": "Осмотр кровельщика при втором визите.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "water_analysis",
+            "label": "Анализ воды",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «»",
+            "why": "Анализ есть — требуем копию.",
+            "how_to_close": "Запросить результат анализа или организовать самостоятельно.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "water_tank",
+            "label": "Накопительный резервуар",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент: «Existe bomba de água instalada no furo. Não existe depósito.»",
+            "why": "Без резервуара при поломке насоса дом без воды. Установка 2 000–4 000 €.",
+            "how_to_close": "Уже известно из ответа агента.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "windows",
+            "label": "Окна — двойное остекление",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «Não. INSTALAÇÕES»",
+            "why": "Одинарное остекление → высокие теплопотери зимой, расходы 6 500–10 000 € на замену. Также несоответствие заявленному энергоклассу.",
+            "how_to_close": "Подтверждено ответом агента.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "fire_risk",
+            "label": "Зона пожарного риска",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "БД помечает как zona de alto risco de incêndio. Пожары в радиусе в годы: 2017,2022. Пожарная часть: 7.3 км.",
+            "why": "По DL 82/2021 владелец обязан поддерживать 50-метровую противопожарную полосу ежегодно. Страховщики применяют повышенный коэффициент. Риск эвакуации в экстремальные годы. Банки могут потребовать дополнительную страховку. Это реальный ежегодный расход и психологический фактор.",
+            "how_to_close": "Уточнить: вся ли 50-метровая полоса в пределах участка, или частично захватывает соседей. Открытые данные: ICNF SGIF (Sistema de Gestão de Incêndios Florestais).",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "internet",
+            "label": "Интернет — оптоволокно",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "БД: internet_fiber_proxy = «fiber». Оптоволокно есть.",
+            "why": "Fiber есть — нет претензий.",
+            "how_to_close": "Подтверждено.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "condition",
+            "label": "Общее состояние",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Состояние не оценивалось.",
+            "why": "Невозможно оценить реальные расходы.",
+            "how_to_close": "Визит.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "heating",
+            "label": "Отопление",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Из визита и/или ответа агента: ответ агента: «--- PAGE 3 --- 2. Sim. Existe um sistema de radiadores alimentado por recuperador de calor.».",
+            "why": "Тип отопления определяет расходы на эксплуатацию. Возраст котла/рекуператора — риск внеплановой замены (3 000–8 000 €). Нужно уточнить последнее ТО.",
+            "how_to_close": "Вопрос агенту: тип системы, год установки, последнее ТО котла/рекуператора.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "painting",
+            "label": "Покраска стен",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Потребность в покраске не оценивалась.",
+            "why": "Может потребоваться после въезда.",
+            "how_to_close": "Визит.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "licenca_utilizacao",
+            "label": "Licença de utilização",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент: «Sim. A licença de utilização é de 2026.»",
+            "why": "Без licença de utilização банки отказывают в ипотеке.",
+            "how_to_close": "Запросить копию документа.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "caderneta_predial",
+            "label": "Caderneta predial + certidão de registo",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Кадастровые документы не запрашивались или ответ не получен.",
+            "why": "Caderneta даёт VPT (от него IMT если VPT > цена сделки), площади, артикулы. Certidão — обременения, ипотеки, аресты. Без них — слепая сделка.",
+            "how_to_close": "Вопрос агенту. Certidão можно самостоятельно заказать в predial.oa.pt.",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "energy_class",
+            "label": "Энергетический класс (класс None)",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "БД: класс None. Агент: «O certificado energético foi emitido em 20/02/2025 e é válido até 20/02/2035. Nome do Perito Qualificado: Daniel Paulo Abrantes Marialva Número do PQ:»",
+            "why": "Класс None — это официальный документ, продавец будет на него опираться. Если состояние дома не соответствует классу — нужен расчётный лист для понимания. Влияет на аргументацию по цене.",
+            "how_to_close": "Запросить полный сертификат с расчётной частью у агента.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          }
+        ]
+      },
+      "claims": {
+        "works_l1": [
+          {
+            "key": "windows",
+            "level": 1,
+            "name_ru": "Окна — замена на двойной стеклопакет по всему дому",
+            "name_pt": "Janelas — substituição por vidro duplo em toda a casa",
+            "cost_min": 6500,
+            "cost_max": 10000,
+            "cost_fixed": null,
+            "source_quote": "Não. INSTALAÇÕES",
+            "source_name": "Опросник агента",
+            "url": "https://www.habitissimo.pt/orcamentos/janelas"
+          },
+          {
+            "key": "water",
+            "level": 1,
+            "name_ru": "Водоснабжение — накопительный резервуар с обвязкой, анализ воды, оформление водозабора",
+            "name_pt": "Abastecimento de água — reservatório com ligações, análise da água, formalização da captação",
+            "cost_min": 2000,
+            "cost_max": 4000,
+            "cost_fixed": null,
+            "source_quote": "Existe bomba de água instalada no furo. Não existe depósito.",
+            "source_name": "Опросник агента",
+            "url": "https://www.habitissimo.pt/orcamentos/canalizacao"
+          },
+          {
+            "key": "dampness",
+            "level": 1,
+            "name_ru": "Устранение точек влажности в подвале",
+            "name_pt": "Eliminação de pontos de humidade na cave",
+            "cost_min": 1500,
+            "cost_max": 3000,
+            "cost_fixed": null,
+            "source_quote": "Existem alguns pontos de humidade, associados também ao facto de a casa estar fechada há algum tempo.",
+            "source_name": "Опросник агента",
+            "url": null
+          }
+        ],
+        "works_l2": [],
+        "appliances": [],
+        "total_l1_min": 10000,
+        "total_l1_max": 17000,
+        "total_l2_min": 0,
+        "total_l2_max": 0,
+        "grand_min": 10000,
+        "grand_max": 17000
+      },
+      "agent_questions": [
+        {
+          "field": "water_analysis",
+          "label": "Анализ воды",
+          "what": "Агент ответил: «»",
+          "why": "Анализ есть — требуем копию.",
+          "how_to_close": "Запросить результат анализа или организовать самостоятельно.",
+          "status": "ПОДТВЕРЖДЕНО"
+        },
+        {
+          "field": "energy_class",
+          "label": "Энергетический класс (класс None)",
+          "what": "БД: класс None. Агент: «O certificado energético foi emitido em 20/02/2025 e é válido até 20/02/2035. Nome do Perito Qualificado: Daniel Paulo Abrantes Marialva Número do PQ:»",
+          "why": "Класс None — это официальный документ, продавец будет на него опираться. Если состояние дома не соответствует классу — нужен расчётный лист для понимания. Влияет на аргументацию по цене.",
+          "how_to_close": "Запросить полный сертификат с расчётной частью у агента.",
+          "status": "ПОДТВЕРЖДЕНО"
+        }
+      ],
+      "links": {
+        "proposta_html": null,
+        "reconcile_md": null
+      },
+      "sync": {
+        "last_checked": "2026-08-13T11:12:27+00:00",
+        "units": [
+          {
+            "id": "h74_work_windows",
+            "label": "Окна — замена на двойной стеклопакет по всему дому",
+            "ru_hash": "2458b2507de9d3e3",
+            "pt_hash": "d10aa02cea7f17ad",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h74_work_water",
+            "label": "Водоснабжение — накопительный резервуар с обвязкой, анализ воды, оформление водо",
+            "ru_hash": "d9d78d429d5ae6ae",
+            "pt_hash": "0a254b39b7f0e5d5",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h74_work_dampness",
+            "label": "Устранение точек влажности в подвале",
+            "ru_hash": "e63413001929b221",
+            "pt_hash": "c184663570af7121",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h74_qvisit_0",
+            "label": "Запросите в банке: принимают ли они к финансированию объекты в зоне alto risco d",
+            "ru_hash": "33f4ff5f47054e83",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h74_qvisit_1",
+            "label": "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в ка",
+            "ru_hash": "8cacfa3d141e6e35",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h74_qvisit_2",
+            "label": "Какова точная площадь в caderneta predial? Что из 240м² / 540м² — útil и что bru",
+            "ru_hash": "3cd47a590aa6119d",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h74_aq_water_analysis",
+            "label": "Анализ воды",
+            "ru_hash": "14385feb3596a77a",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h74_aq_energy_class",
+            "label": "Энергетический класс (класс None)",
+            "ru_hash": "ec4e4e26c844ed3d",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          }
+        ],
+        "phrases": {
+          "units": [
+            {
+              "id": "phrase_who_we_are",
+              "label": "who we are",
+              "ru_hash": "6ef08fd109aaba54",
+              "pt_hash": "3c2d591ce79eeb8f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_approach_good_condition",
+              "label": "approach good condition",
+              "ru_hash": "ef299b6a6eef501c",
+              "pt_hash": "1744228f1680129e",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_approach_renovation",
+              "label": "approach renovation",
+              "ru_hash": "18ea48467e155c20",
+              "pt_hash": "5dc7a74f86dc7121",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_financing",
+              "label": "financing",
+              "ru_hash": "9b534833ad538fcd",
+              "pt_hash": "b7b607f65d6e4ca2",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_taxes_honest",
+              "label": "taxes honest",
+              "ru_hash": "e0b9ed3fb07bddfe",
+              "pt_hash": "dd74c7037ab5d57f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_conditions",
+              "label": "conditions",
+              "ru_hash": "008406cc4c61196a",
+              "pt_hash": "4c64c9036e7ea706",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_deposit_box",
+              "label": "deposit box",
+              "ru_hash": "c4c02cd8b00e962f",
+              "pt_hash": "c61ef24028c03fb2",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_appraisal",
+              "label": "appraisal",
+              "ru_hash": "e07e4d49578e2552",
+              "pt_hash": "ba0ef412a8e3eb73",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_dialogue",
+              "label": "dialogue",
+              "ru_hash": "4ab4068aee1f5a64",
+              "pt_hash": "fd0f99d0a9c96d3f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_market_context_generic",
+              "label": "market context generic",
+              "ru_hash": "8d2349e720a970bb",
+              "pt_hash": "3139d4f77aa301d8",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            }
+          ],
+          "summary": {
+            "synced": 10,
+            "stale": 0,
+            "missing": 0,
+            "total": 10
+          }
+        },
+        "summary": {
+          "synced": 13,
+          "stale": 0,
+          "missing": 5
+        }
+      }
+    },
+    {
+      "id": 340,
+      "title": "Moradia T5 Vila Soeiro do Chao - Fornos de Algodres",
+      "location": {
+        "address": null,
+        "freguesia": "Vila Soeiro do Chao",
+        "concelho": "Fornos de Algodres",
+        "district": "Guarda",
+        "lat": 40.612588,
+        "lon": -7.485636
+      },
+      "listing": {
+        "price_eur": 255000,
+        "area_m2": 316,
+        "land_area_m2": 600.0,
+        "bedrooms": 5,
+        "bathrooms": 3,
+        "energy_class": "F",
+        "url": "https://www.era.pt/imovel/moradia-t5-fornos-de-algodres-vila-soeiro-do-chao-405250058",
+        "agency": "ERA Gouveia",
+        "agent": null,
+        "agent_phone": "926677566"
+      },
+      "offer": {
+        "price_eur": 225000,
+        "price_ppm2": 712
+      },
+      "financibility": {
+        "status": "UNDER_QUESTION",
+        "factors": [
+          {
+            "code": "FIRE_ZONE_OK",
+            "status": "PASSES",
+            "label": "Зона пожарного риска",
+            "detail": "Município не входит в проблемный кластер, fire_risk не high.",
+            "pre_visit_question": ""
+          },
+          {
+            "code": "LICENCA_OK",
+            "status": "PASSES",
+            "label": "Licença de utilização",
+            "detail": "Подтверждена агентом.",
+            "pre_visit_question": ""
+          },
+          {
+            "code": "TYPOLOGY_UNKNOWN",
+            "status": "UNDER_QUESTION",
+            "label": "Типология в caderneta — не подтверждена",
+            "detail": "Нет данных о типологии из caderneta. Если объявление преувеличивает число спален — банковская оценка выйдет ниже цены сделки.",
+            "pre_visit_question": "Какая типология (T0/T1/T2…) указана в caderneta predial?"
+          },
+          {
+            "code": "UNLICENSED_UNKNOWN",
+            "status": "UNDER_QUESTION",
+            "label": "Нелегализованные постройки — не выяснено",
+            "detail": "Информации об obras sem licença нет. Если есть нелегализованные пристройки — банк оценит только основное здание.",
+            "pre_visit_question": "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в каком состоянии легализация?"
+          },
+          {
+            "code": "AREA_OK",
+            "status": "PASSES",
+            "label": "Площадь",
+            "detail": "Данные согласованы или расхождение незначительное.",
+            "pre_visit_question": ""
+          }
+        ],
+        "questions_before_visit": [
+          "Какая типология (T0/T1/T2…) указана в caderneta predial?",
+          "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в каком состоянии легализация?"
+        ]
+      },
+      "math": {
+        "listing_ppm2": 807,
+        "offer_ppm2": 712,
+        "grand_min": 10000,
+        "grand_max": 17000,
+        "imt": 5290,
+        "imt_jovem": 0,
+        "jovem_discount": "100% — полное освобождение (IMT Jovem, до 330 539 €)",
+        "imposto_selo": 1800,
+        "full_entry_min": 237500,
+        "full_entry_max": 249790,
+        "remaining_after_jovem": 22500,
+        "remaining_after_standard": 17210
+      },
+      "infrastructure": {
+        "dist_hospital_km": 41.4,
+        "dist_school_km": null,
+        "dist_pharmacy_km": null,
+        "dist_supermarket_km": null,
+        "dist_highway_km": null,
+        "dist_bombeiros_km": null,
+        "internet_fiber_proxy": null,
+        "elevation_m": null
+      },
+      "fire_risk": {
+        "level": null,
+        "burned_nearby_years": null,
+        "dist_bombeiros_km": null
+      },
+      "market": {
+        "ppm2_median": null,
+        "ppm2_p25": null,
+        "ppm2_min": null
+      },
+      "reconcile": {
+        "confirmed_count": 9,
+        "unknown_count": 5,
+        "contradicts_count": 0,
+        "items": [
+          {
+            "field": "area",
+            "label": "Площадь дома",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Площадь 316.0 м² зафиксирована в БД из объявления ERA.",
+            "why": "Используется для расчёта €/м² и позиционирования на рынке.",
+            "how_to_close": "Подтвердить через caderneta predial (официальный документ).",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "electrical",
+            "label": "Электрика — возраст и состояние",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент письменно подтвердил: «Estamos a confirmar esta informação.». Проводка оригинальная, сертификата CERTIEL нет.",
+            "why": "Оригинальная проводка возраста постройки — пожарный риск и обязательные расходы 8 000–12 000 €. Некоторые банки требуют CERTIEL для ипотеки.",
+            "how_to_close": "Уже в ответах агента. Запросить CERTIEL копию отдельно.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "roof",
+            "label": "Кровля",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «»",
+            "why": "Кровля вмешательств не требует — в смету не включаем.",
+            "how_to_close": "Осмотр кровельщика при втором визите.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "water_analysis",
+            "label": "Анализ воды",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «»",
+            "why": "Анализ есть — требуем копию.",
+            "how_to_close": "Запросить результат анализа или организовать самостоятельно.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "water_tank",
+            "label": "Накопительный резервуар",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент: «Existe bomba de água instalada no furo. Não existe depósito.»",
+            "why": "Без резервуара при поломке насоса дом без воды. Установка 2 000–4 000 €.",
+            "how_to_close": "Уже известно из ответа агента.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "windows",
+            "label": "Окна — двойное остекление",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «Não. INSTALAÇÕES»",
+            "why": "Одинарное остекление → высокие теплопотери зимой, расходы 6 500–10 000 € на замену. Также несоответствие заявленному энергоклассу.",
+            "how_to_close": "Подтверждено ответом агента.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "fire_risk",
+            "label": "Зона пожарного риска",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Риск: не определён.",
+            "why": "Пожарный риск влияет на страховку и ежегодные обязанности.",
+            "how_to_close": "Проверить ICNF или спросить агента.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "internet",
+            "label": "Интернет",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Тип интернет-подключения не установлен.",
+            "why": "Критично для удалённой работы.",
+            "how_to_close": "Вопрос агенту или проверка на сайтах провайдеров.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "condition",
+            "label": "Общее состояние",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Состояние не оценивалось.",
+            "why": "Невозможно оценить реальные расходы.",
+            "how_to_close": "Визит.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "heating",
+            "label": "Отопление",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Из визита и/или ответа агента: два камина; ответ агента: «--- PAGE 3 --- 2. Sim. Existe um sistema de radiadores alimentado por recuperador de calor.».",
+            "why": "Тип отопления определяет расходы на эксплуатацию. Возраст котла/рекуператора — риск внеплановой замены (3 000–8 000 €). Нужно уточнить последнее ТО.",
+            "how_to_close": "Вопрос агенту: тип системы, год установки, последнее ТО котла/рекуператора.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "painting",
+            "label": "Покраска стен",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Потребность в покраске не оценивалась.",
+            "why": "Может потребоваться после въезда.",
+            "how_to_close": "Визит.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "licenca_utilizacao",
+            "label": "Licença de utilização",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент: «Sim. A licença de utilização é de 2026.»",
+            "why": "Без licença de utilização банки отказывают в ипотеке.",
+            "how_to_close": "Запросить копию документа.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "caderneta_predial",
+            "label": "Caderneta predial + certidão de registo",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Кадастровые документы не запрашивались или ответ не получен.",
+            "why": "Caderneta даёт VPT (от него IMT если VPT > цена сделки), площади, артикулы. Certidão — обременения, ипотеки, аресты. Без них — слепая сделка.",
+            "how_to_close": "Вопрос агенту. Certidão можно самостоятельно заказать в predial.oa.pt.",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "energy_class",
+            "label": "Энергетический класс (класс F)",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "БД: класс F. Агент: «O certificado energético foi emitido em 20/02/2025 e é válido até 20/02/2035. Nome do Perito Qualificado: Daniel Paulo Abrantes Marialva Número do PQ:»",
+            "why": "Класс F — это официальный документ, продавец будет на него опираться. Если состояние дома не соответствует классу — нужен расчётный лист для понимания. Влияет на аргументацию по цене.",
+            "how_to_close": "Запросить полный сертификат с расчётной частью у агента.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          }
+        ]
+      },
+      "claims": {
+        "works_l1": [
+          {
+            "key": "windows",
+            "level": 1,
+            "name_ru": "Окна — замена на двойной стеклопакет по всему дому",
+            "name_pt": "Janelas — substituição por vidro duplo em toda a casa",
+            "cost_min": 6500,
+            "cost_max": 10000,
+            "cost_fixed": null,
+            "source_quote": "Não. INSTALAÇÕES",
+            "source_name": "Опросник агента",
+            "url": "https://www.habitissimo.pt/orcamentos/janelas"
+          },
+          {
+            "key": "water",
+            "level": 1,
+            "name_ru": "Водоснабжение — накопительный резервуар с обвязкой, анализ воды, оформление водозабора",
+            "name_pt": "Abastecimento de água — reservatório com ligações, análise da água, formalização da captação",
+            "cost_min": 2000,
+            "cost_max": 4000,
+            "cost_fixed": null,
+            "source_quote": "Existe bomba de água instalada no furo. Não existe depósito.",
+            "source_name": "Опросник агента",
+            "url": "https://www.habitissimo.pt/orcamentos/canalizacao"
+          },
+          {
+            "key": "dampness",
+            "level": 1,
+            "name_ru": "Устранение точек влажности в подвале",
+            "name_pt": "Eliminação de pontos de humidade na cave",
+            "cost_min": 1500,
+            "cost_max": 3000,
+            "cost_fixed": null,
+            "source_quote": "Existem alguns pontos de humidade, associados também ao facto de a casa estar fechada há algum tempo.",
+            "source_name": "Опросник агента",
+            "url": null
+          }
+        ],
+        "works_l2": [],
+        "appliances": [],
+        "total_l1_min": 10000,
+        "total_l1_max": 17000,
+        "total_l2_min": 0,
+        "total_l2_max": 0,
+        "grand_min": 10000,
+        "grand_max": 17000
+      },
+      "agent_questions": [
+        {
+          "field": "water_analysis",
+          "label": "Анализ воды",
+          "what": "Агент ответил: «»",
+          "why": "Анализ есть — требуем копию.",
+          "how_to_close": "Запросить результат анализа или организовать самостоятельно.",
+          "status": "ПОДТВЕРЖДЕНО"
+        },
+        {
+          "field": "internet",
+          "label": "Интернет",
+          "what": "Тип интернет-подключения не установлен.",
+          "why": "Критично для удалённой работы.",
+          "how_to_close": "Вопрос агенту или проверка на сайтах провайдеров.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "energy_class",
+          "label": "Энергетический класс (класс F)",
+          "what": "БД: класс F. Агент: «O certificado energético foi emitido em 20/02/2025 e é válido até 20/02/2035. Nome do Perito Qualificado: Daniel Paulo Abrantes Marialva Número do PQ:»",
+          "why": "Класс F — это официальный документ, продавец будет на него опираться. Если состояние дома не соответствует классу — нужен расчётный лист для понимания. Влияет на аргументацию по цене.",
+          "how_to_close": "Запросить полный сертификат с расчётной частью у агента.",
+          "status": "ПОДТВЕРЖДЕНО"
+        }
+      ],
+      "links": {
+        "proposta_html": null,
+        "reconcile_md": null
+      },
+      "sync": {
+        "last_checked": "2026-08-13T11:12:27+00:00",
+        "units": [
+          {
+            "id": "h340_work_windows",
+            "label": "Окна — замена на двойной стеклопакет по всему дому",
+            "ru_hash": "2458b2507de9d3e3",
+            "pt_hash": "d10aa02cea7f17ad",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h340_work_water",
+            "label": "Водоснабжение — накопительный резервуар с обвязкой, анализ воды, оформление водо",
+            "ru_hash": "d9d78d429d5ae6ae",
+            "pt_hash": "0a254b39b7f0e5d5",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h340_work_dampness",
+            "label": "Устранение точек влажности в подвале",
+            "ru_hash": "e63413001929b221",
+            "pt_hash": "c184663570af7121",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h340_qvisit_0",
+            "label": "Какая типология (T0/T1/T2…) указана в caderneta predial?",
+            "ru_hash": "01e57c6b3c971575",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h340_qvisit_1",
+            "label": "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в ка",
+            "ru_hash": "8cacfa3d141e6e35",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h340_aq_water_analysis",
+            "label": "Анализ воды",
+            "ru_hash": "14385feb3596a77a",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h340_aq_internet",
+            "label": "Интернет",
+            "ru_hash": "c600e4f07c1087a0",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h340_aq_energy_class",
+            "label": "Энергетический класс (класс F)",
+            "ru_hash": "bd238f49bba29634",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          }
+        ],
+        "phrases": {
+          "units": [
+            {
+              "id": "phrase_who_we_are",
+              "label": "who we are",
+              "ru_hash": "6ef08fd109aaba54",
+              "pt_hash": "3c2d591ce79eeb8f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_approach_good_condition",
+              "label": "approach good condition",
+              "ru_hash": "ef299b6a6eef501c",
+              "pt_hash": "1744228f1680129e",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_approach_renovation",
+              "label": "approach renovation",
+              "ru_hash": "18ea48467e155c20",
+              "pt_hash": "5dc7a74f86dc7121",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_financing",
+              "label": "financing",
+              "ru_hash": "9b534833ad538fcd",
+              "pt_hash": "b7b607f65d6e4ca2",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_taxes_honest",
+              "label": "taxes honest",
+              "ru_hash": "e0b9ed3fb07bddfe",
+              "pt_hash": "dd74c7037ab5d57f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_conditions",
+              "label": "conditions",
+              "ru_hash": "008406cc4c61196a",
+              "pt_hash": "4c64c9036e7ea706",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_deposit_box",
+              "label": "deposit box",
+              "ru_hash": "c4c02cd8b00e962f",
+              "pt_hash": "c61ef24028c03fb2",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_appraisal",
+              "label": "appraisal",
+              "ru_hash": "e07e4d49578e2552",
+              "pt_hash": "ba0ef412a8e3eb73",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_dialogue",
+              "label": "dialogue",
+              "ru_hash": "4ab4068aee1f5a64",
+              "pt_hash": "fd0f99d0a9c96d3f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_market_context_generic",
+              "label": "market context generic",
+              "ru_hash": "c94a7b40a9d4c9ce",
+              "pt_hash": "1a13fcb4b4ac18ac",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            }
+          ],
+          "summary": {
+            "synced": 10,
+            "stale": 0,
+            "missing": 0,
+            "total": 10
+          }
+        },
+        "summary": {
+          "synced": 13,
+          "stale": 0,
+          "missing": 5
+        }
+      }
+    },
+    {
+      "id": 66,
+      "title": "Moradia Isolada T4 / Tondela, Molelos",
+      "location": {
+        "address": "Molelos, Viseu",
+        "freguesia": "Molelos",
+        "concelho": "Tondela",
+        "district": "Viseu",
+        "lat": 40.51555,
+        "lon": -8.118737
+      },
+      "listing": {
+        "price_eur": 295000,
+        "area_m2": 229,
+        "land_area_m2": 6049.0,
+        "bedrooms": 4,
+        "bathrooms": 3,
+        "energy_class": "A+",
+        "url": "https://www.era.pt/imovel/moradia-isolada-t4-tondela-molelos-367260134",
+        "agency": "ERA Tondela",
+        "agent": "Jéssica Almeida",
+        "agent_phone": "+351942246805"
+      },
+      "offer": {
+        "price_eur": 270000,
+        "price_ppm2": 1179
+      },
+      "financibility": {
+        "status": "UNDER_QUESTION",
+        "factors": [
+          {
+            "code": "FIRE_ZONE_HIGH",
+            "status": "UNDER_QUESTION",
+            "label": "Высокий пожарный риск — уточнить у банка",
+            "detail": "fire_risk=high, но concelho «Tondela» не в массово-отказном кластере. Конкретный банк может потребовать дополнительный страховой пакет или поднять ставку на 0.3–0.8%.",
+            "pre_visit_question": "Запросите в банке: принимают ли они к финансированию объекты в зоне alto risco de incêndio в Tondela?"
+          },
+          {
+            "code": "LICENCA_OK",
+            "status": "PASSES",
+            "label": "Licença de utilização",
+            "detail": "Подтверждена агентом.",
+            "pre_visit_question": ""
+          },
+          {
+            "code": "TYPOLOGY_OK",
+            "status": "PASSES",
+            "label": "Типология",
+            "detail": "Согласована: 4 спален в DB и 4 в raw_json.",
+            "pre_visit_question": ""
+          },
+          {
+            "code": "UNLICENSED_UNKNOWN",
+            "status": "UNDER_QUESTION",
+            "label": "Нелегализованные постройки — не выяснено",
+            "detail": "Информации об obras sem licença нет. Если есть нелегализованные пристройки — банк оценит только основное здание.",
+            "pre_visit_question": "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в каком состоянии легализация?"
+          },
+          {
+            "code": "AREA_OK",
+            "status": "PASSES",
+            "label": "Площадь",
+            "detail": "Данные согласованы или расхождение незначительное.",
+            "pre_visit_question": ""
+          }
+        ],
+        "questions_before_visit": [
+          "Запросите в банке: принимают ли они к финансированию объекты в зоне alto risco de incêndio в Tondela?",
+          "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в каком состоянии легализация?"
+        ]
+      },
+      "math": {
+        "listing_ppm2": 1288,
+        "offer_ppm2": 1179,
+        "grand_min": 10000,
+        "grand_max": 17000,
+        "imt": 8440,
+        "imt_jovem": 0,
+        "jovem_discount": "100% — полное освобождение (IMT Jovem, до 330 539 €)",
+        "imposto_selo": 2160,
+        "full_entry_min": 282860,
+        "full_entry_max": 298300,
+        "remaining_after_jovem": -22860,
+        "remaining_after_standard": -31300
+      },
+      "infrastructure": {
+        "dist_hospital_km": 27.9,
+        "dist_school_km": 21.8,
+        "dist_pharmacy_km": 6.6,
+        "dist_supermarket_km": 26.7,
+        "dist_highway_km": 19.6,
+        "dist_bombeiros_km": 3.2,
+        "internet_fiber_proxy": "fiber",
+        "elevation_m": 258.0
+      },
+      "fire_risk": {
+        "level": "high",
+        "burned_nearby_years": "2017,2024",
+        "dist_bombeiros_km": 3.2
+      },
+      "market": {
+        "ppm2_median": null,
+        "ppm2_p25": null,
+        "ppm2_min": null
+      },
+      "reconcile": {
+        "confirmed_count": 10,
+        "unknown_count": 3,
+        "contradicts_count": 1,
+        "items": [
+          {
+            "field": "area",
+            "label": "Площадь дома",
+            "status": "ПРОТИВОРЕЧИТ",
+            "what": "БД фиксирует 229.0 м², при этом raw_json (из ERA-скрейпа) показывает 174 м². Разница 55 м² — это не погрешность округления, а структурное расхождение.",
+            "why": "Площадь прямо влияет на €/м² и позицию в рыночном сравнении. Если реальная площадь 240 м² — цена 1 246 €/м², медиана рынка. Если 540 м² — 554 €/м², категория 'под реконструкцию'. Также определяет базу расчёта IMT, IMI и ипотечного лимита.",
+            "how_to_close": "Запросить у агента caderneta predial с актуальными данными и свидетельство о регистрации (certidão de registo predial). Возможно, 540 — bruta (общая), 240 — útil (полезная). Это разные понятия, и нужно уточнить, что именно стоит в кадастре.",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "electrical",
+            "label": "Электрика — возраст и состояние",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент письменно подтвердил: «Estamos a confirmar esta informação.». Проводка оригинальная, сертификата CERTIEL нет.",
+            "why": "Оригинальная проводка возраста постройки — пожарный риск и обязательные расходы 8 000–12 000 €. Некоторые банки требуют CERTIEL для ипотеки.",
+            "how_to_close": "Уже в ответах агента. Запросить CERTIEL копию отдельно.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "roof",
+            "label": "Кровля",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «»",
+            "why": "Кровля вмешательств не требует — в смету не включаем.",
+            "how_to_close": "Осмотр кровельщика при втором визите.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "water_analysis",
+            "label": "Анализ воды",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «»",
+            "why": "Анализ есть — требуем копию.",
+            "how_to_close": "Запросить результат анализа или организовать самостоятельно.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "water_tank",
+            "label": "Накопительный резервуар",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент: «Existe bomba de água instalada no furo. Não existe depósito.»",
+            "why": "Без резервуара при поломке насоса дом без воды. Установка 2 000–4 000 €.",
+            "how_to_close": "Уже известно из ответа агента.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "windows",
+            "label": "Окна — двойное остекление",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент ответил: «Não. INSTALAÇÕES»",
+            "why": "Одинарное остекление → высокие теплопотери зимой, расходы 6 500–10 000 € на замену. Также несоответствие заявленному энергоклассу.",
+            "how_to_close": "Подтверждено ответом агента.",
+            "doc_action": "СМЕТА"
+          },
+          {
+            "field": "fire_risk",
+            "label": "Зона пожарного риска",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "БД помечает как zona de alto risco de incêndio. Пожары в радиусе в годы: 2017,2024. Пожарная часть: 3.2 км.",
+            "why": "По DL 82/2021 владелец обязан поддерживать 50-метровую противопожарную полосу ежегодно. Страховщики применяют повышенный коэффициент. Риск эвакуации в экстремальные годы. Банки могут потребовать дополнительную страховку. Это реальный ежегодный расход и психологический фактор.",
+            "how_to_close": "Уточнить: вся ли 50-метровая полоса в пределах участка, или частично захватывает соседей. Открытые данные: ICNF SGIF (Sistema de Gestão de Incêndios Florestais).",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "internet",
+            "label": "Интернет — оптоволокно",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "БД: internet_fiber_proxy = «fiber». Оптоволокно есть.",
+            "why": "Fiber есть — нет претензий.",
+            "how_to_close": "Подтверждено.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "condition",
+            "label": "Общее состояние",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Состояние не оценивалось.",
+            "why": "Невозможно оценить реальные расходы.",
+            "how_to_close": "Визит.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "heating",
+            "label": "Отопление",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Из визита и/или ответа агента: ответ агента: «--- PAGE 3 --- 2. Sim. Existe um sistema de radiadores alimentado por recuperador de calor.».",
+            "why": "Тип отопления определяет расходы на эксплуатацию. Возраст котла/рекуператора — риск внеплановой замены (3 000–8 000 €). Нужно уточнить последнее ТО.",
+            "how_to_close": "Вопрос агенту: тип системы, год установки, последнее ТО котла/рекуператора.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "painting",
+            "label": "Покраска стен",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Потребность в покраске не оценивалась.",
+            "why": "Может потребоваться после въезда.",
+            "how_to_close": "Визит.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "licenca_utilizacao",
+            "label": "Licença de utilização",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Агент: «Sim. A licença de utilização é de 2026.»",
+            "why": "Без licença de utilização банки отказывают в ипотеке.",
+            "how_to_close": "Запросить копию документа.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "caderneta_predial",
+            "label": "Caderneta predial + certidão de registo",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Кадастровые документы не запрашивались или ответ не получен.",
+            "why": "Caderneta даёт VPT (от него IMT если VPT > цена сделки), площади, артикулы. Certidão — обременения, ипотеки, аресты. Без них — слепая сделка.",
+            "how_to_close": "Вопрос агенту. Certidão можно самостоятельно заказать в predial.oa.pt.",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "energy_class",
+            "label": "Энергетический класс (класс A+)",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "БД: класс A+. Агент: «O certificado energético foi emitido em 20/02/2025 e é válido até 20/02/2035. Nome do Perito Qualificado: Daniel Paulo Abrantes Marialva Número do PQ:»",
+            "why": "Класс A+ — это официальный документ, продавец будет на него опираться. Если состояние дома не соответствует классу — нужен расчётный лист для понимания. Влияет на аргументацию по цене.",
+            "how_to_close": "Запросить полный сертификат с расчётной частью у агента.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          }
+        ]
+      },
+      "claims": {
+        "works_l1": [
+          {
+            "key": "windows",
+            "level": 1,
+            "name_ru": "Окна — замена на двойной стеклопакет по всему дому",
+            "name_pt": "Janelas — substituição por vidro duplo em toda a casa",
+            "cost_min": 6500,
+            "cost_max": 10000,
+            "cost_fixed": null,
+            "source_quote": "Não. INSTALAÇÕES",
+            "source_name": "Опросник агента",
+            "url": "https://www.habitissimo.pt/orcamentos/janelas"
+          },
+          {
+            "key": "water",
+            "level": 1,
+            "name_ru": "Водоснабжение — накопительный резервуар с обвязкой, анализ воды, оформление водозабора",
+            "name_pt": "Abastecimento de água — reservatório com ligações, análise da água, formalização da captação",
+            "cost_min": 2000,
+            "cost_max": 4000,
+            "cost_fixed": null,
+            "source_quote": "Existe bomba de água instalada no furo. Não existe depósito.",
+            "source_name": "Опросник агента",
+            "url": "https://www.habitissimo.pt/orcamentos/canalizacao"
+          },
+          {
+            "key": "dampness",
+            "level": 1,
+            "name_ru": "Устранение точек влажности в подвале",
+            "name_pt": "Eliminação de pontos de humidade na cave",
+            "cost_min": 1500,
+            "cost_max": 3000,
+            "cost_fixed": null,
+            "source_quote": "Existem alguns pontos de humidade, associados também ao facto de a casa estar fechada há algum tempo.",
+            "source_name": "Опросник агента",
+            "url": null
+          }
+        ],
+        "works_l2": [],
+        "appliances": [],
+        "total_l1_min": 10000,
+        "total_l1_max": 17000,
+        "total_l2_min": 0,
+        "total_l2_max": 0,
+        "grand_min": 10000,
+        "grand_max": 17000
+      },
+      "agent_questions": [
+        {
+          "field": "water_analysis",
+          "label": "Анализ воды",
+          "what": "Агент ответил: «»",
+          "why": "Анализ есть — требуем копию.",
+          "how_to_close": "Запросить результат анализа или организовать самостоятельно.",
+          "status": "ПОДТВЕРЖДЕНО"
+        },
+        {
+          "field": "energy_class",
+          "label": "Энергетический класс (класс A+)",
+          "what": "БД: класс A+. Агент: «O certificado energético foi emitido em 20/02/2025 e é válido até 20/02/2035. Nome do Perito Qualificado: Daniel Paulo Abrantes Marialva Número do PQ:»",
+          "why": "Класс A+ — это официальный документ, продавец будет на него опираться. Если состояние дома не соответствует классу — нужен расчётный лист для понимания. Влияет на аргументацию по цене.",
+          "how_to_close": "Запросить полный сертификат с расчётной частью у агента.",
+          "status": "ПОДТВЕРЖДЕНО"
+        }
+      ],
+      "links": {
+        "proposta_html": null,
+        "reconcile_md": null
+      },
+      "sync": {
+        "last_checked": "2026-08-13T11:12:27+00:00",
+        "units": [
+          {
+            "id": "h66_work_windows",
+            "label": "Окна — замена на двойной стеклопакет по всему дому",
+            "ru_hash": "2458b2507de9d3e3",
+            "pt_hash": "d10aa02cea7f17ad",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h66_work_water",
+            "label": "Водоснабжение — накопительный резервуар с обвязкой, анализ воды, оформление водо",
+            "ru_hash": "d9d78d429d5ae6ae",
+            "pt_hash": "0a254b39b7f0e5d5",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h66_work_dampness",
+            "label": "Устранение точек влажности в подвале",
+            "ru_hash": "e63413001929b221",
+            "pt_hash": "c184663570af7121",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "SYNCED"
+          },
+          {
+            "id": "h66_qvisit_0",
+            "label": "Запросите в банке: принимают ли они к финансированию объекты в зоне alto risco d",
+            "ru_hash": "ed43416ed1006f1b",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h66_qvisit_1",
+            "label": "Есть ли пристройки или работы без разрешения (obras sem licença)? Если да — в ка",
+            "ru_hash": "8cacfa3d141e6e35",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h66_aq_water_analysis",
+            "label": "Анализ воды",
+            "ru_hash": "14385feb3596a77a",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h66_aq_energy_class",
+            "label": "Энергетический класс (класс A+)",
+            "ru_hash": "7469901237a80be3",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T11:12:27+00:00",
+            "pt_updated_at": "2026-08-13T11:12:27+00:00",
+            "status": "MISSING"
+          }
+        ],
+        "phrases": {
+          "units": [
+            {
+              "id": "phrase_who_we_are",
+              "label": "who we are",
+              "ru_hash": "6ef08fd109aaba54",
+              "pt_hash": "3c2d591ce79eeb8f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_approach_good_condition",
+              "label": "approach good condition",
+              "ru_hash": "ef299b6a6eef501c",
+              "pt_hash": "1744228f1680129e",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_approach_renovation",
+              "label": "approach renovation",
+              "ru_hash": "18ea48467e155c20",
+              "pt_hash": "5dc7a74f86dc7121",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_financing",
+              "label": "financing",
+              "ru_hash": "9b534833ad538fcd",
+              "pt_hash": "b7b607f65d6e4ca2",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_taxes_honest",
+              "label": "taxes honest",
+              "ru_hash": "e0b9ed3fb07bddfe",
+              "pt_hash": "dd74c7037ab5d57f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_conditions",
+              "label": "conditions",
+              "ru_hash": "008406cc4c61196a",
+              "pt_hash": "4c64c9036e7ea706",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_deposit_box",
+              "label": "deposit box",
+              "ru_hash": "c4c02cd8b00e962f",
+              "pt_hash": "c61ef24028c03fb2",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_appraisal",
+              "label": "appraisal",
+              "ru_hash": "e07e4d49578e2552",
+              "pt_hash": "ba0ef412a8e3eb73",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_dialogue",
+              "label": "dialogue",
+              "ru_hash": "4ab4068aee1f5a64",
+              "pt_hash": "fd0f99d0a9c96d3f",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_market_context_generic",
+              "label": "market context generic",
+              "ru_hash": "9827b2bfdb847b67",
+              "pt_hash": "4d28035a762b643d",
+              "ru_updated_at": "2026-08-13T11:12:27+00:00",
+              "pt_updated_at": "2026-08-13T11:12:27+00:00",
+              "status": "SYNCED"
+            }
+          ],
+          "summary": {
+            "synced": 10,
+            "stale": 0,
+            "missing": 0,
+            "total": 10
+          }
+        },
+        "summary": {
+          "synced": 13,
+          "stale": 0,
+          "missing": 4
+        }
+      }
+    }
+  ]
+}
