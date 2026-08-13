@@ -7,7 +7,7 @@ Checks:
   • sync.json files exist in proposta/out/
   • history.json files exist in proposta/out/
   • sync units have required fields (id, status, ru_hash, pt_hash)
-  • STALE indicator logic: unit with ru_updated_at > pt_updated_at → STALE
+  • STALE indicator logic: unit with ru_updated_at > pt_updated_at -> STALE
   • index.html contains data-f="proposta" filter button
   • index.html contains #propostabox div
   • index.html contains renderProposta function
@@ -116,7 +116,7 @@ for house in houses_with_sync[:1]:
         fail(f"Дом #{hid} sync.units: пусто")
 
 # ── 6. STALE logic test ───────────────────────────────────────────────────
-# Simulate: create a unit where ru_updated_at > pt_updated_at → must be STALE
+# Simulate: create a unit where ru_updated_at > pt_updated_at -> must be STALE
 import hashlib
 sys.path.insert(0, str(PROPOSTA_DIR))
 try:
@@ -124,23 +124,23 @@ try:
     # SYNCED case
     s1 = _unit_status("abc", "def", "2026-08-13T10:00:00", "2026-08-13T10:00:00")
     if s1 == "SYNCED":
-        ok("STALE logic: tu==pt → SYNCED")
+        ok("STALE logic: tu==pt -> SYNCED")
     else:
-        fail(f"STALE logic: tu==pt → {s1} (ожидали SYNCED)")
+        fail(f"STALE logic: tu==pt -> {s1} (ожидали SYNCED)")
 
     # STALE case
     s2 = _unit_status("abc", "def", "2026-08-13T12:00:00", "2026-08-13T10:00:00")
     if s2 == "STALE":
-        ok("STALE logic: ru_upd > pt_upd → STALE")
+        ok("STALE logic: ru_upd > pt_upd -> STALE")
     else:
-        fail(f"STALE logic: ru_upd > pt_upd → {s2} (ожидали STALE)")
+        fail(f"STALE logic: ru_upd > pt_upd -> {s2} (ожидали STALE)")
 
     # MISSING case
     s3 = _unit_status("abc", "", "2026-08-13T10:00:00", "2026-08-13T10:00:00")
     if s3 == "MISSING":
-        ok("STALE logic: pt_hash='' → MISSING")
+        ok("STALE logic: pt_hash='' -> MISSING")
     else:
-        fail(f"STALE logic: pt_hash='' → {s3} (ожидали MISSING)")
+        fail(f"STALE logic: pt_hash='' -> {s3} (ожидали MISSING)")
 except ImportError as e:
     fail(f"translation_sync import error: {e}")
 

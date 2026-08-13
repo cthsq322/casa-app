@@ -47,9 +47,9 @@ for block in h_matches:
         if int(m.group(1)) >= 40:
             found_height = True
 if found_height:
-    ok(".mpbtn min-height ≥ 40px")
+    ok(".mpbtn min-height >= 40px")
 else:
-    fail(".mpbtn не имеет min-height ≥ 40px")
+    fail(".mpbtn не имеет min-height >= 40px")
 
 # ── 2. .mpbtn font-size ≥ 12px ────────────────────────────────
 fs_matches = re.findall(r'\.mpbtn\s*\{([^}]+)\}', css)
@@ -59,9 +59,9 @@ for block in fs_matches:
         if int(m.group(1)) >= 12:
             found_fs = True
 if found_fs:
-    ok(".mpbtn font-size ≥ 12px")
+    ok(".mpbtn font-size >= 12px")
 else:
-    fail(".mpbtn нет font-size ≥ 12px")
+    fail(".mpbtn нет font-size >= 12px")
 
 # ── 3. No overflow-x:hidden on body or no horizontal scroll forced ─
 # Positive check: mpdrawer should have overflow-y:auto or overflow-y:scroll
@@ -108,15 +108,48 @@ for block in zi_blocks:
         if int(m.group(1)) >= 10:
             found_zi = True
 if found_zi:
-    ok(".mpback z-index ≥ 10 (над контентом)")
+    ok(".mpback z-index >= 10 (над контентом)")
 else:
-    fail(".mpback нет z-index ≥ 10")
+    fail(".mpback нет z-index >= 10")
 
 # ── 8. Close button (#mpx) exists in HTML ─────────────────────
 if 'id="mpx"' in html:
     ok("#mpx кнопка закрыть существует в HTML")
 else:
     fail("#mpx кнопка закрыть отсутствует в HTML")
+
+# ── 9. .actrow — uniform action buttons row ──────────────────
+actrow_css = re.findall(r'\.actrow\s*\{([^}]+)\}', css)
+if actrow_css:
+    ok(".actrow block exists (action buttons row)")
+else:
+    fail(".actrow CSS block missing — action buttons may be unstyled")
+
+actrow_btn = re.findall(r'\.actrow\s+button\s*\{([^}]+)\}', css)
+if any("min-height" in b for b in actrow_btn):
+    ok(".actrow button has min-height (uniform tap target)")
+else:
+    fail(".actrow button нет min-height")
+
+# ── 10. .card overflow:hidden — prevents mobile page overflow ─
+card_blocks = re.findall(r'\.card\s*\{([^}]+)\}', css)
+if any("overflow" in b for b in card_blocks):
+    ok(".card has overflow property (mobile overflow containment)")
+else:
+    fail(".card нет overflow — mobile status chips could cause page scroll")
+
+# ── 11. footer footnote is collapsible (foot-toggle) ────────
+if "foot-toggle" in html:
+    ok("foot-toggle exists — footnote is collapse-hidden by default")
+else:
+    fail("foot-toggle missing — footnote may show as long plain text")
+
+# ── 12. .stg .st uses flex-wrap:wrap ─────────────────────────
+stg_st_css = re.findall(r'\.stg\s+\.st\s*\{([^}]+)\}', css)
+if any("flex-wrap" in b and "wrap" in b for b in stg_st_css):
+    ok(".stg .st flex-wrap:wrap — status chips wrap on mobile")
+else:
+    fail(".stg .st нет flex-wrap:wrap — status chips may overflow horizontally")
 
 # ── summary ───────────────────────────────────────────────────
 print()
