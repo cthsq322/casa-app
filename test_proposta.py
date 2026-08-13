@@ -158,6 +158,37 @@ for house in houses[:2]:
     else:
         fail(f"proposta/out/{hid}_history.json НЕ найден")
 
+# ── 7b. Offer prices correctness ─────────────────────────────────────────
+EXPECTED_PRICES = {
+    64:  {"price_eur": 240000, "price_ppm2": 1000},   # unchanged — was already correct
+    74:  {"price_eur": 220000, "price_ppm2": 1152},   # fixed: was 210000/1099
+    340: {"price_eur": 240000, "price_ppm2": 760},    # fixed: was 225000/712
+    66:  {"price_eur": 240000, "price_ppm2": 1048},   # fixed: was 270000/1179
+}
+for house in houses:
+    hid = house.get("id")
+    if hid not in EXPECTED_PRICES:
+        continue
+    offer = house.get("offer", {})
+    exp = EXPECTED_PRICES[hid]
+    if offer.get("price_eur") == exp["price_eur"]:
+        ok(f"Дом #{hid}: offer.price_eur = {exp['price_eur']} ✓")
+    else:
+        fail(f"Дом #{hid}: offer.price_eur = {offer.get('price_eur')} (ожидали {exp['price_eur']})")
+    if offer.get("price_ppm2") == exp["price_ppm2"]:
+        ok(f"Дом #{hid}: offer.price_ppm2 = {exp['price_ppm2']} ✓")
+    else:
+        fail(f"Дом #{hid}: offer.price_ppm2 = {offer.get('price_ppm2')} (ожидали {exp['price_ppm2']})")
+
+# ── 7c. listing.url present for all houses ───────────────────────────────
+for house in houses:
+    hid = house.get("id")
+    url = (house.get("listing") or {}).get("url", "")
+    if url:
+        ok(f"Дом #{hid}: listing.url присутствует")
+    else:
+        fail(f"Дом #{hid}: listing.url ОТСУТСТВУЕТ")
+
 # ── 8. index.html proposta integration ────────────────────────────────────
 idx = HERE / "index.html"
 if not idx.exists():
@@ -178,6 +209,15 @@ for expect, label in [
     ('propostas.json',       "fetch propostas.json"),
     ('pp-work-status',       "CSS класс pp-work-status (индикатор статуса)"),
     ('ppRenderSyncBar',      "функция ppRenderSyncBar (общий индикатор)"),
+    # New assertions for enhanced card
+    ('pp-card-header',       "CSS класс pp-card-header (header карточки)"),
+    ('pp-bulk-btn',          "CSS класс pp-bulk-btn (bulk copy кнопки)"),
+    ('pp-infra-toggle',      "CSS класс pp-infra-toggle (кнопка инфраструктуры)"),
+    ('ppCopyAll',            "функция ppCopyAll (bulk copy вопросов)"),
+    ('ppToggleInfra',        "функция ppToggleInfra (раскрыть инфраструктуру)"),
+    ('ppSaveNote',           "функция ppSaveNote (сохранить заметку)"),
+    ('ppRenderInfra',        "функция ppRenderInfra (блок инфраструктуры)"),
+    ('pp-note-area',         "CSS класс pp-note-area (поле заметок)"),
 ]:
     if expect in html:
         ok(f"index.html: {label}")

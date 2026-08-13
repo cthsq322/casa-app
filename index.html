@@ -603,6 +603,49 @@ button:active{transform:scale(.985)}
  margin:0 0 6px;font-size:13px;line-height:1.45}
 .pp-history{font-size:12px;color:var(--soft);padding:4px 0}
 .pp-history b{color:var(--ink)}
+/* ── PROPOSTA CARD HEADER ────────────────────────────────── */
+.pp-card-header{padding:0 0 14px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.pp-listing-link{display:inline-block;font:600 13.5px/1 sans-serif;color:var(--accent);
+ text-decoration:none;padding:8px 14px;border:2px solid var(--accent);border-radius:8px;
+ margin-bottom:10px;transition:.12s}
+.pp-listing-link:hover{background:var(--accent-s)}
+.pp-params{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.pp-param-chip{font-size:12px;color:var(--soft);background:var(--accent-s);
+ padding:3px 9px;border-radius:999px}
+.pp-price-row{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.pp-price-box{flex:1;min-width:130px;padding:10px 12px;border-radius:8px;
+ border:1px solid var(--line);background:var(--card)}
+.pp-price-label{font-size:11px;color:var(--soft);text-transform:uppercase;letter-spacing:.08em}
+.pp-price-val{font:700 18px/1.2 sans-serif;color:var(--ink);margin-top:3px}
+.pp-price-val.target{color:var(--accent)}
+.pp-price-sub{font-size:11px;color:var(--soft);margin-top:2px}
+.pp-agent-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:9px;font-size:13px}
+.pp-agent-phone{color:var(--accent);text-decoration:none;font-weight:600}
+.pp-bulk-row{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;
+ padding:10px 0;border-bottom:1px solid var(--line)}
+.pp-bulk-btn{font:600 12px/1 sans-serif;padding:9px 15px;border-radius:6px;
+ border:1px solid var(--accent);color:var(--accent);background:var(--accent-s);cursor:pointer;transition:.12s}
+.pp-bulk-btn:hover{background:var(--accent);color:var(--paper)}
+.pp-bulk-btn.no-pt{border-color:var(--soft);color:var(--soft);background:transparent;opacity:.7}
+.pp-infra-toggle{font:600 12px/1 sans-serif;padding:8px 14px;border-radius:6px;
+ border:1px solid var(--line);color:var(--soft);background:none;cursor:pointer;
+ display:flex;align-items:center;gap:6px;margin:16px 0 0;width:100%;text-align:left;transition:.12s}
+.pp-infra-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.pp-infra-body{margin-top:8px}
+.pp-infra-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:5px;margin:4px 0}
+.pp-infra-row{display:flex;justify-content:space-between;align-items:center;
+ font-size:12.5px;padding:5px 9px;background:var(--card);border-radius:5px;border:1px solid var(--line)}
+.pp-infra-key{color:var(--soft)}
+.pp-infra-val{font-weight:600;color:var(--ink);text-align:right}
+.pp-note-area{width:100%;margin:8px 0 0;padding:10px;border:1px solid var(--line);
+ border-radius:8px;background:var(--card);color:var(--ink);
+ font:14px/1.5 -apple-system,sans-serif;resize:vertical;min-height:80px;
+ max-height:300px;box-sizing:border-box}
+.pp-note-area:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.pp-save-note-btn{margin-top:6px;font-size:12.5px;padding:6px 13px;border-radius:6px;
+ border:1px solid var(--accent);color:var(--accent);background:none;cursor:pointer;transition:.12s}
+.pp-save-note-btn:hover{background:var(--accent);color:var(--paper)}
+@media(max-width:480px){.pp-price-val{font-size:15px}}
 .feedstats{font-size:13px;color:var(--soft);padding:6px 0 10px}
 .feedstats b{color:var(--warn)}
 .feedbar{display:flex;gap:6px;flex-wrap:wrap;padding:4px 0 10px;overflow-x:auto;scrollbar-width:none}
@@ -1088,7 +1131,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260813-1224-431d841';
+const BUILD='20260813-1336-a750444';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -3216,20 +3259,63 @@ function ppShowHouse(hid){
   var qs=house.agent_questions||[];
   var fin=house.financibility||{};
   var links=house.links||{};
+  var listing=house.listing||{};
+  var offer=house.offer||{};
+  var location=house.location||{};
+  var math=house.math||{};
 
   var h=[];
-  // Header
-  h.push('<div class="section-header" style="margin-bottom:12px">');
-  h.push('<div><div class="section-title" style="font-size:17px;font-weight:700">'+ppEsc(house.title)+'</div>');
-  h.push('<div class="section-meta" style="font-size:12px;color:var(--soft)">');
-  h.push(ppEsc((house.location||{}).freguesia||'')+'&nbsp;·&nbsp;');
-  h.push(ppFmtEur((house.offer||{}).price_eur));
-  h.push('</div></div></div>');
 
-  // Sync bar
+  // ── HEADER CARD ───────────────────────────────────────────
+  h.push('<div class="pp-card-header">');
+  // Listing link — prominent
+  if(listing.url){
+    h.push('<a href="'+ppEsc(listing.url)+'" target="_blank" rel="noopener" class="pp-listing-link">&#128279;&nbsp;Открыть объявление</a>');
+  }
+  // Title line
+  h.push('<div style="font:600 15px/1.35 sans-serif;margin:8px 0 4px">'+ppEsc(house.title)+'</div>');
+  // Param chips
+  h.push('<div class="pp-params">');
+  var typo='T'+(listing.bedrooms||'?');
+  h.push('<span class="pp-param-chip">'+ppEsc(typo)+'</span>');
+  if(listing.area_m2!=null) h.push('<span class="pp-param-chip">'+ppFmtNum(listing.area_m2)+' м²</span>');
+  if(listing.land_area_m2!=null) h.push('<span class="pp-param-chip">'+ppFmtNum(listing.land_area_m2)+' м² участок</span>');
+  if(listing.energy_class) h.push('<span class="pp-param-chip">Класс '+ppEsc(listing.energy_class)+'</span>');
+  var concDist=(location.concelho||'')+(location.district?' · '+location.district:'');
+  if(concDist) h.push('<span class="pp-param-chip">'+ppEsc(concDist)+'</span>');
+  h.push('</div>');
+  // Price comparison
+  h.push('<div class="pp-price-row">');
+  h.push('<div class="pp-price-box">');
+  h.push('<div class="pp-price-label">Продавец просит</div>');
+  h.push('<div class="pp-price-val">'+ppFmtEur(listing.price_eur)+'</div>');
+  if(math.listing_ppm2) h.push('<div class="pp-price-sub">'+math.listing_ppm2+' €/м²</div>');
+  h.push('</div>');
+  h.push('<div class="pp-price-box">');
+  h.push('<div class="pp-price-label">Наша цель</div>');
+  h.push('<div class="pp-price-val target">'+ppFmtEur(offer.price_eur)+'</div>');
+  if(offer.price_ppm2) h.push('<div class="pp-price-sub">'+offer.price_ppm2+' €/м²</div>');
+  h.push('</div>');
+  h.push('</div>');
+  // Agent
+  if(listing.agent||listing.agent_phone){
+    h.push('<div class="pp-agent-row">&#128100;');
+    if(listing.agent) h.push('&nbsp;<b>'+ppEsc(listing.agent)+'</b>');
+    if(listing.agent&&listing.agent_phone) h.push('&nbsp;·&nbsp;');
+    if(listing.agent_phone){
+      var rawPhone=String(listing.agent_phone||'');
+      var telHref=rawPhone.split(/[\s;(]/)[0].replace(/[^+0-9]/g,'');
+      h.push('<a href="tel:'+ppEsc(telHref)+'" class="pp-agent-phone">'+ppEsc(rawPhone.slice(0,30))+'</a>');
+    }
+    if(listing.agency) h.push('&nbsp;<span style="font-size:11px;color:var(--soft)">'+ppEsc(listing.agency)+'</span>');
+    h.push('</div>');
+  }
+  h.push('</div>');
+
+  // ── SYNC BAR ─────────────────────────────────────────────
   h.push(ppRenderSyncBar(sync));
 
-  // Works with sync status
+  // ── WORKS WITH SYNC ──────────────────────────────────────
   var workUnits=units.filter(function(u){return u.id.indexOf('_work_')>=0;});
   if(workUnits.length){
     h.push('<div class="pp-section">Смета работ (RU↔PT синхронизация)</div>');
@@ -3237,19 +3323,16 @@ function ppShowHouse(hid){
       var st=u.status||'MISSING';
       var stLow=st.toLowerCase();
       var stLabel=st==='SYNCED'?'✓ синхронно':st==='STALE'?'⚠ устарело':'○ нет PT';
-      // find work data for name_pt
-      var work=null;
       var wKey=u.id.replace('h'+hid+'_work_','');
       var allWorks=(claims.works_l1||[]).concat(claims.works_l2||[]);
-      work=allWorks.find(function(w){return (w.key||'')==wKey;});
+      var work=allWorks.find(function(w){return (w.key||'')==wKey;});
       var namePt=work?work.name_pt:'';
       var nameRu=work?work.name_ru:u.label;
       var isStale=st==='STALE';
-
       h.push('<div class="pp-work-row '+stLow+'">');
-      h.push('<div class="pp-work-ru" style="font-size:12px;color:var(--soft)">🇷🇺 '+ppEsc(nameRu)+'</div>');
+      h.push('<div class="pp-work-ru" style="font-size:12px;color:var(--soft)">&#127479;&#127482; '+ppEsc(nameRu)+'</div>');
       if(namePt){
-        h.push('<div class="pp-work-pt">🇵🇹 '+ppEsc(namePt)+'</div>');
+        h.push('<div class="pp-work-pt">&#127477;&#127481; '+ppEsc(namePt)+'</div>');
         h.push('<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">');
         h.push('<span class="pp-work-status '+stLow+'">'+stLabel+'</span>');
         if(u.ru_updated_at) h.push('<span style="font-size:11px;color:var(--soft)">RU: '+ppFmtDate(u.ru_updated_at)+'</span>');
@@ -3266,8 +3349,23 @@ function ppShowHouse(hid){
     });
   }
 
-  // Questions before visit
+  // ── BULK COPY BUTTONS ────────────────────────────────────
   var qVisit=fin.questions_before_visit||[];
+  var allQUnits=units.filter(function(u){return u.id.indexOf('_qvisit_')>=0||u.id.indexOf('_aq_')>=0;});
+  var missingPTCount=allQUnits.filter(function(u){return !u.pt_hash;}).length;
+  var totalQCount=qVisit.length+qs.length;
+  var noPT=totalQCount>0&&missingPTCount===totalQCount;
+  if(totalQCount>0){
+    h.push('<div class="pp-section">Скопировать все вопросы</div>');
+    h.push('<div class="pp-bulk-row">');
+    h.push('<button class="pp-bulk-btn'+(noPT?' no-pt':'')+'" onclick="ppCopyAll(this,'+hid+',\'pt\')">');
+    h.push(noPT?'PT — перевод не готов':'Скопировать все (PT)');
+    h.push('</button>');
+    h.push('<button class="pp-bulk-btn" onclick="ppCopyAll(this,'+hid+',\'ru\')">Скопировать все (RU)</button>');
+    h.push('</div>');
+  }
+
+  // ── QUESTIONS BEFORE VISIT ───────────────────────────────
   if(qVisit.length){
     h.push('<div class="pp-section">Вопросы ДО выезда</div>');
     qVisit.forEach(function(q,i){
@@ -3286,7 +3384,7 @@ function ppShowHouse(hid){
     });
   }
 
-  // Agent questions
+  // ── AGENT QUESTIONS ──────────────────────────────────────
   if(qs.length){
     h.push('<div class="pp-section">Вопросы агенту</div>');
     qs.forEach(function(q){
@@ -3309,7 +3407,10 @@ function ppShowHouse(hid){
     });
   }
 
-  // History (last 3 events)
+  // ── INFRASTRUCTURE COLLAPSIBLE ────────────────────────────
+  h.push(ppRenderInfra(house));
+
+  // ── HISTORY ──────────────────────────────────────────────
   if(sync.last_checked){
     h.push('<div class="pp-section" style="margin-top:24px">Последние изменения</div>');
     h.push('<div class="pp-history">Последняя проверка: <b>'+ppFmtDate(sync.last_checked)+'</b></div>');
@@ -3318,13 +3419,153 @@ function ppShowHouse(hid){
     h.push('<b>'+s.stale+' устарело</b>, <b>'+s.missing+' без PT</b></div>');
   }
 
-  // Links
+  // ── LINKS ─────────────────────────────────────────────────
   h.push('<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">');
   if(links.proposta_html) h.push('<a href="'+ppEsc(links.proposta_html)+'" target="_blank" style="font-size:13px;color:var(--accent);padding:7px 13px;border:1px solid var(--line);border-radius:8px;text-decoration:none">Открыть Proposta HTML</a>');
   if(links.reconcile_md) h.push('<a href="'+ppEsc(links.reconcile_md)+'" target="_blank" style="font-size:13px;color:var(--soft);padding:7px 13px;border:1px solid var(--line);border-radius:8px;text-decoration:none">Reconcile</a>');
   h.push('</div>');
 
+  // ── NOTES ─────────────────────────────────────────────────
+  h.push('<div class="pp-section" style="margin-top:24px">Заметки по объекту</div>');
+  var existingNote='';
+  if(typeof NOTES!=='undefined'&&NOTES&&NOTES[hid]&&NOTES[hid].length){
+    existingNote=NOTES[hid].map(function(n){return n.text||'';}).filter(Boolean).join('\n---\n');
+  }
+  h.push('<textarea class="pp-note-area" id="pp-note-'+hid+'" placeholder="Ваши заметки после визита, переговоров, наблюдений...">'+ppEsc(existingNote)+'</textarea>');
+  h.push('<button class="pp-save-note-btn" onclick="ppSaveNote('+hid+')">Сохранить заметку</button>');
+
   document.getElementById('pp-main-content').innerHTML=h.join('');
+}
+
+function ppFmtNum(n){
+  if(n==null)return '—';
+  return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+
+function ppToggleInfra(btn){
+  var body=btn.nextElementSibling;
+  if(!body)return;
+  var lbl=btn.getAttribute('data-infra-label')||'Инфраструктура и риски';
+  var isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  btn.textContent=(isOpen?'▶ ':'▼ ')+lbl;
+}
+
+function ppRenderInfra(house){
+  var infra=house.infrastructure||{};
+  var fire=house.fire_risk||{};
+  var items=[];
+  if(infra.dist_hospital_km!=null) items.push(['Больница',infra.dist_hospital_km+' км']);
+  if(infra.dist_school_km!=null) items.push(['Школа',infra.dist_school_km+' км']);
+  if(infra.dist_pharmacy_km!=null) items.push(['Аптека',infra.dist_pharmacy_km+' км']);
+  if(infra.dist_supermarket_km!=null) items.push(['Супермаркет',infra.dist_supermarket_km+' км']);
+  if(infra.dist_highway_km!=null) items.push(['До трассы',infra.dist_highway_km+' км']);
+  if(infra.dist_bombeiros_km!=null) items.push(['Пожарные',infra.dist_bombeiros_km+' км']);
+  if(infra.internet_fiber_proxy!=null) items.push(['Интернет',infra.internet_fiber_proxy==='fiber'?'Оптоволокно ✓':ppEsc(String(infra.internet_fiber_proxy))]);
+  if(infra.elevation_m!=null) items.push(['Высота',infra.elevation_m+' м']);
+  var fireItems=[];
+  if(fire.level) fireItems.push(['Пожарный риск',fire.level==='high'?'⚠ Высокий':ppEsc(fire.level)]);
+  if(fire.burned_nearby_years) fireItems.push(['Пожары рядом',ppEsc(String(fire.burned_nearby_years))]);
+  if(!items.length&&!fireItems.length) return '';
+  var out='<button class="pp-infra-toggle" data-infra-label="Инфраструктура и риски" onclick="ppToggleInfra(this)">▶ Инфраструктура и риски</button>';
+  out+='<div class="pp-infra-body" style="display:none">';
+  if(items.length){
+    out+='<div class="pp-infra-grid">';
+    items.forEach(function(it){
+      out+='<div class="pp-infra-row"><span class="pp-infra-key">'+it[0]+'</span><span class="pp-infra-val">'+it[1]+'</span></div>';
+    });
+    out+='</div>';
+  }
+  if(fireItems.length){
+    out+='<div class="pp-infra-grid" style="margin-top:6px">';
+    fireItems.forEach(function(it){
+      out+='<div class="pp-infra-row"><span class="pp-infra-key">'+it[0]+'</span><span class="pp-infra-val">'+it[1]+'</span></div>';
+    });
+    out+='</div>';
+  }
+  out+='</div>';
+  return out;
+}
+
+function ppCopyAll(btn,hid,lang){
+  if(!PROPOSTA_DATA)return;
+  var house=PROPOSTA_DATA.houses.find(function(h){return h.id===hid;});
+  if(!house)return;
+  var listing=house.listing||{};
+  var fin=house.financibility||{};
+  var qVisit=fin.questions_before_visit||[];
+  var qs=house.agent_questions||[];
+  var sync=house.sync||{};
+  var units=sync.units||[];
+
+  var allQUnits=units.filter(function(u){return u.id.indexOf('_qvisit_')>=0||u.id.indexOf('_aq_')>=0;});
+  var missingCount=allQUnits.filter(function(u){return !u.pt_hash;}).length;
+  var totalQ=qVisit.length+qs.length;
+
+  if(lang==='pt'&&missingCount>0){
+    var hasSome=(missingCount<totalQ);
+    var msg=hasSome
+      ?('⚠ Португальский перевод ещё не готов для '+missingCount+' из '+totalQ+' вопросов.\nСкопировать с русским текстом для непереведённых?')
+      :('⚠ Португальский перевод вопросов для этого объекта ещё не готов ('+missingCount+'/'+totalQ+').\nВсё равно скопировать с русским текстом?');
+    if(!confirm(msg))return;
+  }
+
+  var lines=[];
+  lines.push(house.title+' — ref. '+hid);
+  if(listing.url) lines.push(listing.url);
+  lines.push('');
+  if(lang==='pt'){
+    lines.push('Bom dia. Estamos a preparar uma proposta formal para este imóvel e precisamos de esclarecer alguns pontos:');
+  } else {
+    lines.push('Вопросы по объекту:');
+  }
+  lines.push('');
+
+  var num=1;
+  if(qVisit.length){
+    lines.push(lang==='pt'?'[Antes da visita]':'[Перед визитом]');
+    qVisit.forEach(function(q,i){
+      var unit=units.find(function(u){return u.id==='h'+hid+'_qvisit_'+i;});
+      var hasPT=unit&&unit.pt_hash;
+      lines.push(num+'. '+q+((!hasPT&&lang==='pt')?' [перевод не готов]':''));
+      num++;
+    });
+    lines.push('');
+  }
+  if(qs.length){
+    lines.push(lang==='pt'?'[Questões ao agente]':'[Вопросы агенту]');
+    qs.forEach(function(q){
+      var unit=units.find(function(u){return u.id==='h'+hid+'_aq_'+q.field;});
+      var hasPT=unit&&unit.pt_hash;
+      var text=q.how_to_close||q.label;
+      lines.push(num+'. '+text+((!hasPT&&lang==='pt')?' [перевод не готов]':''));
+      num++;
+    });
+    lines.push('');
+  }
+  if(lang==='pt'){
+    lines.push('Agradecemos as respostas para podermos avançar.');
+  }
+
+  var out=lines.join('\n');
+  var origText=btn.textContent;
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(out).then(function(){
+      btn.textContent='Скопировано!';
+      setTimeout(function(){btn.textContent=origText;},1800);
+    });
+  } else {
+    var ta=document.createElement('textarea');ta.value=out;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    btn.textContent='Скопировано!';
+    setTimeout(function(){btn.textContent=origText;},1800);
+  }
+}
+
+function ppSaveNote(hid){
+  var ta=document.getElementById('pp-note-'+hid);
+  if(!ta)return;
+  if(typeof saveNote==='function') saveNote(hid,ta.value,null,false);
 }
 
 function ppRenderSidebar(){

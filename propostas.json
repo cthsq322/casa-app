@@ -574,8 +574,8 @@
         "agent_phone": "+351912969770 (WA Carmen Reis); +351926677566 (из объявления, Susana Ramos ERA)"
       },
       "offer": {
-        "price_eur": 210000,
-        "price_ppm2": 1099
+        "price_eur": 220000,
+        "price_ppm2": 1152
       },
       "financibility": {
         "status": "UNDER_QUESTION",
@@ -1066,8 +1066,8 @@
         "agent_phone": "926677566"
       },
       "offer": {
-        "price_eur": 225000,
-        "price_ppm2": 712
+        "price_eur": 240000,
+        "price_ppm2": 760
       },
       "financibility": {
         "status": "UNDER_QUESTION",
@@ -1565,8 +1565,8 @@
         "agent_phone": "+351942246805"
       },
       "offer": {
-        "price_eur": 270000,
-        "price_ppm2": 1179
+        "price_eur": 240000,
+        "price_ppm2": 1048
       },
       "financibility": {
         "status": "UNDER_QUESTION",
