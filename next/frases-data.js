@@ -9,7 +9,7 @@
 // Concelhos where fire-risk question shows first in the picker
 window.FRASES_FIRE_CONCELHOS = [
   'Pedrógão Grande', 'Castanheira de Pêra', 'Figueiró dos Vinhos',
-  'Alvaiázere', 'Ansião', 'Sertã'
+  'Alvaiázere', 'Ansião', 'Sertã', 'Góis', 'Pampilhosa da Serra'
 ];
 
 // The 5 picker templates, in default display order.

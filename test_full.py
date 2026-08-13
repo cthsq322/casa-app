@@ -65,11 +65,46 @@ for expect, label in [
     ('data-pick',                    "атрибут data-pick на кнопках picker"),
     ('buildPickerText',              "функция buildPickerText"),
     ('<title>Дома</title>',          "заголовок 'Дома' (не 'тест')"),
+    # NEW: quick-copy row buttons
+    ('data-cpfirst',                 "кнопка 'primeiro' (data-cpfirst)"),
+    ('data-cplink',                  "кнопка 'ссылка' (data-cplink)"),
+    ('data-cptime',                  "кнопка 'время' (data-cptime)"),
+    ('buildPrimeiroMsg',             "функция buildPrimeiroMsg"),
+    ('addrText',                     "функция addrText"),
 ]:
     if expect in html:
         ok(f"index.html: {label}")
     else:
         fail(f"index.html НЕ содержит: {label}")
+
+# ── buildPrimeiroMsg content: 6 standard questions ────────
+EXPECTED_BULLETS = [
+    'O imóvel é financiável por banco',
+    'Tem licença de utilização válida',
+    'A caderneta predial e a certidão do registo',
+    'Tem certificado energético',
+    'As plantas correspondem ao que está construído',
+    'Prevê algum problema para passar na avaliação bancária',
+]
+for bullet in EXPECTED_BULLETS:
+    if bullet in html:
+        ok(f"buildPrimeiroMsg: bullet '{bullet[:40]}…'")
+    else:
+        fail(f"buildPrimeiroMsg НЕ содержит bullet: '{bullet[:40]}…'")
+
+# 7th fire-risk bullet
+FIRE_BULLET = 'O imóvel está inserido em zona de risco de incêndio'
+if FIRE_BULLET in html:
+    ok("buildPrimeiroMsg: fire-risk 7th bullet present")
+else:
+    fail(f"buildPrimeiroMsg: НЕ содержит fire-risk bullet")
+
+# fire-risk concelhos updated (Góis, Pampilhosa in index.html fallback)
+for fc in ["Góis", "Pampilhosa da Serra"]:
+    if fc in html:
+        ok(f"FIRE_CONCELHOS fallback содержит '{fc}'")
+    else:
+        fail(f"FIRE_CONCELHOS fallback НЕ содержит '{fc}'")
 
 # ── JS syntax check ───────────────────────────────────────
 blocks = re.findall(r"<script>(.*?)</script>", html, re.S)

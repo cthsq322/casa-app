@@ -1131,7 +1131,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260813-1336-a750444';
+const BUILD='20260813-1403-8e03825';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1948,10 +1948,37 @@ function msgFor(h){ return buildFirstContact(h); }
 // ── PICKER HELPERS ────────────────────────────────────────
 var FIRE_CONCELHOS=(window.FRASES_FIRE_CONCELHOS||
   ['Pedrógão Grande','Castanheira de Pêra','Figueiró dos Vinhos',
-   'Alvaiázere','Ansião','Sertã']);
+   'Alvaiázere','Ansião','Sertã','Góis','Pampilhosa da Serra']);
 function isFireRisk(h){
+  if(h.fire_risk==='high'||h.fire_risk==='very_high') return true;
   var c=(h.concelho||'').trim().toLowerCase();
   return FIRE_CONCELHOS.some(function(f){return f.toLowerCase()===c;});
+}
+function addrText(h){
+  if(h.address&&h.address.trim()) return h.address.trim();
+  var parts=[h.concelho,h.freguesia].filter(Boolean);
+  return parts.length?parts.join(', '):'';
+}
+function buildPrimeiroMsg(h){
+  var NL='\n';
+  var fire=isFireRisk(h);
+  var bullets=[
+    '• O imóvel é financiável por banco?',
+    '• Tem licença de utilização válida?',
+    '• A caderneta predial e a certidão do registo estão actualizadas?',
+    '• Tem certificado energético? Qual a classe?',
+    '• As plantas correspondem ao que está construído — sem obras por legalizar?',
+    '• Prevê algum problema para passar na avaliação bancária?'
+  ];
+  if(fire) bullets.push('• O imóvel está inserido em zona de risco de incêndio? Tem certidão de localização?');
+  return [
+    'Boa tarde!',
+    'Chamo-me Serhii. Eu e a minha esposa estamos à procura de casa nesta zona e o vosso imóvel interessou-nos bastante.',
+    'Temos pré-aprovação de crédito do UCI e do Novo Banco, por isso podemos avançar rapidamente.',
+    'Estamos a organizar as visitas para os próximos dias. Que dia e hora lhe seriam mais convenientes? Assim conseguimos planear o percurso com calma e não atrasar ninguém.',
+    'Antes de marcarmos a visita, precisava de confirmar algumas coisas:'+NL+NL+bullets.join(NL),
+    'Obrigado!'
+  ].join(NL+NL);
 }
 function buildPickerText(fp,h,timeOverride){
   if(fp.dynamic) return buildFirstContact(h,timeOverride);
@@ -2230,6 +2257,13 @@ function card(h){
       'rel="noopener" title="где это">📍 Карта</a>'
     : '')+
   '<button class="lnk" data-link="'+h.id+'" title="скопировать ссылку">🔗</button></div>'+
+ // ZONE 9b: QUICK COPY — primeiro·ссылка·адрес·время
+ '<div class="acts">'+
+  '<button class="lnk" data-cpfirst="'+h.id+'" title="первое сообщение на португальском">📋 primeiro</button>'+
+  '<button class="lnk" data-cplink="'+h.id+'" title="скопировать ссылку">🔗 ссылка</button>'+
+  (addrText(h)?'<button class="lnk" data-cpaddr="'+h.id+'" title="скопировать адрес">📍 адрес</button>':'')+
+  '<button class="lnk" data-cptime="'+h.id+'" title="скопировать шаблон времени">🕐 время</button>'+
+ '</div>'+
  // ZONES 10+11: rating (tiers) → others' notes → own note (inside noteBlock)
  noteBlock(h)+'</article>';
 }
@@ -3936,6 +3970,48 @@ document.addEventListener('click',async e=>{
      lk.classList.add('done');
      setTimeout(function(){ lk.classList.remove('done'); },1600);
      toast('Ссылка скопирована');
+   },function(){ toast('Не получилось скопировать',true); });
+   return;
+ }
+ const cpf=e.target.closest('[data-cpfirst]');
+ if(cpf){
+   const h=HOUSES.find(function(x){return String(x.id)===String(cpf.dataset.cpfirst);});
+   if(h) copyText(buildPrimeiroMsg(h)).then(function(){
+     cpf.classList.add('done');
+     setTimeout(function(){ cpf.classList.remove('done'); },1600);
+     toast('Первое сообщение скопировано');
+   },function(){ toast('Не получилось скопировать',true); });
+   return;
+ }
+ const cpl=e.target.closest('[data-cplink]');
+ if(cpl){
+   const h=HOUSES.find(function(x){return String(x.id)===String(cpl.dataset.cplink);});
+   if(h) copyText(h.url).then(function(){
+     cpl.classList.add('done');
+     setTimeout(function(){ cpl.classList.remove('done'); },1600);
+     toast('Ссылка скопирована');
+   },function(){ toast('Не получилось скопировать',true); });
+   return;
+ }
+ const cpa=e.target.closest('[data-cpaddr]');
+ if(cpa){
+   const h=HOUSES.find(function(x){return String(x.id)===String(cpa.dataset.cpaddr);});
+   if(h){
+     var addr=addrText(h);
+     if(addr) copyText(addr).then(function(){
+       cpa.classList.add('done');
+       setTimeout(function(){ cpa.classList.remove('done'); },1600);
+       toast('Адрес скопирован');
+     },function(){ toast('Не получилось скопировать',true); });
+   }
+   return;
+ }
+ const cpt=e.target.closest('[data-cptime]');
+ if(cpt){
+   copyText('Estamos hoje/amanhã nesta zona. Podemos visitar entre as __h e as __h. Qual o horário melhor para si?').then(function(){
+     cpt.classList.add('done');
+     setTimeout(function(){ cpt.classList.remove('done'); },1600);
+     toast('Шаблон времени скопирован');
    },function(){ toast('Не получилось скопировать',true); });
    return;
  }
