@@ -219,9 +219,7 @@ textarea{font:inherit;width:100%;min-height:52px;padding:8px 10px;border-radius:
 .tiers button{padding:4px 11px;font-size:14px}
 .tiers button.on{background:var(--gold);border-color:var(--gold);color:#fff}
 .stg{display:flex;flex-direction:column;gap:3px}
-.stg .st{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
- -webkit-overflow-scrolling:touch;padding-bottom:2px}
-.stg .st::-webkit-scrollbar{display:none}
+.stg .st{flex-wrap:wrap;padding-bottom:2px}
 .stg .st button{flex:0 0 auto;white-space:nowrap}
 .stg .gl{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
  color:var(--soft)}
@@ -525,7 +523,7 @@ button, .acts a, .dacts a, .pinopen, .wa, .lnk{
 .tiers button{min-height:40px; min-width:44px}
 .acts a, .dacts a{min-height:38px; display:inline-flex; align-items:center;
   justify-content:center}
-.msg,.skip,.cal,.conf,.cpday,.askaddr,.msgall{min-height:40px; border-radius:9px}
+.msg,.skip,.cal,.conf,.cpday,.askaddr,.msgall{min-height:40px; border-radius:10px; padding:6px 14px; font-size:13px}
 .tel{border-radius:10px; min-height:40px}
 .card{gap:11px}
 .stg .gl{margin-bottom:2px}
@@ -533,6 +531,22 @@ button, .acts a, .dacts a, .pinopen, .wa, .lnk{
 .visit input,.addtel input,.pinrow input{min-height:38px}
 button:active{transform:scale(.985)}
 @media (prefers-reduced-motion:reduce){button:active{transform:none}}
+/* ── ACTROW: кнопки действий — единая сетка ─────────────────── */
+.actrow{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+.actrow button{flex:0 0 auto;min-height:40px;padding:6px 14px;font-size:13px;
+ border-radius:10px;border:1px solid var(--line);font-weight:500;background:var(--card);color:var(--ink)}
+.actrow button.msg{border-color:var(--accent);color:var(--accent);font-weight:600}
+.actrow button.huntb{border-color:var(--line);color:var(--soft)}
+.actrow button.skip{border-color:var(--line);color:var(--soft)}
+.actrow button.skip.on{border-color:var(--warn);color:var(--warn);font-weight:600}
+.actrow button.conf{border-color:var(--accent);color:var(--accent)}
+.actrow button.conf.off{border-color:var(--warn);color:var(--warn);font-weight:600}
+/* ── FOOT: пояснения — скрыто по умолчанию ─────────────────── */
+.foot-toggle{font-size:12px;padding:4px 10px;border-radius:999px;
+ color:var(--soft);border:1px solid var(--line);background:transparent;cursor:pointer;font:inherit}
+.foot-text{display:none;font-size:12.5px;color:var(--soft);margin-top:8px;
+ padding:8px 12px;border:1px dashed var(--line);border-radius:9px;line-height:1.55}
+.foot-text.on{display:block}
 /* ── ЛЕНТА ЗАМЕТОК ──────────────────────────────────────────── */
 #feedbox{display:none}
 #feedbox.on{display:block;margin:6px 0}
@@ -1074,7 +1088,7 @@ function scheduleRetry(){
 
 
 // The page cannot update itself in the background, but it can notice.
-const BUILD='20260813-1216-182554c';
+const BUILD='20260813-1224-431d841';
 let updateSeen=false;
 async function checkBuild(){
   if(updateSeen) return;
@@ -1151,10 +1165,13 @@ async function load(){
  loadPlan();
  if(DIRTY.size){ push().then(mark); }
  document.getElementById('foot').innerHTML=
+  '<button class="foot-toggle" onclick="this.nextElementSibling.classList.toggle(\'on\')">? пояснения</button>'+
+  '<div class="foot-text">'+
   '«выше округи» — насколько дом выше среднего рельефа в радиусе 15 км. '+
   '«до соседа» — до ближайшей постройки по карте. '+
   'Оценка: земля 30, комнаты 15, высота 15, без соседей 15, туалеты 10, лес 10, площадь 5. '+
-  'Заметки общие — Serhii, Violeta, Milena.';
+  'Заметки общие — Serhii, Violeta, Milena.'+
+  '</div>';
  render();
 }
 
@@ -1336,6 +1353,8 @@ function noteBlock(h){
    (vTime(h.id)?'<button class="clr" data-clr="'+h.id+'">x</button>':'')+
    (vBy(h.id)?'<span class="vby">'+vBy(h.id)+'</span>':'')+
    (vTime(h.id)?'<button class="cal" data-cal="'+h.id+'">в календарь</button>':'')+
+   '</div>'+
+   '<div class="actrow">'+
    '<button class="msg" data-msg="'+h.id+'">✍ текст агенту</button>'+
    '<button class="huntb" data-hunt="'+h.id+'">🔎 дубль?</button>'+
    '<button class="skip'+(isSkipped(h.id)?' on':'')+'" data-skip="'+h.id+'">'+
