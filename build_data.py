@@ -25,6 +25,8 @@ COLS = [
     "access_score", "dist_city_km", "city_name",
     "town_lat", "town_lon",     # the town, never the house - see scoring notes
     "listing_status", "listing_checked",
+    "visited_at", "proposal_status",
+    "out_of_circle", "out_of_circle_why", "snoozed",
 ]
 
 

@@ -2022,6 +2022,435 @@
           "missing": 4
         }
       }
+    },
+    {
+      "id": 93,
+      "title": "Moradia Isolada T4 / Castanheira de Pêra, Castanheira de Pêra e Coentral",
+      "location": {
+        "address": "Castanheira de Pêra e Coentral, Castanheira de Pêra",
+        "freguesia": "Castanheira de Pêra e Coentral",
+        "concelho": "Castanheira de Pêra",
+        "district": "Leiria",
+        "lat": 40.0079381,
+        "lon": -8.2119711
+      },
+      "listing": {
+        "price_eur": 280000,
+        "area_m2": 263,
+        "area_bruta_m2": 393,
+        "land_area_m2": 4626.0,
+        "bedrooms": 4,
+        "bathrooms": 4,
+        "energy_class": "B-",
+        "url": "https://www.imodiva.pt/imovel/moradia-isolada-t4-em-castanheira-de-pera/26411966",
+        "url_idealista": "https://www.idealista.pt/imovel/35234466/",
+        "agency": "IMODIVA Imobiliária",
+        "agent": "Sandra Quintas",
+        "agent_phone": "+351 963 657 303",
+        "ref": "SQ495/0826"
+      },
+      "offer": {
+        "price_eur": 245000,
+        "price_ppm2": 932
+      },
+      "financibility": {
+        "status": "BLOCKER",
+        "factors": [
+          {
+            "code": "FIRE_ZONE_PEDROGAO_CLUSTER",
+            "status": "BLOCKER",
+            "label": "КРИТИЧЕСКИЙ пожарный риск — кластер Pedrógão Grande",
+            "detail": "Castanheira de Pêra — эпицентр катастрофы Pedrógão Grande 17 июня 2017 (66 погибших). Пожары также 2023 г. Страховщики массово отказывают от multirisco. Без страховки нет ипотеки. Смягчающие факторы: bombeiros 400 м, лес 750 м, класс B−.",
+            "pre_visit_question": "Позвонить в Crédito Agrícola / CGD / Millennium BCP: принимают ли ипотеку в Castanheira de Pêra (зона PMDFCI высокого риска, Pedrógão 2017)?"
+          },
+          {
+            "code": "LICENCA_UNKNOWN",
+            "status": "UNDER_QUESTION",
+            "label": "Licença de utilização — не подтверждена",
+            "detail": "Licença de utilização не запрашивалась. Без неё банки отказывают в ипотеке.",
+            "pre_visit_question": "Есть ли licença de utilização? Какого года? Включает ли гараж?"
+          },
+          {
+            "code": "UNLICENSED_UNKNOWN",
+            "status": "UNDER_QUESTION",
+            "label": "Нелегализованные постройки — не выяснено",
+            "detail": "Гараж на 5 машин, солнечные панели — необходимо подтвердить декларацию.",
+            "pre_visit_question": "Obras sem licença? Гараж и панели задекларированы в caderneta?"
+          },
+          {
+            "code": "AREA_OK",
+            "status": "PASSES",
+            "label": "Площадь подтверждена из объявления",
+            "detail": "263 м² útil / 393 м² bruta — явно указано в объявлении.",
+            "pre_visit_question": ""
+          }
+        ],
+        "questions_before_visit": [
+          "ШАГ 1: Позвонить в банк (Crédito Agrícola, CGD, Millennium BCP) — принимают ли ипотеку в Castanheira de Pêra?",
+          "ШАГ 2: Позвонить страховщику (Fidelidade, Allianz PT, Generali PT) — дают ли multirisco и по какой ставке?",
+          "Запросить у агента certidão de localização и PMDFCI.",
+          "Есть ли licença de utilização? Включает ли гараж?",
+          "Obras sem licença? Гараж и панели задекларированы?"
+        ]
+      },
+      "math": {
+        "listing_ppm2": 1065,
+        "offer_ppm2": 932,
+        "grand_min": 0,
+        "grand_max": 0,
+        "imt": 7390,
+        "imt_jovem": 0,
+        "jovem_discount": "100% — полное освобождение (IMT Jovem, до 330 539 €)",
+        "imposto_selo": 1960,
+        "full_entry_min": 246960,
+        "full_entry_max": 254350,
+        "remaining_after_jovem": 0,
+        "remaining_after_standard": 0
+      },
+      "infrastructure": {
+        "dist_hospital_km": 26.0,
+        "dist_school_km": 13.8,
+        "dist_pharmacy_km": 12.0,
+        "dist_supermarket_km": 6.8,
+        "dist_highway_km": 21.1,
+        "dist_bombeiros_km": 0.4,
+        "dist_forest_edge_m": 750,
+        "internet_fiber_proxy": "fiber",
+        "elevation_m": null,
+        "dist_coimbra_km": 78,
+        "dist_leiria_km": 55,
+        "dist_lisboa_km": 220,
+        "dist_porto_km": 200,
+        "dist_lisbon_airport_km": 225,
+        "dist_porto_airport_km": 210,
+        "note_connectivity": "IC8 + A17 до Leiria ~55 км (~45 мин); A13 до Coimbra ~78 км (~1 ч); Lisboa ~220 км (~2 ч); Porto ~200 км (~2 ч)"
+      },
+      "fire_risk": {
+        "level": "high",
+        "burned_nearby_years": "2017,2023",
+        "dist_bombeiros_km": 0.4,
+        "dist_forest_edge_m": 750,
+        "mitigating": "bombeiros 400 м — ближайший в нашей выборке; лес 750 м; класс B−"
+      },
+      "market": {
+        "ppm2_median": 680,
+        "ppm2_p25": 430,
+        "ppm2_min": 200,
+        "note": "Castanheira de Pêra: тонкий рынок (36 объявлений), медиана всех типов ~680 €/м². T4+ в хорошем состоянии: только наш объект + 195k/140м²=1393 €/м²(Coentral). Figueiró dos Vinhos T4: 199k/163м²=1221 €/м². Ansião T4 (меньший fire risk): 1000-1300 €/м²."
+      },
+      "reconcile": {
+        "confirmed_count": 7,
+        "unknown_count": 5,
+        "contradicts_count": 0,
+        "items": [
+          {
+            "field": "windows",
+            "label": "Окна — двойной стеклопакет алюминий",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Объявление: caixilharia de alumínio com vidro duplo.",
+            "why": "Стоимость замены 0 € — окна уже новые. Плюс при торге.",
+            "how_to_close": "Подтверждено объявлением.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "heating",
+            "label": "Центральное отопление + рекуператоры",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Объявление: aquecimento central a gasóleo + radiadores elétricos + recuperadores.",
+            "why": "Система есть. Дизель = операционные расходы, нужно выяснить.",
+            "how_to_close": "Запросить: расход дизеля/год, год котла, последнее ТО.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "solar_panels",
+            "label": "6 солнечных панелей",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Объявление: 6 painéis solares.",
+            "why": "Тип (termico/fotovoltaico) определяет реальную экономию.",
+            "how_to_close": "Запросить: тип, мощность, год установки.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "garage",
+            "label": "Гараж 5 машин + автоворота",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Объявление: garagem para 5 automóveis com portão automático.",
+            "why": "Значительный актив. Легальность постройки необходима для ипотеки.",
+            "how_to_close": "Гараж задекларирован в caderneta predial?",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "water",
+            "label": "Скважина + канализация в сеть",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Объявление: água do furo (скважина) + esgoto à rede.",
+            "why": "Скважина = независимость от сети. Лицензия и анализ воды обязательны.",
+            "how_to_close": "Licença de captação + boletim de análise + наличие резервуара.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "fire_risk",
+            "label": "Зона пожарного риска — кластер Pedrógão Grande",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "2017 (66 погибших, эпицентр), 2023. Bombeiros 0.4 км. Лес 750 м.",
+            "why": "КРИТИЧНО для financing. Ежегодные расходы на 50-метровую полосу по DL 82/2021.",
+            "how_to_close": "Certidão de localização + PMDFCI. Звонок в банк/страховщик = шаг 1.",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "internet",
+            "label": "Оптоволокно",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "DB: internet_fiber_proxy = fiber. Fiber доступен.",
+            "why": "Покупатели работают из дома — критично. Факт подтверждён.",
+            "how_to_close": "Уточнить оператора и скорость.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "electrical",
+            "label": "Электрика — возраст и CERTIEL",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Возраст дома и состояние проводки не известны.",
+            "why": "Старая проводка = 8–12 тыс. € на замену + CERTIEL для ипотеки.",
+            "how_to_close": "Запросить: год постройки, наличие CERTIEL.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "roof",
+            "label": "Кровля",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Состояние кровли не выяснялось.",
+            "why": "Класс B− = признак хорошего состояния, но осмотр обязателен.",
+            "how_to_close": "Вопрос агенту + осмотр специалиста при втором визите.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          },
+          {
+            "field": "caderneta_predial",
+            "label": "Caderneta predial + certidão de registo",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Кадастровые документы не запрашивались.",
+            "why": "VPT, обременения, аресты — обязательно до предложения.",
+            "how_to_close": "Запросить у агента / predial.oa.pt.",
+            "doc_action": "РИСК СДЕЛКИ"
+          },
+          {
+            "field": "energy_class",
+            "label": "Класс B−",
+            "status": "ПОДТВЕРЖДЕНО",
+            "what": "Объявление: certificado energético B−.",
+            "why": "Редкий класс для сельского дома. Смягчает позицию при страховании.",
+            "how_to_close": "Запросить полный сертификат с расчётной частью.",
+            "doc_action": "СПРАВОЧНО"
+          },
+          {
+            "field": "price_history",
+            "label": "История цены",
+            "status": "НЕИЗВЕСТНО",
+            "what": "Срок на рынке и снижения цены — неизвестны.",
+            "why": "Долго висящий объект в fire zone = рычаг давления на цену.",
+            "how_to_close": "Прямой вопрос агенту.",
+            "doc_action": "ВОПРОС АГЕНТУ"
+          }
+        ]
+      },
+      "claims": {
+        "works_l1": [],
+        "works_l2": [],
+        "appliances": [],
+        "total_l1_min": 0,
+        "total_l1_max": 0,
+        "total_l2_min": 0,
+        "total_l2_max": 0,
+        "grand_min": 0,
+        "grand_max": 0,
+        "note": "Класс B−, двойные окна, отопление и панели есть — ни одна конкретная работа не подтверждена. Смета заполняется после ответов агента. Потенциальные вопросы: скважина (резервуар?), электрика (CERTIEL?), кровля."
+      },
+      "agent_questions": [
+        {
+          "field": "fire_insurance",
+          "label": "🔴 Финансирование — ПЕРВЫЙ ВОПРОС",
+          "what": "Подтверждение банка и страховщика что объект финансируем.",
+          "why": "Без multirisco нет ипотеки. Pedrógão 2017 = проблемный кластер.",
+          "how_to_close": "Звонки в Crédito Agrícola + Fidelidade/Allianz PT ДО предложения.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "diesel_consumption",
+          "label": "Расход дизеля на отопление (годовой)",
+          "what": "Литров и евро в год. Год установки котла.",
+          "why": "Дизель ~1.3 €/л. Расход 1000 л = 1300 €/год. Старый котёл = замена 3–8 тыс. €.",
+          "how_to_close": "Накладные от поставщика за последний год.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "solar_type",
+          "label": "Солнечные панели — тип и мощность",
+          "what": "Térmicos (ГВС) или fotovoltaicos? Год, мощность, инвертор.",
+          "why": "Определяет реальную экономию.",
+          "how_to_close": "Документация на установку.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "well_license",
+          "label": "Скважина — лицензия и анализ воды",
+          "what": "Licença de captação + boletim de análise + глубина + дебит. Есть ли резервуар?",
+          "why": "Нелицензированная = штраф. Отсутствие резервуара = риск перебоев.",
+          "how_to_close": "Документы от агента.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "certiel",
+          "label": "CERTIEL и год постройки",
+          "what": "Действующий CERTIEL? Год постройки? Проводка оригинальная?",
+          "why": "Ряд банков требует CERTIEL. Оригинальная проводка = 8–12 тыс. €.",
+          "how_to_close": "Запросить сертификат.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "caderneta",
+          "label": "Caderneta predial + certidão de registo predial",
+          "what": "Полные кадастровые документы, VPT, площади, артикулы.",
+          "why": "VPT влияет на IMT; certidão = обременения.",
+          "how_to_close": "Запросить у агента / predial.oa.pt.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "licenca_utilizacao",
+          "label": "Licença de utilização",
+          "what": "Есть ли? Какого года? На всё здание включая гараж?",
+          "why": "Без licença банки отказывают.",
+          "how_to_close": "Запросить копию.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "roof_condition",
+          "label": "Состояние кровли",
+          "what": "Когда последний ремонт? Есть ли протечки/инфильтрации?",
+          "why": "Осмотр специалиста обязателен перед предложением.",
+          "how_to_close": "Вопрос агенту + осмотр при втором визите.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "what_stays",
+          "label": "Что остаётся в доме",
+          "what": "Какая мебель/техника/оборудование входит в цену?",
+          "why": "Дом 263 м² + 4 ванных — мебель может быть значительным активом.",
+          "how_to_close": "Полный перечень от агента.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "price_history",
+          "label": "История цены и срок на рынке",
+          "what": "Сколько дней на рынке? Начальная цена? Снижалась?",
+          "why": "Долго висящий объект в fire zone = рычаг давления. Снижение = мотивация продавца.",
+          "how_to_close": "Прямой вопрос агенту.",
+          "status": "НЕИЗВЕСТНО"
+        },
+        {
+          "field": "fiber_operator",
+          "label": "Оператор и скорость fiber-интернета",
+          "what": "Провайдер? Максимальная скорость? NOS/MEO/Vodafone?",
+          "why": "Fiber подтверждён в DB, но оператор и скорость критичны для работы из дома.",
+          "how_to_close": "Вопрос агенту + проверка на nos.pt / meo.pt по адресу.",
+          "status": "НЕИЗВЕСТНО"
+        }
+      ],
+      "links": {
+        "proposta_html": null,
+        "reconcile_md": null
+      },
+      "sync": {
+        "last_checked": "2026-08-13T15:00:00+01:00",
+        "units": [
+          {
+            "id": "h93_qvisit_0",
+            "label": "Звонок в банк: финансирование в Castanheira de Pêra?",
+            "ru_hash": "a1b2c3d4e5f60001",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T15:00:00+01:00",
+            "pt_updated_at": "2026-08-13T15:00:00+01:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h93_qvisit_1",
+            "label": "Звонок страховщику: multirisco в зоне Pedrógão Grande?",
+            "ru_hash": "a1b2c3d4e5f60002",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T15:00:00+01:00",
+            "pt_updated_at": "2026-08-13T15:00:00+01:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h93_aq_diesel",
+            "label": "Расход дизеля на отопление",
+            "ru_hash": "a1b2c3d4e5f60003",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T15:00:00+01:00",
+            "pt_updated_at": "2026-08-13T15:00:00+01:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h93_aq_well",
+            "label": "Лицензия на скважину и анализ воды",
+            "ru_hash": "a1b2c3d4e5f60004",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T15:00:00+01:00",
+            "pt_updated_at": "2026-08-13T15:00:00+01:00",
+            "status": "MISSING"
+          },
+          {
+            "id": "h93_aq_certiel",
+            "label": "Электрика — CERTIEL",
+            "ru_hash": "a1b2c3d4e5f60005",
+            "pt_hash": "",
+            "ru_updated_at": "2026-08-13T15:00:00+01:00",
+            "pt_updated_at": "2026-08-13T15:00:00+01:00",
+            "status": "MISSING"
+          }
+        ],
+        "phrases": {
+          "units": [
+            {
+              "id": "phrase_who_we_are",
+              "label": "who we are",
+              "ru_hash": "6ef08fd109aaba54",
+              "pt_hash": "3c2d591ce79eeb8f",
+              "ru_updated_at": "2026-08-13T15:00:00+01:00",
+              "pt_updated_at": "2026-08-13T15:00:00+01:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_approach_good_condition",
+              "label": "approach good condition",
+              "ru_hash": "ef299b6a6eef501c",
+              "pt_hash": "1744228f1680129e",
+              "ru_updated_at": "2026-08-13T15:00:00+01:00",
+              "pt_updated_at": "2026-08-13T15:00:00+01:00",
+              "status": "SYNCED"
+            },
+            {
+              "id": "phrase_financing",
+              "label": "financing",
+              "ru_hash": "9b534833ad538fcd",
+              "pt_hash": "b7b607f65d6e4ca2",
+              "ru_updated_at": "2026-08-13T15:00:00+01:00",
+              "pt_updated_at": "2026-08-13T15:00:00+01:00",
+              "status": "SYNCED"
+            }
+          ],
+          "summary": {
+            "synced": 3,
+            "stale": 0,
+            "missing": 0,
+            "total": 3
+          }
+        },
+        "summary": {
+          "synced": 0,
+          "stale": 0,
+          "missing": 5
+        }
+      }
     }
   ]
 }

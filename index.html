@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt"><head>
+<!doctype html><html lang="ru"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Дома</title>
 <style>
@@ -702,6 +702,30 @@ button:active{transform:scale(.985)}
 .mpsmart .smrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .smtime{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
 .smadj{padding:5px 13px;font-size:13px;border-radius:999px;display:none}
+/* ── HERO traction bar ───────────────────────────────────── */
+.hero{padding:14px 0 12px;border-bottom:1px solid var(--line);margin-bottom:0}
+.hero-label{font:700 10px/1 -apple-system,sans-serif;letter-spacing:.14em;
+ text-transform:uppercase;color:var(--soft);margin-bottom:10px}
+.hero-tiles{display:flex;flex-wrap:wrap;gap:8px}
+.hero-tile{background:var(--card);border:1px solid var(--line);border-radius:11px;
+ padding:10px 14px;min-width:90px;flex:1 1 auto;box-shadow:var(--sh)}
+.hero-tile .htv{font:700 22px/1 Georgia,serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.hero-tile .htk{font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--soft);margin-top:3px}
+.hero-tile.ht-accent{background:var(--accent);border-color:var(--accent)}
+.hero-tile.ht-accent .htv,.hero-tile.ht-accent .htk{color:var(--paper)}
+.hero-tile.ht-gold{background:linear-gradient(135deg,var(--card),var(--accent-s) 80%);
+ border-color:var(--gold)}
+.hero-tile.ht-gold .htv{color:var(--gold)}
+/* card hover lift */
+@media(hover:hover){
+ .card{transition:transform .14s ease,box-shadow .14s ease}
+ .card:hover{transform:translateY(-2px);
+  box-shadow:0 6px 24px rgba(30,40,20,.10),var(--sh)}}
+@media(prefers-reduced-motion:reduce){.card:hover{transform:none;box-shadow:var(--sh)}}
+/* shot-warn: softer tone — "no photo" is info, not an alarm */
+.shot-warn{background:var(--line)!important;color:var(--soft)!important;
+ font-weight:400!important;font-size:12px!important}
 </style></head><body>
 <script src="frases-data.js"></script>
 
@@ -718,6 +742,7 @@ button:active{transform:scale(.985)}
   <span class="who" id="who"></span>
   <button id="swap">выйти</button><button id="theme">◐</button>
 </header>
+<div class="hero" id="hero"></div>
 <div class="bar">
   <button data-f="all" class="on">Все</button>
   <button data-f="work">🖐 Моя работа</button>
@@ -736,8 +761,8 @@ button:active{transform:scale(.985)}
   <button data-f="day">📋 Мой день</button>
   <button data-f="mine" class="sec">С заметками</button>
   <button data-f="notes">📝 Лента</button>
-  <button data-f="flag" class="sec">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button><button data-f="proposta">📋 Proposta</button>
-  <button id="morebtn">ещё ▾</button><select id="sort" title="ordenar"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
+  <button data-f="flag" class="sec">⚠ Проблемы</button><button data-f="rota">🗺 Маршрут</button><button data-f="mapa">📍 Карта</button><button data-f="proposta">📋 Оферта</button>
+  <button id="morebtn">ещё ▾</button><select id="sort" title="Сортировка"><option value="score">Оценка &darr;</option><option value="tier">Уровень &starf; &darr;</option><option value="land">Земля &darr;</option><option value="price">Цена &uarr;</option><option value="price_d">Цена &darr;</option><option value="ppm">&euro;/м&sup2; &uarr;</option><option value="area">Площадь дома &darr;</option><option value="rooms">Комнаты &darr;</option><option value="wc">Туалеты &darr;</option><option value="alt">Высота &darr;</option><option value="alone">Дальше от соседей &darr;</option></select></div>
 <div class="findwrap"><div class="find"><span class="mag">🔍</span><input id="q" type="search" placeholder="Найти: город, телефон, № или цена"><button id="qx" title="очистить">✕</button></div></div>
 <div class="upd" id="upd"></div>
 <div class="soon" id="soon"></div>
@@ -2143,7 +2168,7 @@ function card(h){
        'onerror="this.closest(\'.shot\').classList.add(\'broken\')">'+
        (h.photo_count?'<span class="cnt">'+h.photo_count+' фото</span>':'')+
      '</a>'
-   : '<div class="shot-warn">📷 ФОТО НЕТ — вслепую не ехать</div>')+
+   : '<div class="shot-warn">Нет фото — смотри объявление</div>')+
  // Status: sold / reserved
  ((isSold(h)||isReserved(h))
    ? '<div class="dead'+(isReserved(h)?' held':'')+'">'+
@@ -3654,6 +3679,35 @@ function renderProposta(){
     });
 }
 
+function renderHero(){
+ const box=document.getElementById('hero');
+ if(!box||!HOUSES.length) return;
+ const total=HOUSES.length;
+ // visited: either from data.json field or from user-set VISITS
+ const visited=HOUSES.filter(function(h){ return h.visited_at||vTime(h.id); }).length;
+ const starred=HOUSES.filter(function(h){ return bestTier(h.id)>0; }).length;
+ const inWork=Object.keys(STATUS).filter(function(id){
+   const v=stVal(id); return v&&v!=='recusa'; }).length;
+ const alive=HOUSES.filter(function(h){ return !isSold(h)&&!isSkipped(h.id); }).length;
+ const tiles=[
+  {v:total,k:'домов в базе'},
+  {v:'9',k:'порталов'},
+  {v:alive,k:'активных'},
+  visited?{v:visited,k:'осмотрено'}:null,
+  inWork?{v:inWork,k:'в работе'}:null,
+  starred?{v:starred,k:'топ кандидатов',cls:'ht-gold'}:null,
+  {v:'250k€',k:'ипотека одобрена',cls:'ht-accent'},
+ ].filter(Boolean);
+ box.innerHTML='<div class="hero-label">Поиск дома в Португалии · обновлено сегодня</div>'+
+  '<div class="hero-tiles">'+
+  tiles.map(function(t){
+   return '<div class="hero-tile'+(t.cls?' '+t.cls:'')+
+    '"><div class="htv">'+t.v+'</div>'+
+    '<div class="htk">'+t.k+'</div></div>';
+  }).join('')+
+  '</div>';
+}
+
 function render(){
  // searching means looking for one house - everything else steps aside
  document.body.classList.toggle('searching', !!q);
@@ -3674,7 +3728,7 @@ function render(){
  document.getElementById('grid').innerHTML=
  (filt==='mapa'||filt==='plan'||filt==='day'||filt==='notes'||filt==='proposta')?'' :
  filt==='new' ? newLedger(list) : list.map(card).join('');
- renderRota(); renderMapa(list); renderStBar(); renderPlan(); renderDay(); renderFeed(); renderProposta();
+ renderRota(); renderMapa(list); renderStBar(); renderPlan(); renderDay(); renderFeed(); renderProposta(); renderHero();
  if(keepY!=null){
    const put=function(){
      if(Math.abs(window.scrollY-keepY)>2) window.scrollTo({top:keepY,behavior:'instant'});

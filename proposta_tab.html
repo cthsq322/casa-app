@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proposta — аналитика домов</title>
+<style>
+:root{
+  --ink:#14181a;--soft:#5d666b;--paper:#f4f4f1;--card:#fff;
+  --line:#d9d9d3;--rule:#1f3a4d;--accent:#1f3a4d;--accent-s:#eaeff3;
+  --warn:#8c3a1c;--green:#2d6a3f;--green-s:#e6f3ea;
+  --gold:#7a5c10;--gold-s:#faf3e0;
+}
+@media(prefers-color-scheme:dark){
+  :root{--ink:#e8e8e4;--soft:#98a1a6;--paper:#0f1214;--card:#171b1e;
+        --line:#2a3034;--rule:#7fa8c4;--accent:#7fa8c4;--accent-s:#1a2429;
+        --warn:#d98a63;--green:#5ca872;--green-s:#142419;--gold:#c9a84c;--gold-s:#1e1a0d;}
+}
+:root[data-theme=dark]{--ink:#e8e8e4;--soft:#98a1a6;--paper:#0f1214;--card:#171b1e;
+  --line:#2a3034;--rule:#7fa8c4;--accent:#7fa8c4;--accent-s:#1a2429;
+  --warn:#d98a63;--green:#5ca872;--green-s:#142419;--gold:#c9a84c;--gold-s:#1e1a0d;}
+:root[data-theme=light]{--ink:#14181a;--soft:#5d666b;--paper:#f4f4f1;--card:#fff;
+  --line:#d9d9d3;--rule:#1f3a4d;--accent:#1f3a4d;--accent-s:#eaeff3;
+  --warn:#8c3a1c;--green:#2d6a3f;--green-s:#e6f3ea;--gold:#7a5c10;--gold-s:#faf3e0;}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);
+  font:400 15px/1.6 -apple-system,"Segoe UI",Roboto,sans-serif}
+
+/* ─── Layout ─── */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+@media(max-width:640px){.layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}}
+
+/* ─── Sidebar ─── */
+.sidebar{background:var(--card);border-right:1px solid var(--line);
+  padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-title{font:700 11px/1 sans-serif;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--soft);padding:0 16px 14px}
+.house-btn{display:block;width:100%;text-align:left;padding:10px 16px;cursor:pointer;
+  background:none;border:none;color:var(--soft);border-left:3px solid transparent;
+  font:400 13px/1.4 sans-serif;transition:.15s}
+.house-btn:hover{background:var(--accent-s);color:var(--ink)}
+.house-btn.active{border-left-color:var(--accent);background:var(--accent-s);
+  color:var(--ink);font-weight:600}
+.house-btn .price-tag{display:block;font-size:11px;color:var(--soft);margin-top:2px}
+.house-btn .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+  margin-right:6px;vertical-align:middle}
+.dot-pass{background:var(--green)}
+.dot-q{background:var(--gold)}
+.dot-fail{background:var(--warn)}
+
+/* ─── Main ─── */
+.main{padding:24px 28px 60px;overflow-x:hidden}
+@media(max-width:640px){.main{padding:16px 14px 48px}}
+
+.section-header{display:flex;align-items:center;gap:12px;margin:0 0 20px}
+.section-title{font:700 20px/1.2 sans-serif}
+.section-meta{font:400 12px/1 sans-serif;color:var(--soft)}
+
+/* ─── Cards ─── */
+.card{background:var(--card);border:1px solid var(--line);padding:20px;margin:0 0 16px}
+.card-title{font:700 12px/1 sans-serif;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--soft);margin:0 0 14px}
+
+/* ─── Status ─── */
+.status-block{padding:14px 16px;margin:0 0 16px;display:flex;align-items:flex-start;gap:12px}
+.status-block.pass{background:var(--green-s);border-left:4px solid var(--green)}
+.status-block.question{background:var(--gold-s);border-left:4px solid var(--gold)}
+.status-block.fail{background:#fdf0ec;border-left:4px solid var(--warn)}
+.status-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.status-text b{display:block;font-size:15px;margin:0 0 4px}
+.status-text p{font-size:13px;color:var(--soft);margin:0}
+
+/* ─── Grid stats ─── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:0 0 16px}
+.stat-item{background:var(--card);border:1px solid var(--line);padding:12px}
+.stat-label{font:600 10.5px/1 sans-serif;letter-spacing:.11em;text-transform:uppercase;color:var(--soft)}
+.stat-value{font:700 18px/1.2 sans-serif;margin:6px 0 0}
+.stat-note{font:400 11px/1.4 sans-serif;color:var(--soft);margin:4px 0 0}
+
+/* ─── Table ─── */
+table.infra{width:100%;border-collapse:collapse;font-size:13px}
+table.infra th{text-align:left;font-weight:600;font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--soft);border-bottom:1px solid var(--ink);padding:0 0 6px}
+table.infra td{padding:7px 0;border-bottom:1px solid var(--line);vertical-align:top}
+table.infra td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+
+/* ─── Questions ─── */
+.q-block{padding:12px 14px;background:var(--accent-s);margin:0 0 8px}
+.q-block .q-label{font:600 13px/1.3 sans-serif}
+.q-block .q-what{font:400 12px/1.5 sans-serif;color:var(--soft);margin:4px 0 6px}
+.copy-btn{background:none;border:1px solid var(--line);padding:4px 10px;cursor:pointer;
+  font:600 11px/1 sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);
+  border-radius:3px;transition:.15s}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.copy-btn.copied{color:var(--green);border-color:var(--green)}
+
+/* ─── Finac factors ─── */
+.factor-row{padding:8px 12px;margin:0 0 6px;display:flex;gap:10px;align-items:flex-start;
+  border:1px solid var(--line)}
+.factor-icon{flex-shrink:0;font-size:15px;margin-top:1px}
+.factor-text .f-label{font:600 13px/1.3 sans-serif}
+.factor-text .f-detail{font:400 12px/1.5 sans-serif;color:var(--soft);margin:3px 0 0}
+
+/* ─── Reconcile pills ─── */
+.rec-pills{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.pill{padding:4px 10px;font:600 11px/1 sans-serif;letter-spacing:.08em;text-transform:uppercase;border-radius:20px}
+.pill.conf{background:var(--green-s);color:var(--green)}
+.pill.unk{background:var(--gold-s);color:var(--gold)}
+.pill.contra{background:#fdf0ec;color:var(--warn)}
+
+/* ─── Math table ─── */
+table.math{width:100%;border-collapse:collapse;font-size:14px}
+table.math td{padding:7px 0;border-bottom:1px solid var(--line)}
+table.math td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.math tr.total td{border-bottom:0;border-top:1.5px solid var(--ink);font-weight:650;padding-top:10px}
+table.math .muted td{color:var(--soft)}
+
+/* ─── Links ─── */
+.link-btn{display:inline-block;padding:10px 16px;background:var(--rule);color:#fff;
+  font:600 12px/1 sans-serif;letter-spacing:.07em;text-transform:uppercase;
+  text-decoration:none;margin:4px 6px 4px 0}
+.link-btn:hover{opacity:.85}
+.link-btn.secondary{background:var(--card);color:var(--rule);border:1px solid var(--rule)}
+
+/* ─── Theme toggle ─── */
+.theme-toggle{position:fixed;top:14px;right:14px;z-index:100;
+  background:var(--card);border:1px solid var(--line);padding:6px 10px;cursor:pointer;
+  font:600 11px/1 sans-serif;color:var(--soft);border-radius:4px}
+
+/* ─── Loading ─── */
+#loading{padding:48px;text-align:center;color:var(--soft);font-size:15px}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()">◑ Тема</button>
+
+<div id="loading">Загрузка данных...</div>
+
+<div class="layout" id="app" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-title">Объекты</div>
+    <div id="house-list"></div>
+  </aside>
+  <main class="main" id="main-content">
+    <div style="color:var(--soft);padding-top:40px;text-align:center">← Выберите объект</div>
+  </main>
+</div>
+
+<script>
+var DATA = null;
+var currentId = null;
+
+// ─── Theme ───────────────────────────────────────────────
+function toggleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  localStorage.setItem('theme', cur === 'dark' ? 'light' : 'dark');
+}
+(function(){
+  var saved = localStorage.getItem('theme') ||
+    (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+
+// ─── Helpers ─────────────────────────────────────────────
+function fmtEur(n){
+  if(n == null) return '—';
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
+}
+function fmtRange(mn, mx){
+  if(!mn && !mx) return '—';
+  if(mn === mx || !mn) return fmtEur(mx || mn);
+  return fmtEur(mn) + ' – ' + fmtEur(mx);
+}
+function esc(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── Status ──────────────────────────────────────────────
+var STATUS_MAP = {
+  'PASSES':         {cls:'pass',   icon:'✅', label:'ПРОХОДИТ'},
+  'UNDER_QUESTION': {cls:'question',icon:'⚠️', label:'ПОД ВОПРОСОМ'},
+  'FAILS':          {cls:'fail',   icon:'🔴', label:'НЕ ПРОХОДИТ'},
+};
+var FACTOR_ICONS = {
+  'PASSES':         '✅',
+  'UNDER_QUESTION': '⚠️',
+  'FAILS':          '🔴',
+};
+
+// ─── Copy to clipboard ───────────────────────────────────
+function copyText(btn, text){
+  navigator.clipboard.writeText(text).then(function(){
+    btn.textContent = 'Скопировано';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = 'Копировать'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+// ─── Render Sidebar ──────────────────────────────────────
+function renderSidebar(){
+  var list = document.getElementById('house-list');
+  list.innerHTML = '';
+  DATA.houses.forEach(function(h){
+    var fin = h.financibility;
+    var st = STATUS_MAP[fin.status] || STATUS_MAP['UNDER_QUESTION'];
+    var btn = document.createElement('button');
+    btn.className = 'house-btn' + (h.id === currentId ? ' active' : '');
+    btn.dataset.id = h.id;
+    var city = h.location.freguesia || h.location.concelho || '';
+    btn.innerHTML = '<span class="status-dot dot-' + (fin.status === 'PASSES' ? 'pass' : fin.status === 'FAILS' ? 'fail' : 'q') + '"></span>'
+      + esc(city) + '<span class="price-tag">' + fmtEur(h.offer.price_eur) + ' · #' + h.id + '</span>';
+    btn.onclick = function(){ showHouse(h.id); };
+    list.appendChild(btn);
+  });
+}
+
+// ─── Render House ─────────────────────────────────────────
+function showHouse(id){
+  currentId = id;
+  var house = DATA.houses.find(function(h){ return h.id === id; });
+  if(!house) return;
+
+  // Update sidebar
+  document.querySelectorAll('.house-btn').forEach(function(b){
+    b.classList.toggle('active', parseInt(b.dataset.id) === id);
+  });
+
+  var fin = house.financibility;
+  var st = STATUS_MAP[fin.status] || STATUS_MAP['UNDER_QUESTION'];
+  var m = house.math;
+  var l = house.listing;
+  var inf = house.infrastructure;
+  var rec = house.reconcile;
+  var cl = house.claims;
+  var links = house.links;
+
+  var html = [];
+
+  // Header
+  html.push('<div class="section-header">');
+  html.push('<div><div class="section-title">' + esc(house.title) + '</div>');
+  html.push('<div class="section-meta">' + esc(house.location.freguesia || '') + ' · ' + esc(house.location.concelho || '') + ' · ' + esc(house.location.district || '') + '</div></div>');
+  html.push('</div>');
+
+  // ─── Финансируемость ───────────────────────────────────
+  html.push('<div class="status-block ' + st.cls + '">');
+  html.push('<div class="status-icon">' + st.icon + '</div>');
+  html.push('<div class="status-text"><b>Финансируемость: ' + st.label + '</b>');
+  var failFactors = fin.factors.filter(function(f){ return f.status === 'FAILS'; });
+  var qFactors = fin.factors.filter(function(f){ return f.status === 'UNDER_QUESTION'; });
+  if(failFactors.length){
+    html.push('<p>' + failFactors.map(function(f){return esc(f.label);}).join('; ') + '</p>');
+  } else if(qFactors.length){
+    html.push('<p>' + qFactors.map(function(f){return esc(f.label);}).join('; ') + '</p>');
+  }
+  html.push('</div></div>');
+
+  // Факторы гейта
+  if(fin.factors.length){
+    html.push('<div class="card"><div class="card-title">Факторы гейта</div>');
+    fin.factors.forEach(function(f){
+      html.push('<div class="factor-row"><div class="factor-icon">' + (FACTOR_ICONS[f.status]||'•') + '</div>');
+      html.push('<div class="factor-text"><div class="f-label">' + esc(f.label) + '</div>');
+      if(f.detail) html.push('<div class="f-detail">' + esc(f.detail.slice(0,220)) + '</div>');
+      html.push('</div></div>');
+    });
+    html.push('</div>');
+  }
+
+  // Вопросы до выезда
+  if(fin.questions_before_visit && fin.questions_before_visit.length){
+    html.push('<div class="card"><div class="card-title">Вопросы ДО выезда</div>');
+    fin.questions_before_visit.forEach(function(q, i){
+      html.push('<div class="q-block">');
+      html.push('<div class="q-what">' + esc(q) + '</div>');
+      html.push('<button class="copy-btn" onclick="copyText(this,\'' + esc(q).replace(/'/g,"\\'") + '\')">Копировать</button>');
+      html.push('</div>');
+    });
+    html.push('</div>');
+  }
+
+  // ─── Математика ────────────────────────────────────────
+  html.push('<div class="card"><div class="card-title">Математика</div>');
+  html.push('<table class="math">');
+  html.push('<tr><td>Запрашиваемая цена</td><td>' + fmtEur(l.price_eur) + '</td></tr>');
+  html.push('<tr><td>Наша предлагаемая цена</td><td>' + fmtEur(house.offer.price_eur) + '</td></tr>');
+  if(l.area_m2){
+    html.push('<tr class="muted"><td>€/м² по запросу</td><td>' + (m.listing_ppm2||'—') + ' €/м²</td></tr>');
+    html.push('<tr class="muted"><td>€/м² по нашей цене</td><td>' + (m.offer_ppm2||'—') + ' €/м²</td></tr>');
+  }
+  html.push('<tr><td>Смета работ</td><td>' + fmtRange(m.grand_min, m.grand_max) + '</td></tr>');
+  html.push('<tr><td>IMT стандарт</td><td>' + fmtEur(m.imt) + '</td></tr>');
+  html.push('<tr><td>IMT Jovem</td><td>' + fmtEur(m.imt_jovem) + '</td></tr>');
+  html.push('<tr class="muted"><td colspan="2" style="font-size:12px;padding-top:2px">' + esc(m.jovem_discount||'') + '</td></tr>');
+  html.push('<tr><td>Imposto de Selo</td><td>' + fmtEur(m.imposto_selo) + '</td></tr>');
+  html.push('<tr class="total"><td>Полная стоимость входа (Jovem)</td><td>' + fmtEur(m.full_entry_min) + '</td></tr>');
+  html.push('<tr class="total"><td>Полная стоимость входа (стандарт)</td><td>' + fmtEur(m.full_entry_max) + '</td></tr>');
+  html.push('<tr class="muted"><td>Остаток из бюджета 250k (Jovem)</td><td>' + fmtEur(m.remaining_after_jovem) + '</td></tr>');
+  html.push('</table></div>');
+
+  // ─── Объект ────────────────────────────────────────────
+  html.push('<div class="stats-grid">');
+  if(l.area_m2) html.push('<div class="stat-item"><div class="stat-label">Площадь</div><div class="stat-value">' + l.area_m2 + ' м²</div></div>');
+  if(l.bedrooms != null) html.push('<div class="stat-item"><div class="stat-label">Комнат</div><div class="stat-value">T' + l.bedrooms + '</div></div>');
+  if(l.energy_class) html.push('<div class="stat-item"><div class="stat-label">Энергокласс</div><div class="stat-value">' + esc(l.energy_class) + '</div></div>');
+  if(inf.dist_hospital_km) html.push('<div class="stat-item"><div class="stat-label">Больница</div><div class="stat-value">' + inf.dist_hospital_km + ' км</div></div>');
+  if(inf.dist_school_km) html.push('<div class="stat-item"><div class="stat-label">Школа</div><div class="stat-value">' + inf.dist_school_km + ' км</div></div>');
+  if(inf.internet_fiber_proxy) html.push('<div class="stat-item"><div class="stat-label">Интернет</div><div class="stat-value" style="font-size:14px">' + esc(inf.internet_fiber_proxy) + '</div></div>');
+  if(house.fire_risk.level) html.push('<div class="stat-item"><div class="stat-label">Пожарный риск</div><div class="stat-value" style="color:var(--warn)">' + esc(house.fire_risk.level) + '</div></div>');
+  html.push('</div>');
+
+  // Инфраструктура
+  var infra_rows = [
+    ['Больница', inf.dist_hospital_km, 'км'],
+    ['Школа', inf.dist_school_km, 'км'],
+    ['Аптека', inf.dist_pharmacy_km, 'км'],
+    ['Супермаркет', inf.dist_supermarket_km, 'км'],
+    ['Автотрасса', inf.dist_highway_km, 'км'],
+    ['Пожарная', inf.dist_bombeiros_km, 'км'],
+    ['Высота', inf.elevation_m, 'м'],
+  ].filter(function(r){ return r[1] != null; });
+
+  if(infra_rows.length){
+    html.push('<div class="card"><div class="card-title">Инфраструктура</div>');
+    html.push('<table class="infra"><tr><th>Объект</th><th>Расстояние</th></tr>');
+    infra_rows.forEach(function(r){
+      html.push('<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + ' ' + r[2] + '</td></tr>');
+    });
+    html.push('</table></div>');
+  }
+
+  // ─── Рыночный контекст ────────────────────────────────
+  var mkt = house.market;
+  if(mkt.ppm2_median || mkt.ppm2_min){
+    html.push('<div class="card"><div class="card-title">Рынок (€/м²)</div>');
+    html.push('<table class="infra">');
+    if(mkt.ppm2_min) html.push('<tr><td>Min</td><td>' + mkt.ppm2_min + ' €/м²</td></tr>');
+    if(mkt.ppm2_p25) html.push('<tr><td>P25</td><td>' + mkt.ppm2_p25 + ' €/м²</td></tr>');
+    if(mkt.ppm2_median) html.push('<tr><td>Медиана</td><td>' + mkt.ppm2_median + ' €/м²</td></tr>');
+    html.push('</table></div>');
+  }
+
+  // ─── Reconcile ────────────────────────────────────────
+  html.push('<div class="card"><div class="card-title">Сверка источников (reconcile)</div>');
+  html.push('<div class="rec-pills">');
+  html.push('<span class="pill conf">✓ Подтверждено: ' + rec.confirmed_count + '</span>');
+  html.push('<span class="pill unk">? Неизвестно: ' + rec.unknown_count + '</span>');
+  if(rec.contradicts_count) html.push('<span class="pill contra">⚡ Противоречий: ' + rec.contradicts_count + '</span>');
+  html.push('</div>');
+
+  // Показываем противоречия и UNKNOWNS
+  var showItems = rec.items.filter(function(i){ return i.status === 'CONTRADICTS' || i.status === 'UNKNOWN'; });
+  showItems.slice(0, 6).forEach(function(item){
+    html.push('<div class="factor-row">');
+    html.push('<div class="factor-icon">' + (item.status === 'CONTRADICTS' ? '⚡' : '?') + '</div>');
+    html.push('<div class="factor-text"><div class="f-label">' + esc(item.label) + '</div>');
+    if(item.what) html.push('<div class="f-detail">' + esc(item.what.slice(0,180)) + '</div>');
+    html.push('</div></div>');
+  });
+  html.push('</div>');
+
+  // ─── Вопросы агенту ───────────────────────────────────
+  if(house.agent_questions && house.agent_questions.length){
+    html.push('<div class="card"><div class="card-title">Вопросы агенту (' + house.agent_questions.length + ')</div>');
+    house.agent_questions.forEach(function(q){
+      html.push('<div class="q-block">');
+      html.push('<div class="q-label">' + esc(q.label) + '</div>');
+      if(q.what) html.push('<div class="q-what">' + esc(q.what.slice(0,200)) + '</div>');
+      if(q.how_to_close){
+        var copyText_ = q.how_to_close;
+        html.push('<button class="copy-btn" onclick="copyText(this,\'' + esc(copyText_).replace(/'/g,"\\'").replace(/\n/g,' ') + '\')">Копировать вопрос</button>');
+      }
+      html.push('</div>');
+    });
+    html.push('</div>');
+  }
+
+  // ─── Смета ────────────────────────────────────────────
+  var hasWorks = (cl.works_l1 && cl.works_l1.length) || (cl.works_l2 && cl.works_l2.length);
+  if(hasWorks){
+    html.push('<div class="card"><div class="card-title">Смета работ</div>');
+    if(cl.works_l1 && cl.works_l1.length){
+      html.push('<p style="font:600 11px/1 sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:0 0 10px">Уровень 1 — Необходимое</p>');
+      html.push('<table class="math">');
+      cl.works_l1.forEach(function(w){
+        html.push('<tr><td>' + esc(w.name_ru) + '<br><span style="font-size:12px;color:var(--soft)">' + esc(w.source_name) + '</span></td>');
+        html.push('<td>' + fmtRange(w.cost_min, w.cost_max) + '</td></tr>');
+      });
+      html.push('<tr class="total"><td>Итого L1</td><td>' + fmtRange(cl.total_l1_min, cl.total_l1_max) + '</td></tr>');
+      html.push('</table>');
+    }
+    if(cl.works_l2 && cl.works_l2.length){
+      html.push('<p style="font:600 11px/1 sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:16px 0 10px">Уровень 2 — Для въезда</p>');
+      html.push('<table class="math">');
+      cl.works_l2.forEach(function(w){
+        html.push('<tr><td>' + esc(w.name_ru) + '</td>');
+        html.push('<td>' + fmtRange(w.cost_min, w.cost_max) + '</td></tr>');
+      });
+      html.push('<tr class="total"><td>Итого L2</td><td>' + fmtRange(cl.total_l2_min, cl.total_l2_max) + '</td></tr>');
+      html.push('</table>');
+    }
+    html.push('<table class="math" style="margin-top:14px">');
+    html.push('<tr class="total"><td>Смета ИТОГО</td><td>' + fmtRange(cl.grand_min, cl.grand_max) + '</td></tr>');
+    html.push('</table>');
+    html.push('</div>');
+  } else {
+    html.push('<div class="card"><div class="card-title">Смета работ</div>');
+    html.push('<p style="color:var(--soft);font-size:13px">Подтверждённых дефектов нет — смета пуста. Вопросы агенту уточнят ситуацию.</p></div>');
+  }
+
+  // ─── Ссылки ───────────────────────────────────────────
+  html.push('<div style="margin-top:20px">');
+  if(links.proposta_html){
+    html.push('<a class="link-btn" href="' + esc(links.proposta_html) + '" target="_blank">Открыть Proposta HTML</a>');
+  }
+  if(links.reconcile_md){
+    html.push('<a class="link-btn secondary" href="' + esc(links.reconcile_md) + '" target="_blank">Reconcile отчёт</a>');
+  }
+  if(l.url){
+    html.push('<a class="link-btn secondary" href="' + esc(l.url) + '" target="_blank">Объявление</a>');
+  }
+  html.push('</div>');
+
+  document.getElementById('main-content').innerHTML = html.join('');
+}
+
+// ─── Load data ────────────────────────────────────────────
+fetch('propostas.json')
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    DATA = data;
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = 'grid';
+    renderSidebar();
+    if(DATA.houses.length) showHouse(DATA.houses[0].id);
+  })
+  .catch(function(e){
+    document.getElementById('loading').innerHTML =
+      '<strong>Ошибка загрузки propostas.json</strong><br>' +
+      'Запустите: <code>python proposta/export_json.py</code><br>' +
+      '<small>' + e + '</small>';
+  });
+</script>
+</body>
+</html>
